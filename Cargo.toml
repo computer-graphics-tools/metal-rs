@@ -1,0 +1,37 @@
+[package]
+name = "metal-rs"
+version = "0.2.0"
+edition = "2024"
+license = "MIT"
+authors = ["Eugene Bokhan <eugenebokhan@icloud.com>"]
+description = "Rust bindings for Apple's Metal API"
+readme = "README.md"
+keywords = ["metal", "graphics", "apple", "macos", "ios"]
+categories = ["api-bindings", "graphics", "rendering"]
+repository = "https://github.com/eugenebokhan/metal-rs"
+
+[dependencies]
+objc = { version = "0.2.7", features = ["exception"] }
+block = "0.1.6"
+foreign-types = "0.5"
+bitflags = "2.9.0"
+core-graphics-types = { version = "0.2.0", default-features = false }
+bytemuck = { version = "1.14.0", features = ["derive"] }
+libc = "0.2"
+malloc_buf = "1.0.0"
+paste = "1.0.14"
+
+[lib]
+name = "metal_rs"
+path = "src/lib.rs"
+
+[features]
+default = ["foundation"]
+foundation = []
+
+
+[build-dependencies]
+cc = "1.2.16"
+
+[package.metadata.macos]
+frameworks = ["Metal", "Foundation", "CoreGraphics", "QuartzCore"]
