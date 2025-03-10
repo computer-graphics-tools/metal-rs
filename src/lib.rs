@@ -3,4 +3,5 @@
 
 // Re-exports
 pub mod foundation;
+pub mod metal;
 pub mod quartzcore;

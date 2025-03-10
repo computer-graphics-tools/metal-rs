@@ -27,6 +27,8 @@
 //! ```
 
 mod string;
+mod types;
 
 // Re-export
 pub use string::{NSString, NSStringRef, nsstring_from_str, nsstring_as_str};
+pub use types::{NSRange, NSPoint, NSSize, NSRect, NSInteger, NSUInteger};

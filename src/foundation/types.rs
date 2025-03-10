@@ -10,6 +10,7 @@ pub type NSInteger = isize;
 pub type NSUInteger = usize;
 
 /// Represents the comparison result in Objective-C.
+#[allow(dead_code)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[repr(isize)]
 pub enum NSComparisonResult {
@@ -68,6 +69,7 @@ impl Hash for NSRange {
 }
 
 /// Defines the coordinate system of the receiver in macOS.
+#[allow(dead_code)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[repr(usize)]
 pub enum NSBackingStoreType {
