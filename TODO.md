@@ -60,10 +60,10 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [ ] Base pipeline functionality
   - [ ] Common properties and methods
 
-- [ ] Complete MTLRenderPipeline
-  - [ ] Full descriptor implementation
-  - [ ] Pipeline reflection
-  - [ ] Pipeline state creation with validation
+- [x] Complete MTLRenderPipeline
+  - [x] Full descriptor implementation
+  - [x] Pipeline reflection
+  - [x] Pipeline state creation with validation
 
 - [x] MTLComputePipeline
   - [x] Pipeline state creation

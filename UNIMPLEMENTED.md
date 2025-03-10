@@ -7,7 +7,7 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 | Category | Unimplemented Types |
 |----------|---------------------|
 | **Command Encoding** | MTLParallelRenderCommandEncoder, MTLResourceStateCommandEncoder, MTLComputePass, MTLBlitPass, MTLRenderPass |
-| **Pipeline States** | MTLRenderPipeline (partially implemented), MTLPipeline |
+| **Pipeline States** | MTLPipeline |
 | **Resource Management** | MTLHeap, MTLFence, MTLEvent, MTLDrawable, MTLResource (partially implemented), MTLAllocation, MTLResidencySet |
 | **Descriptors** | MTLStageInputOutputDescriptor, MTLFunctionDescriptor |
 | **Advanced Rendering** | MTLRasterizationRate, MTLLinkedFunctions, MTLCounters |
@@ -41,7 +41,7 @@ Based on the typical Metal application requirements and existing implementation,
 1. **Essential for Rendering**
    - ✅ MTLSampler
    - ✅ MTLVertexDescriptor
-   - Complete MTLRenderPipeline
+   - ✅ Complete MTLRenderPipeline
    - Complete MTLResource
 
 2. **Essential for Resource Management**
