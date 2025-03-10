@@ -136,6 +136,21 @@ pub enum MTLPrimitiveTopologyClass {
     Triangle = 3,
 }
 
+/// Options for pipeline creation
+#[allow(non_camel_case_types)]
+#[repr(u64)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum MTLPipelineOption {
+    /// No options
+    None = 0,
+    /// Include argument information
+    ArgumentInfo = 1,
+    /// Include buffer type information
+    BufferTypeInfo = 2,
+    /// Fail creation if binary archive is missing
+    FailOnBinaryArchiveMiss = 4,
+}
+
 /// A reference to a color attachment descriptor in an Objective-C `MTLRenderPipelineColorAttachmentDescriptor`.
 pub struct MTLRenderPipelineColorAttachmentDescriptorRef(Object);
 
@@ -729,6 +744,241 @@ impl Clone for MTLRenderPipelineState {
         unsafe {
             let obj: *mut Object = msg_send![self.0, retain];
             MTLRenderPipelineState::from_ptr(obj)
+        }
+    }
+}
+
+/// A reference to an Objective-C `MTLRenderPipelineReflection`.
+pub struct MTLRenderPipelineReflectionRef(Object);
+
+/// An owned Objective-C `MTLRenderPipelineReflection`.
+pub struct MTLRenderPipelineReflection(*mut Object);
+
+unsafe impl ForeignTypeRef for MTLRenderPipelineReflectionRef {
+    type CType = Object;
+}
+
+unsafe impl Send for MTLRenderPipelineReflectionRef {}
+unsafe impl Sync for MTLRenderPipelineReflectionRef {}
+
+unsafe impl ForeignType for MTLRenderPipelineReflection {
+    type CType = Object;
+    type Ref = MTLRenderPipelineReflectionRef;
+    
+    unsafe fn from_ptr(ptr: *mut Object) -> MTLRenderPipelineReflection {
+        MTLRenderPipelineReflection(ptr)
+    }
+
+    fn as_ptr(&self) -> *mut Object {
+        self.0
+    }
+}
+
+impl AsRef<MTLRenderPipelineReflectionRef> for MTLRenderPipelineReflection {
+    fn as_ref(&self) -> &MTLRenderPipelineReflectionRef {
+        unsafe { &*(self.0.cast::<MTLRenderPipelineReflectionRef>()) }
+    }
+}
+
+unsafe impl Send for MTLRenderPipelineReflection {}
+unsafe impl Sync for MTLRenderPipelineReflection {}
+
+unsafe impl objc::Message for MTLRenderPipelineReflectionRef {}
+
+impl MTLRenderPipelineReflection {
+    /// Returns the vertex bindings in the reflection data.
+    #[must_use]
+    pub fn vertex_bindings(&self) -> Vec<crate::foundation::NSString> {
+        unsafe {
+            let array: *mut Object = msg_send![self.as_ref(), vertexBindings];
+            if array.is_null() {
+                Vec::new()
+            } else {
+                let count: usize = msg_send![array, count];
+                let mut result = Vec::with_capacity(count);
+                for i in 0..count {
+                    let obj: *mut Object = msg_send![array, objectAtIndex:i];
+                    result.push(crate::foundation::NSString::from_ptr(obj));
+                }
+                result
+            }
+        }
+    }
+    
+    /// Returns the fragment bindings in the reflection data.
+    #[must_use]
+    pub fn fragment_bindings(&self) -> Vec<crate::foundation::NSString> {
+        unsafe {
+            let array: *mut Object = msg_send![self.as_ref(), fragmentBindings];
+            if array.is_null() {
+                Vec::new()
+            } else {
+                let count: usize = msg_send![array, count];
+                let mut result = Vec::with_capacity(count);
+                for i in 0..count {
+                    let obj: *mut Object = msg_send![array, objectAtIndex:i];
+                    result.push(crate::foundation::NSString::from_ptr(obj));
+                }
+                result
+            }
+        }
+    }
+    
+    /// Returns the vertex arguments in the reflection data.
+    #[must_use]
+    pub fn vertex_arguments(&self) -> Vec<crate::foundation::NSString> {
+        unsafe {
+            let array: *mut Object = msg_send![self.as_ref(), vertexArguments];
+            if array.is_null() {
+                Vec::new()
+            } else {
+                let count: usize = msg_send![array, count];
+                let mut result = Vec::with_capacity(count);
+                for i in 0..count {
+                    let obj: *mut Object = msg_send![array, objectAtIndex:i];
+                    result.push(crate::foundation::NSString::from_ptr(obj));
+                }
+                result
+            }
+        }
+    }
+    
+    /// Returns the fragment arguments in the reflection data.
+    #[must_use]
+    pub fn fragment_arguments(&self) -> Vec<crate::foundation::NSString> {
+        unsafe {
+            let array: *mut Object = msg_send![self.as_ref(), fragmentArguments];
+            if array.is_null() {
+                Vec::new()
+            } else {
+                let count: usize = msg_send![array, count];
+                let mut result = Vec::with_capacity(count);
+                for i in 0..count {
+                    let obj: *mut Object = msg_send![array, objectAtIndex:i];
+                    result.push(crate::foundation::NSString::from_ptr(obj));
+                }
+                result
+            }
+        }
+    }
+}
+
+impl Drop for MTLRenderPipelineReflection {
+    fn drop(&mut self) {
+        unsafe {
+            let _: () = msg_send![self.0, release];
+        }
+    }
+}
+
+impl Clone for MTLRenderPipelineReflection {
+    fn clone(&self) -> Self {
+        unsafe {
+            let obj: *mut Object = msg_send![self.0, retain];
+            MTLRenderPipelineReflection::from_ptr(obj)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::metal::{MTLCreateSystemDefaultDevice, MTLPixelFormat, MTLVertexFormat};
+    use crate::metal::vertex_descriptor::MTLVertexDescriptor;
+    
+    const SHADER_SRC: &str = r#"
+        #include <metal_stdlib>
+        using namespace metal;
+        
+        struct VertexIn {
+            float3 position [[attribute(0)]];
+            float2 texCoord [[attribute(1)]];
+        };
+        
+        struct VertexOut {
+            float4 position [[position]];
+            float2 texCoord;
+        };
+        
+        vertex VertexOut vertex_main(VertexIn in [[stage_in]]) {
+            VertexOut out;
+            out.position = float4(in.position, 1.0);
+            out.texCoord = in.texCoord;
+            return out;
+        }
+        
+        fragment float4 fragment_main(VertexOut in [[stage_in]]) {
+            return float4(in.texCoord, 0.0, 1.0);
+        }
+    "#;
+    
+    #[test]
+    #[cfg(target_os = "macos")]
+    #[ignore] // Only run manually since it requires a Metal environment
+    fn test_render_pipeline_creation() {
+        // Get the default device
+        let device = MTLCreateSystemDefaultDevice();
+        
+        // Create a library from our shader source
+        let library = device.new_library_with_source(SHADER_SRC, &Default::default()).unwrap();
+        
+        // Get vertex and fragment functions
+        let vertex_function = library.get_function("vertex_main").unwrap();
+        let fragment_function = library.get_function("fragment_main").unwrap();
+        
+        // Create and configure a vertex descriptor
+        let vertex_descriptor = MTLVertexDescriptor::new();
+        
+        // Configure position attribute
+        let position_attribute = vertex_descriptor.as_ref().attributes().as_ref().object(0).unwrap();
+        position_attribute.as_ref().set_format(MTLVertexFormat::Float3);
+        position_attribute.as_ref().set_offset(0);
+        position_attribute.as_ref().set_buffer_index(0);
+        
+        // Configure texcoord attribute
+        let texcoord_attribute = vertex_descriptor.as_ref().attributes().as_ref().object(1).unwrap();
+        texcoord_attribute.as_ref().set_format(MTLVertexFormat::Float2);
+        texcoord_attribute.as_ref().set_offset(12); // After 3 floats (12 bytes)
+        texcoord_attribute.as_ref().set_buffer_index(0);
+        
+        // Configure buffer layout
+        let buffer_layout = vertex_descriptor.as_ref().layouts().as_ref().object(0).unwrap();
+        buffer_layout.as_ref().set_stride(20); // 3 floats for position + 2 floats for texcoord = 5 floats = 20 bytes
+        
+        // Create a render pipeline descriptor
+        let pipeline_descriptor = MTLRenderPipelineDescriptor::new();
+        pipeline_descriptor.set_label("Test Render Pipeline");
+        pipeline_descriptor.set_vertex_function(&vertex_function);
+        pipeline_descriptor.set_fragment_function(&fragment_function);
+        pipeline_descriptor.set_vertex_descriptor(Some(&vertex_descriptor.as_ref()));
+        
+        // Configure color attachment
+        let color_attachment = pipeline_descriptor.color_attachments().object(0);
+        color_attachment.set_pixel_format(MTLPixelFormat::BGRA8Unorm);
+        
+        // Create the pipeline state
+        let pipeline_result = device.new_render_pipeline_state(&pipeline_descriptor);
+        assert!(pipeline_result.is_ok(), "Failed to create render pipeline state: {:?}", pipeline_result.err());
+        
+        // Test with reflection data
+        let reflection_result = device.new_render_pipeline_state_with_reflection(
+            &pipeline_descriptor,
+            MTLPipelineOption::ArgumentInfo as u64
+        );
+        assert!(reflection_result.is_ok(), "Failed to create render pipeline state with reflection: {:?}", reflection_result.err());
+        
+        // Get the pipeline state and reflection data
+        let (pipeline_state, reflection) = reflection_result.unwrap();
+        
+        // Verify pipeline state
+        assert!(!pipeline_state.label().is_empty());
+        assert!(pipeline_state.max_total_threads_per_threadgroup() > 0);
+        
+        // Verify reflection data if available
+        if let Some(reflection) = reflection {
+            // We should have vertex arguments information due to ArgumentInfo flag
+            let vertex_args = reflection.vertex_arguments();
+            println!("Vertex arguments: {:?}", vertex_args.len());
         }
     }
 }

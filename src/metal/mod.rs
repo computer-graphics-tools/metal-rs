@@ -75,11 +75,12 @@ pub use sampler::{
     MTLSamplerAddressMode, MTLSamplerBorderColor
 };
 pub use render_pipeline::{
-    MTLColorWriteMask, MTLBlendFactor, MTLBlendOperation, MTLPrimitiveTopologyClass,
+    MTLColorWriteMask, MTLBlendFactor, MTLBlendOperation, MTLPrimitiveTopologyClass, MTLPipelineOption,
     MTLRenderPipelineColorAttachmentDescriptor, MTLRenderPipelineColorAttachmentDescriptorRef,
     MTLRenderPipelineColorAttachmentDescriptorArray, MTLRenderPipelineColorAttachmentDescriptorArrayRef,
     MTLRenderPipelineDescriptor, MTLRenderPipelineDescriptorRef,
-    MTLRenderPipelineState, MTLRenderPipelineStateRef
+    MTLRenderPipelineState, MTLRenderPipelineStateRef,
+    MTLRenderPipelineReflection, MTLRenderPipelineReflectionRef
 };
 pub use vertex_descriptor::{
     MTLVertexFormat, MTLVertexStepFunction,

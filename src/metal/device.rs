@@ -272,6 +272,65 @@ impl MTLDevice {
             crate::metal::sampler::MTLSamplerState::from_ptr(ptr)
         }
     }
+    
+    /// Creates a new render pipeline state from a descriptor.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the render pipeline state could not be created.
+    pub fn new_render_pipeline_state(&self, descriptor: &crate::metal::render_pipeline::MTLRenderPipelineDescriptor) -> Result<crate::metal::render_pipeline::MTLRenderPipelineState, String> {
+        unsafe {
+            let mut err: *mut Object = std::ptr::null_mut();
+            
+            let ptr: *mut Object = msg_send![self.as_ref(), newRenderPipelineStateWithDescriptor:descriptor.as_ptr()
+                                                                error:&mut err];
+            
+            if !err.is_null() {
+                let error = NSString::from_ptr(msg_send![err, localizedDescription]);
+                let error_str = error.to_rust_string();
+                Err(error_str)
+            } else {
+                Ok(crate::metal::render_pipeline::MTLRenderPipelineState::from_ptr(ptr))
+            }
+        }
+    }
+    
+    /// Creates a new render pipeline state with reflection data.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the render pipeline state could not be created.
+    pub fn new_render_pipeline_state_with_reflection(
+        &self, 
+        descriptor: &crate::metal::render_pipeline::MTLRenderPipelineDescriptor,
+        options: u64
+    ) -> Result<(crate::metal::render_pipeline::MTLRenderPipelineState, Option<crate::metal::render_pipeline::MTLRenderPipelineReflection>), String> {
+        unsafe {
+            let mut err: *mut Object = std::ptr::null_mut();
+            let mut reflection: *mut Object = std::ptr::null_mut();
+            
+            let ptr: *mut Object = msg_send![self.as_ref(), newRenderPipelineStateWithDescriptor:descriptor.as_ptr()
+                                                                options:options
+                                                              reflection:&mut reflection
+                                                                  error:&mut err];
+            
+            if !err.is_null() {
+                let error = NSString::from_ptr(msg_send![err, localizedDescription]);
+                let error_str = error.to_rust_string();
+                Err(error_str)
+            } else {
+                let pipeline_state = crate::metal::render_pipeline::MTLRenderPipelineState::from_ptr(ptr);
+                
+                let reflection_option = if reflection.is_null() {
+                    None
+                } else {
+                    Some(crate::metal::render_pipeline::MTLRenderPipelineReflection::from_ptr(reflection))
+                };
+                
+                Ok((pipeline_state, reflection_option))
+            }
+        }
+    }
 }
 
 impl fmt::Debug for MTLDevice {
