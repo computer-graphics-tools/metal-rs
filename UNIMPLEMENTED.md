@@ -16,7 +16,6 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 | **Binary Archives** | MTLBinaryArchive, MTLDynamicLibrary |
 | **Ray Tracing** | MTLAccelerationStructure, MTLAccelerationStructureCommandEncoder, MTLAccelerationStructureTypes |
 | **Function Tables** | MTLVisibleFunctionTable, MTLIntersectionFunctionTable |
-| **Sampling** | MTLSampler |
 | **Arguments** | MTLArgument, MTLArgumentEncoder |
 | **Debugging & Profiling** | MTLCaptureManager, MTLCaptureScope, MTLLogState |
 | **I/O Operations** | MTLIOCommandBuffer, MTLIOCommandQueue, MTLIOCompressor |
@@ -32,14 +31,15 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 | **Shader Code** | MTLLibrary, MTLFunction |
 | **Compute** | MTLComputeCommandEncoder, MTLComputePipelineState |
 | **Types and Constants** | MTLPixelFormat, MTLTypes |
+| **Sampling** | MTLSampler |
 
 ## Priority Implementation Order
 
 Based on the typical Metal application requirements and existing implementation, here's a suggested implementation order:
 
 1. **Essential for Rendering**
-   - MTLSampler
-   - MTLVertexDescriptor 
+   - ✅ MTLSampler
+   - MTLVertexDescriptor
    - Complete MTLRenderPipeline
    - Complete MTLResource
 

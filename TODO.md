@@ -114,10 +114,10 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [ ] Compute stage configuration
   - [ ] IO buffer bindings
 
-- [ ] MTLSampler
-  - [ ] Filtering options
-  - [ ] Address modes
-  - [ ] LOD settings
+- [x] MTLSampler
+  - [x] Filtering options
+  - [x] Address modes
+  - [x] LOD settings
 
 - [ ] MTLFunctionDescriptor
   - [ ] Function creation with specialized settings

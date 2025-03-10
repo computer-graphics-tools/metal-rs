@@ -38,6 +38,7 @@ pub mod library;
 pub mod depth_stencil;
 pub mod blit_command_encoder;
 pub mod compute_command_encoder;
+pub mod sampler;
 
 // Re-export types for public API
 pub use device::{MTLDevice, MTLDeviceRef, MTLCreateSystemDefaultDevice, MTLFeatureSet};
@@ -64,4 +65,10 @@ pub use compute_command_encoder::{
     MTLResource, MTLResourceRef,
     MTLDispatchType, MTLResourceUsage, MTLBarrierScope,
     MTLDispatchThreadgroupsIndirectArguments, MTLStageInRegionIndirectArguments
+};
+pub use sampler::{
+    MTLSamplerState, MTLSamplerStateRef,
+    MTLSamplerDescriptor, MTLSamplerDescriptorRef,
+    MTLSamplerMinMagFilter, MTLSamplerMipFilter,
+    MTLSamplerAddressMode, MTLSamplerBorderColor
 };

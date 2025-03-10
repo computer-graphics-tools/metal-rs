@@ -183,7 +183,7 @@ impl MTLDevice {
     pub fn new_buffer(&self, length: usize, options: crate::metal::MTLResourceOptions) -> crate::metal::MTLBuffer {
         unsafe {
             let ptr: *mut Object = msg_send![self.as_ref(), newBufferWithLength:length
-                                                                      options:options];
+                                                                  options:options];
             crate::metal::MTLBuffer::from_ptr(ptr)
         }
     }
@@ -198,8 +198,8 @@ impl MTLDevice {
     ) -> crate::metal::MTLBuffer {
         unsafe {
             let ptr: *mut Object = msg_send![self.as_ref(), newBufferWithBytes:data
-                                                                      length:length
-                                                                     options:options];
+                                                                  length:length
+                                                                 options:options];
             crate::metal::MTLBuffer::from_ptr(ptr)
         }
     }
@@ -215,8 +215,8 @@ impl MTLDevice {
             let mut err: *mut Object = std::ptr::null_mut();
             
             let ptr: *mut Object = msg_send![self.as_ref(), newLibraryWithSource:source_str.as_ptr()
-                                                                     options:options
-                                                                       error:&mut err];
+                                                                 options:options
+                                                                   error:&mut err];
             
             if !err.is_null() {
                 let error = NSString::from_ptr(msg_send![err, localizedDescription]);
@@ -252,7 +252,7 @@ impl MTLDevice {
             let mut err: *mut Object = std::ptr::null_mut();
             
             let ptr: *mut Object = msg_send![self.as_ref(), newComputePipelineStateWithFunction:function.as_ref().as_ptr()
-                                                                         error:&mut err];
+                                                                     error:&mut err];
             
             if !err.is_null() {
                 let error = NSString::from_ptr(msg_send![err, localizedDescription]);
@@ -261,6 +261,15 @@ impl MTLDevice {
             } else {
                 Ok(crate::metal::compute_command_encoder::MTLComputePipelineState::from_ptr(ptr))
             }
+        }
+    }
+    
+    /// Creates a new sampler state from a descriptor.
+    #[must_use]
+    pub fn new_sampler_state(&self, descriptor: &impl AsRef<crate::metal::sampler::MTLSamplerDescriptorRef>) -> crate::metal::sampler::MTLSamplerState {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), newSamplerStateWithDescriptor:descriptor.as_ref().as_ptr()];
+            crate::metal::sampler::MTLSamplerState::from_ptr(ptr)
         }
     }
 }
