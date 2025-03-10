@@ -29,6 +29,7 @@ use objc::runtime::Object;
 use foreign_types::{ForeignType, ForeignTypeRef};
 use crate::foundation::NSString;
 use crate::metal::types::MTLPixelFormat;
+use crate::metal::MTLResourceRef;
 
 /// Describes the dimensionality of a texture.
 #[repr(u64)]
@@ -122,6 +123,19 @@ impl AsRef<MTLTextureRef> for MTLTexture {
     }
 }
 
+impl AsRef<MTLResourceRef> for MTLTextureRef {
+    fn as_ref(&self) -> &MTLResourceRef {
+        unsafe { &*(self as *const MTLTextureRef as *const MTLResourceRef) }
+    }
+}
+
+impl AsRef<MTLResourceRef> for MTLTexture {
+    fn as_ref(&self) -> &MTLResourceRef {
+        let texture_ref: &MTLTextureRef = AsRef::<MTLTextureRef>::as_ref(self);
+        AsRef::<MTLResourceRef>::as_ref(texture_ref)
+    }
+}
+
 unsafe impl Send for MTLTexture {}
 unsafe impl Sync for MTLTexture {}
 
@@ -132,7 +146,8 @@ impl MTLTexture {
     #[must_use]
     pub fn label(&self) -> Option<String> {
         unsafe {
-            let label: *mut Object = msg_send![self.as_ref(), label];
+            let texture_ref: &MTLTextureRef = self.as_ref();
+            let label: *mut Object = msg_send![texture_ref, label];
             if label.is_null() {
                 None
             } else {
@@ -146,7 +161,8 @@ impl MTLTexture {
     pub fn set_label(&self, label: &str) {
         unsafe {
             let ns_string = NSString::from_rust_str(label);
-            let _: () = msg_send![self.as_ref(), setLabel:ns_string.as_ptr()];
+            let texture_ref: &MTLTextureRef = self.as_ref();
+            let _: () = msg_send![texture_ref, setLabel:ns_string.as_ptr()];
         }
     }
     
@@ -154,7 +170,8 @@ impl MTLTexture {
     #[must_use]
     pub fn width(&self) -> usize {
         unsafe {
-            msg_send![self.as_ref(), width]
+            let texture_ref: &MTLTextureRef = self.as_ref();
+            msg_send![texture_ref, width]
         }
     }
     
@@ -162,7 +179,8 @@ impl MTLTexture {
     #[must_use]
     pub fn height(&self) -> usize {
         unsafe {
-            msg_send![self.as_ref(), height]
+            let texture_ref: &MTLTextureRef = self.as_ref();
+            msg_send![texture_ref, height]
         }
     }
     
@@ -170,7 +188,8 @@ impl MTLTexture {
     #[must_use]
     pub fn depth(&self) -> usize {
         unsafe {
-            msg_send![self.as_ref(), depth]
+            let texture_ref: &MTLTextureRef = self.as_ref();
+            msg_send![texture_ref, depth]
         }
     }
     
@@ -178,7 +197,8 @@ impl MTLTexture {
     #[must_use]
     pub fn pixel_format(&self) -> MTLPixelFormat {
         unsafe {
-            msg_send![self.as_ref(), pixelFormat]
+            let texture_ref: &MTLTextureRef = self.as_ref();
+            msg_send![texture_ref, pixelFormat]
         }
     }
     
@@ -186,7 +206,8 @@ impl MTLTexture {
     #[must_use]
     pub fn texture_type(&self) -> MTLTextureType {
         unsafe {
-            msg_send![self.as_ref(), textureType]
+            let texture_ref: &MTLTextureRef = self.as_ref();
+            msg_send![texture_ref, textureType]
         }
     }
     
@@ -194,7 +215,8 @@ impl MTLTexture {
     #[must_use]
     pub fn mipmap_level_count(&self) -> usize {
         unsafe {
-            msg_send![self.as_ref(), mipmapLevelCount]
+            let texture_ref: &MTLTextureRef = self.as_ref();
+            msg_send![texture_ref, mipmapLevelCount]
         }
     }
     
@@ -202,7 +224,8 @@ impl MTLTexture {
     #[must_use]
     pub fn sample_count(&self) -> usize {
         unsafe {
-            msg_send![self.as_ref(), sampleCount]
+            let texture_ref: &MTLTextureRef = self.as_ref();
+            msg_send![texture_ref, sampleCount]
         }
     }
     
@@ -210,7 +233,8 @@ impl MTLTexture {
     #[must_use]
     pub fn usage(&self) -> MTLTextureUsage {
         unsafe {
-            msg_send![self.as_ref(), usage]
+            let texture_ref: &MTLTextureRef = self.as_ref();
+            msg_send![texture_ref, usage]
         }
     }
     
@@ -223,7 +247,8 @@ impl MTLTexture {
         bytes_per_row: usize
     ) {
         unsafe {
-            let _: () = msg_send![self.as_ref(), replaceRegion:region
+            let texture_ref: &MTLTextureRef = self.as_ref();
+            let _: () = msg_send![texture_ref, replaceRegion:region
                                                 mipmapLevel:mipmap_level
                                                   withBytes:data.as_ptr()
                                                 bytesPerRow:bytes_per_row];
@@ -241,12 +266,87 @@ impl MTLTexture {
         slice: usize
     ) {
         unsafe {
-            let _: () = msg_send![self.as_ref(), getBytes:dest.as_mut_ptr()
+            let texture_ref: &MTLTextureRef = self.as_ref();
+            let _: () = msg_send![texture_ref, getBytes:dest.as_mut_ptr()
                                                bytesPerRow:bytes_per_row
                                              bytesPerImage:bytes_per_image
                                                 fromRegion:region
                                                mipmapLevel:mipmap_level
                                                      slice:slice];
+        }
+    }
+    
+    // MTLResource protocol methods
+    
+    /// Returns the CPU cache mode of the texture.
+    #[must_use]
+    pub fn cpu_cache_mode(&self) -> crate::metal::MTLCPUCacheMode {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            msg_send![resource_ref, cpuCacheMode]
+        }
+    }
+    
+    /// Returns the storage mode of the texture.
+    #[must_use]
+    pub fn storage_mode(&self) -> crate::metal::MTLStorageMode {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            msg_send![resource_ref, storageMode]
+        }
+    }
+    
+    /// Returns the hazard tracking mode of the texture.
+    #[must_use]
+    pub fn hazard_tracking_mode(&self) -> crate::metal::MTLHazardTrackingMode {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            msg_send![resource_ref, hazardTrackingMode]
+        }
+    }
+    
+    /// Returns the resource options of the texture.
+    #[must_use]
+    pub fn resource_options(&self) -> crate::metal::MTLResourceOptions {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            msg_send![resource_ref, resourceOptions]
+        }
+    }
+    
+    /// Returns the allocated size of the texture in bytes.
+    #[must_use]
+    pub fn allocated_size(&self) -> usize {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            msg_send![resource_ref, allocatedSize]
+        }
+    }
+    
+    /// Sets the purgeable state of the texture.
+    ///
+    /// Returns the previous purgeable state.
+    pub fn set_purgeable_state(&self, state: crate::metal::MTLPurgeableState) -> crate::metal::MTLPurgeableState {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            msg_send![resource_ref, setPurgeableState:state]
+        }
+    }
+    
+    /// Makes the texture aliasable.
+    pub fn make_aliasable(&self) {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            let _: () = msg_send![resource_ref, makeAliasable];
+        }
+    }
+    
+    /// Returns whether the texture is aliasable.
+    #[must_use]
+    pub fn is_aliasable(&self) -> bool {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            msg_send![resource_ref, isAliasable]
         }
     }
 }
@@ -464,9 +564,23 @@ impl MTLTextureDescriptor {
     }
     
     /// Sets the storage mode of the texture.
-    pub fn set_storage_mode(&self, mode: crate::metal::MTLResourceOptions) {
+    pub fn set_storage_mode(&self, mode: crate::metal::MTLStorageMode) {
         unsafe {
             let _: () = msg_send![self.as_ref(), setStorageMode:mode];
+        }
+    }
+    
+    /// Sets the CPU cache mode of the texture.
+    pub fn set_cpu_cache_mode(&self, mode: crate::metal::MTLCPUCacheMode) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), setCpuCacheMode:mode];
+        }
+    }
+    
+    /// Sets the hazard tracking mode of the texture.
+    pub fn set_hazard_tracking_mode(&self, mode: crate::metal::MTLHazardTrackingMode) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), setHazardTrackingMode:mode];
         }
     }
 }

@@ -8,7 +8,7 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 |----------|---------------------|
 | **Command Encoding** | MTLParallelRenderCommandEncoder, MTLResourceStateCommandEncoder, MTLComputePass, MTLBlitPass, MTLRenderPass |
 | **Pipeline States** | MTLPipeline |
-| **Resource Management** | MTLHeap, MTLFence, MTLEvent, MTLDrawable, MTLResource (partially implemented), MTLAllocation, MTLResidencySet |
+| **Resource Management** | MTLHeap, MTLFence, MTLEvent, MTLDrawable, MTLAllocation, MTLResidencySet |
 | **Descriptors** | MTLStageInputOutputDescriptor, MTLFunctionDescriptor |
 | **Advanced Rendering** | MTLRasterizationRate, MTLLinkedFunctions, MTLCounters |
 | **Function Features** | MTLFunctionConstantValues (partially implemented), MTLFunctionHandle, MTLFunctionLog, MTLFunctionStitching |
@@ -25,7 +25,7 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 | Category | Implemented Types |
 |----------|-------------------|
 | **Command Management** | MTLDevice, MTLCommandQueue, MTLCommandBuffer, MTLCommandEncoder |
-| **Resources** | MTLBuffer, MTLTexture, MTLTextureDescriptor |
+| **Resources** | MTLResource, MTLBuffer, MTLTexture, MTLTextureDescriptor |
 | **Rendering** | MTLRenderCommandEncoder (partially), MTLDepthStencilState |
 | **Memory Operations** | MTLBlitCommandEncoder |
 | **Shader Code** | MTLLibrary, MTLFunction |
@@ -42,7 +42,7 @@ Based on the typical Metal application requirements and existing implementation,
    - ✅ MTLSampler
    - ✅ MTLVertexDescriptor
    - ✅ Complete MTLRenderPipeline
-   - Complete MTLResource
+   - ✅ Complete MTLResource
 
 2. **Essential for Resource Management**
    - MTLFence (synchronization)

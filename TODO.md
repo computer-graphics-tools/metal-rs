@@ -72,10 +72,10 @@ This document outlines the comprehensive todo list for developing a fully-featur
 
 ### Resource Management
 
-- [ ] Complete MTLResource
-  - [ ] Resource common functionality
-  - [ ] Resource options and state management
-  - [ ] Proper inheritance for specific resources
+- [x] Complete MTLResource
+  - [x] Resource common functionality
+  - [x] Resource options and state management
+  - [x] Proper inheritance for specific resources
 
 - [ ] MTLDrawable
   - [ ] Drawable presentation

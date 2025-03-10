@@ -48,30 +48,8 @@ use objc::{msg_send, sel, sel_impl};
 use objc::runtime::Object;
 use foreign_types::{ForeignType, ForeignTypeRef};
 use crate::foundation::NSString;
+use crate::metal::{MTLResourceRef, MTLResourceOptions};
 
-/// Options determining how memory for a resource is allocated and accessed.
-#[allow(non_camel_case_types)]
-#[repr(u64)]
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub enum MTLResourceOptions {
-    /// The default option.
-    CPUCacheModeDefaultCache = 0,
-    
-    /// CPU access is not needed.
-    CPUCacheModeWriteCombined = 1,
-    
-    /// Resources are stored in system memory and are accessible by both the CPU and GPU.
-    StorageModeManaged = 16,
-    
-    /// Resources are stored in memory only accessible from the GPU.
-    StorageModePrivate = 32,
-    
-    /// Resources are stored on the device, but there will be memory accessible by both the CPU and GPU.
-    StorageModeMemoryless = 48,
-    
-    /// A commonly used configuration for shared memory.
-    StorageModeSharedCpuCacheModeWriteCombined = 17,
-}
 
 /// A reference to an Objective-C `MTLBuffer`.
 pub struct MTLBufferRef(Object);
@@ -105,6 +83,19 @@ impl AsRef<MTLBufferRef> for MTLBuffer {
     }
 }
 
+impl AsRef<MTLResourceRef> for MTLBufferRef {
+    fn as_ref(&self) -> &MTLResourceRef {
+        unsafe { &*(self as *const MTLBufferRef as *const MTLResourceRef) }
+    }
+}
+
+impl AsRef<MTLResourceRef> for MTLBuffer {
+    fn as_ref(&self) -> &MTLResourceRef {
+        let buffer_ref: &MTLBufferRef = AsRef::<MTLBufferRef>::as_ref(self);
+        AsRef::<MTLResourceRef>::as_ref(buffer_ref)
+    }
+}
+
 unsafe impl Send for MTLBuffer {}
 unsafe impl Sync for MTLBuffer {}
 
@@ -115,7 +106,8 @@ impl MTLBuffer {
     #[must_use]
     pub fn label(&self) -> Option<String> {
         unsafe {
-            let label: *mut Object = msg_send![self.as_ref(), label];
+            let buffer_ref: &MTLBufferRef = self.as_ref();
+            let label: *mut Object = msg_send![buffer_ref, label];
             if label.is_null() {
                 None
             } else {
@@ -129,7 +121,8 @@ impl MTLBuffer {
     pub fn set_label(&self, label: &str) {
         unsafe {
             let ns_string = NSString::from_rust_str(label);
-            let _: () = msg_send![self.as_ref(), setLabel:ns_string.as_ptr()];
+            let buffer_ref: &MTLBufferRef = self.as_ref();
+            let _: () = msg_send![buffer_ref, setLabel:ns_string.as_ptr()];
         }
     }
     
@@ -137,7 +130,8 @@ impl MTLBuffer {
     #[must_use]
     pub fn length(&self) -> usize {
         unsafe {
-            msg_send![self.as_ref(), length]
+            let buffer_ref: &MTLBufferRef = self.as_ref();
+            msg_send![buffer_ref, length]
         }
     }
     
@@ -147,7 +141,8 @@ impl MTLBuffer {
     #[must_use]
     pub fn contents(&self) -> *mut std::ffi::c_void {
         unsafe {
-            msg_send![self.as_ref(), contents]
+            let buffer_ref: &MTLBufferRef = self.as_ref();
+            msg_send![buffer_ref, contents]
         }
     }
     
@@ -155,7 +150,8 @@ impl MTLBuffer {
     #[must_use]
     pub fn resource_options(&self) -> MTLResourceOptions {
         unsafe {
-            msg_send![self.as_ref(), resourceOptions]
+            let buffer_ref: &MTLBufferRef = self.as_ref();
+            msg_send![buffer_ref, resourceOptions]
         }
     }
     
@@ -168,7 +164,8 @@ impl MTLBuffer {
         let length = range.end - range.start;
         
         unsafe {
-            let ptr: *mut Object = msg_send![self.as_ref(), newBufferWithBytesNoCopy:self.contents().byte_add(location)
+            let buffer_ref: &MTLBufferRef = self.as_ref();
+            let ptr: *mut Object = msg_send![buffer_ref, newBufferWithBytesNoCopy:self.contents().byte_add(location)
                                                          length:length
                                                          options:self.resource_options()
                                                          deallocator:ptr::null_mut::<Object>()];
@@ -224,6 +221,71 @@ impl MTLBuffer {
     #[must_use]
     pub fn is_shared_storage_mode(&self) -> bool {
         self.resource_options() as u64 & (3 << 4) == 0
+    }
+    
+    // MTLResource protocol methods
+    
+    /// Returns the CPU cache mode of the buffer.
+    #[must_use]
+    pub fn cpu_cache_mode(&self) -> crate::metal::MTLCPUCacheMode {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            msg_send![resource_ref, cpuCacheMode]
+        }
+    }
+    
+    /// Returns the storage mode of the buffer.
+    #[must_use]
+    pub fn storage_mode(&self) -> crate::metal::MTLStorageMode {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            msg_send![resource_ref, storageMode]
+        }
+    }
+    
+    /// Returns the hazard tracking mode of the buffer.
+    #[must_use]
+    pub fn hazard_tracking_mode(&self) -> crate::metal::MTLHazardTrackingMode {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            msg_send![resource_ref, hazardTrackingMode]
+        }
+    }
+    
+    /// Returns the allocated size of the buffer in bytes.
+    #[must_use]
+    pub fn allocated_size(&self) -> usize {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            msg_send![resource_ref, allocatedSize]
+        }
+    }
+    
+    /// Sets the purgeable state of the buffer.
+    ///
+    /// Returns the previous purgeable state.
+    pub fn set_purgeable_state(&self, state: crate::metal::MTLPurgeableState) -> crate::metal::MTLPurgeableState {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            msg_send![resource_ref, setPurgeableState:state]
+        }
+    }
+    
+    /// Makes the buffer aliasable.
+    pub fn make_aliasable(&self) {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            let _: () = msg_send![resource_ref, makeAliasable];
+        }
+    }
+    
+    /// Returns whether the buffer is aliasable.
+    #[must_use]
+    pub fn is_aliasable(&self) -> bool {
+        let resource_ref: &crate::metal::MTLResourceRef = self.as_ref();
+        unsafe {
+            msg_send![resource_ref, isAliasable]
+        }
     }
 }
 

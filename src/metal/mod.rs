@@ -32,6 +32,7 @@ pub mod command_queue;
 pub mod command_buffer;
 pub mod command_encoder;
 pub mod types;
+pub mod resource;
 pub mod buffer;
 pub mod texture;
 pub mod library;
@@ -49,7 +50,7 @@ pub use command_buffer::{MTLCommandBuffer, MTLCommandBufferRef, MTLCommandBuffer
 pub use command_encoder::{MTLCommandEncoder, MTLCommandEncoderRef};
 pub use types::{MTLClearColor, MTLPixelFormat, MTLLoadAction, MTLStoreAction, MTLPrimitiveType};
 pub use texture::{MTLSize, MTLOrigin, MTLRegion};
-pub use buffer::{MTLBuffer, MTLBufferRef, MTLResourceOptions};
+pub use buffer::{MTLBuffer, MTLBufferRef};
 pub use texture::{MTLTexture, MTLTextureRef, MTLTextureType, MTLTextureUsage, MTLTextureDescriptor, MTLTextureDescriptorRef};
 pub use library::{MTLLibrary, MTLLibraryRef, MTLFunction, MTLFunctionRef, MTLCompileOptions, MTLFunctionConstantValues, MTLFunctionConstantValuesRef};
 pub use depth_stencil::{
@@ -61,10 +62,13 @@ pub use depth_stencil::{
 pub use blit_command_encoder::{
     MTLBlitCommandEncoder, MTLBlitCommandEncoderRef, MTLBlitOption
 };
+pub use resource::{
+    MTLResource, MTLResourceRef,
+    MTLPurgeableState, MTLCPUCacheMode, MTLStorageMode, MTLHazardTrackingMode, MTLResourceOptions,
+};
 pub use compute_command_encoder::{
     MTLComputeCommandEncoder, MTLComputeCommandEncoderRef,
     MTLComputePipelineState, MTLComputePipelineStateRef,
-    MTLResource, MTLResourceRef,
     MTLDispatchType, MTLResourceUsage, MTLBarrierScope,
     MTLDispatchThreadgroupsIndirectArguments, MTLStageInRegionIndirectArguments
 };

@@ -46,7 +46,8 @@ use crate::metal::{
     MTLCommandEncoderRef,
     MTLBufferRef,
     MTLTextureRef,
-    MTLSize, MTLRegion
+    MTLSize, MTLRegion,
+    MTLResource, MTLResourceRef
 };
 
 /// Dispatch type for compute command encoders.
@@ -323,59 +324,6 @@ impl MTLComputeCommandEncoder {
     }
 }
 
-/// A reference to an Objective-C `MTLResource`.
-pub struct MTLResourceRef(Object);
-
-/// An owned Objective-C `MTLResource`.
-pub struct MTLResource(*mut Object);
-
-unsafe impl ForeignTypeRef for MTLResourceRef {
-    type CType = Object;
-}
-
-unsafe impl Send for MTLResourceRef {}
-unsafe impl Sync for MTLResourceRef {}
-
-unsafe impl ForeignType for MTLResource {
-    type CType = Object;
-    type Ref = MTLResourceRef;
-    
-    unsafe fn from_ptr(ptr: *mut Object) -> MTLResource {
-        MTLResource(ptr)
-    }
-
-    fn as_ptr(&self) -> *mut Object {
-        self.0
-    }
-}
-
-impl AsRef<MTLResourceRef> for MTLResource {
-    fn as_ref(&self) -> &MTLResourceRef {
-        unsafe { &*(self.0.cast::<MTLResourceRef>()) }
-    }
-}
-
-unsafe impl Send for MTLResource {}
-unsafe impl Sync for MTLResource {}
-
-unsafe impl objc::Message for MTLResourceRef {}
-
-impl Drop for MTLResource {
-    fn drop(&mut self) {
-        unsafe {
-            let _: () = msg_send![self.0, release];
-        }
-    }
-}
-
-impl Clone for MTLResource {
-    fn clone(&self) -> Self {
-        unsafe {
-            let obj: *mut Object = msg_send![self.0, retain];
-            MTLResource::from_ptr(obj)
-        }
-    }
-}
 
 /// A reference to an Objective-C `MTLComputePipelineState`.
 pub struct MTLComputePipelineStateRef(Object);
