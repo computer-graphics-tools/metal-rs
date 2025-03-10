@@ -37,7 +37,8 @@ use objc::runtime::Object;
 use foreign_types::{ForeignType, ForeignTypeRef};
 use crate::foundation::NSString;
 use crate::metal::types::MTLPixelFormat;
-use crate::metal::library::{MTLFunction, MTLLibrary, LibraryError};
+use crate::metal::library::{MTLFunction};
+use crate::metal::vertex_descriptor::{MTLVertexDescriptor, MTLVertexDescriptorRef};
 
 /// Options for color write operations
 #[allow(non_camel_case_types)]
@@ -623,6 +624,30 @@ impl MTLRenderPipelineDescriptor {
     pub fn reset(&self) {
         unsafe {
             let _: () = msg_send![self.as_ref(), reset];
+        }
+    }
+    
+    /// Sets the vertex descriptor.
+    pub fn set_vertex_descriptor(&self, vertex_descriptor: Option<&MTLVertexDescriptorRef>) {
+        unsafe {
+            let ptr = match vertex_descriptor {
+                Some(descriptor) => descriptor.as_ptr(),
+                None => std::ptr::null_mut(),
+            };
+            let _: () = msg_send![self.as_ref(), setVertexDescriptor:ptr];
+        }
+    }
+    
+    /// Gets the vertex descriptor.
+    #[must_use]
+    pub fn vertex_descriptor(&self) -> Option<MTLVertexDescriptor> {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), vertexDescriptor];
+            if ptr.is_null() {
+                None
+            } else {
+                Some(MTLVertexDescriptor::from_ptr(ptr))
+            }
         }
     }
 }

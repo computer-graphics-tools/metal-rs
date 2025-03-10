@@ -9,7 +9,7 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 | **Command Encoding** | MTLParallelRenderCommandEncoder, MTLResourceStateCommandEncoder, MTLComputePass, MTLBlitPass, MTLRenderPass |
 | **Pipeline States** | MTLRenderPipeline (partially implemented), MTLPipeline |
 | **Resource Management** | MTLHeap, MTLFence, MTLEvent, MTLDrawable, MTLResource (partially implemented), MTLAllocation, MTLResidencySet |
-| **Descriptors** | MTLVertexDescriptor, MTLStageInputOutputDescriptor, MTLFunctionDescriptor |
+| **Descriptors** | MTLStageInputOutputDescriptor, MTLFunctionDescriptor |
 | **Advanced Rendering** | MTLRasterizationRate, MTLLinkedFunctions, MTLCounters |
 | **Function Features** | MTLFunctionConstantValues (partially implemented), MTLFunctionHandle, MTLFunctionLog, MTLFunctionStitching |
 | **Indirect Commands** | MTLIndirectCommandBuffer, MTLIndirectCommandEncoder |
@@ -32,6 +32,7 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 | **Compute** | MTLComputeCommandEncoder, MTLComputePipelineState |
 | **Types and Constants** | MTLPixelFormat, MTLTypes |
 | **Sampling** | MTLSampler |
+| **Vertex Data** | MTLVertexDescriptor |
 
 ## Priority Implementation Order
 
@@ -39,7 +40,7 @@ Based on the typical Metal application requirements and existing implementation,
 
 1. **Essential for Rendering**
    - ✅ MTLSampler
-   - MTLVertexDescriptor
+   - ✅ MTLVertexDescriptor
    - Complete MTLRenderPipeline
    - Complete MTLResource
 

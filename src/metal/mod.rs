@@ -39,6 +39,8 @@ pub mod depth_stencil;
 pub mod blit_command_encoder;
 pub mod compute_command_encoder;
 pub mod sampler;
+pub mod render_pipeline;
+pub mod vertex_descriptor;
 
 // Re-export types for public API
 pub use device::{MTLDevice, MTLDeviceRef, MTLCreateSystemDefaultDevice, MTLFeatureSet};
@@ -71,4 +73,20 @@ pub use sampler::{
     MTLSamplerDescriptor, MTLSamplerDescriptorRef,
     MTLSamplerMinMagFilter, MTLSamplerMipFilter,
     MTLSamplerAddressMode, MTLSamplerBorderColor
+};
+pub use render_pipeline::{
+    MTLColorWriteMask, MTLBlendFactor, MTLBlendOperation, MTLPrimitiveTopologyClass,
+    MTLRenderPipelineColorAttachmentDescriptor, MTLRenderPipelineColorAttachmentDescriptorRef,
+    MTLRenderPipelineColorAttachmentDescriptorArray, MTLRenderPipelineColorAttachmentDescriptorArrayRef,
+    MTLRenderPipelineDescriptor, MTLRenderPipelineDescriptorRef,
+    MTLRenderPipelineState, MTLRenderPipelineStateRef
+};
+pub use vertex_descriptor::{
+    MTLVertexFormat, MTLVertexStepFunction,
+    MTLVertexBufferLayoutDescriptor, MTLVertexBufferLayoutDescriptorRef,
+    MTLVertexBufferLayoutDescriptorArray, MTLVertexBufferLayoutDescriptorArrayRef,
+    MTLVertexAttributeDescriptor, MTLVertexAttributeDescriptorRef,
+    MTLVertexAttributeDescriptorArray, MTLVertexAttributeDescriptorArrayRef,
+    MTLVertexDescriptor, MTLVertexDescriptorRef,
+    BUFFER_LAYOUT_STRIDE_DYNAMIC
 };

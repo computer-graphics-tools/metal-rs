@@ -105,10 +105,10 @@ This document outlines the comprehensive todo list for developing a fully-featur
 
 ### Descriptors and Data Structures
 
-- [ ] MTLVertexDescriptor
-  - [ ] Vertex layout configuration
-  - [ ] Vertex attribute formats
-  - [ ] Buffer bindings
+- [x] MTLVertexDescriptor
+  - [x] Vertex layout configuration
+  - [x] Vertex attribute formats
+  - [x] Buffer bindings
 
 - [ ] MTLStageInputOutputDescriptor
   - [ ] Compute stage configuration
