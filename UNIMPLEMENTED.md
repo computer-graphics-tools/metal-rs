@@ -6,17 +6,17 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 
 | Category | Unimplemented Types |
 |----------|---------------------|
-| **Command Encoding** | MTLParallelRenderCommandEncoder, MTLResourceStateCommandEncoder, MTLComputePass, MTLBlitPass, MTLRenderPass |
+| **Command Encoding** | MTLParallelRenderCommandEncoder, MTLResourceStateCommandEncoder, MTLComputePass, MTLBlitPass |
 | **Pipeline States** | MTLPipeline |
-| **Resource Management** | MTLHeap, MTLFence, MTLEvent, MTLDrawable, MTLAllocation, MTLResidencySet |
+| **Resource Management** | MTLEvent, MTLAllocation, MTLResidencySet |
 | **Descriptors** | MTLStageInputOutputDescriptor, MTLFunctionDescriptor |
 | **Advanced Rendering** | MTLRasterizationRate, MTLLinkedFunctions, MTLCounters |
-| **Function Features** | MTLFunctionConstantValues (partially implemented), MTLFunctionHandle, MTLFunctionLog, MTLFunctionStitching |
+| **Function Features** | MTLFunctionHandle, MTLFunctionLog, MTLFunctionStitching |
 | **Indirect Commands** | MTLIndirectCommandBuffer, MTLIndirectCommandEncoder |
 | **Binary Archives** | MTLBinaryArchive, MTLDynamicLibrary |
 | **Ray Tracing** | MTLAccelerationStructure, MTLAccelerationStructureCommandEncoder, MTLAccelerationStructureTypes |
 | **Function Tables** | MTLVisibleFunctionTable, MTLIntersectionFunctionTable |
-| **Arguments** | MTLArgument, MTLArgumentEncoder |
+| **Arguments** | MTLArgument |
 | **Debugging & Profiling** | MTLCaptureManager, MTLCaptureScope, MTLLogState |
 | **I/O Operations** | MTLIOCommandBuffer, MTLIOCommandQueue, MTLIOCompressor |
 
@@ -26,13 +26,17 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 |----------|-------------------|
 | **Command Management** | MTLDevice, MTLCommandQueue, MTLCommandBuffer, MTLCommandEncoder |
 | **Resources** | MTLResource, MTLBuffer, MTLTexture, MTLTextureDescriptor |
-| **Rendering** | MTLRenderCommandEncoder (partially), MTLDepthStencilState |
+| **Rendering** | MTLRenderCommandEncoder (partially), MTLDepthStencilState, MTLRenderPass |
 | **Memory Operations** | MTLBlitCommandEncoder |
-| **Shader Code** | MTLLibrary, MTLFunction |
+| **Shader Code** | MTLLibrary, MTLFunction, MTLFunctionConstantValues |
 | **Compute** | MTLComputeCommandEncoder, MTLComputePipelineState |
 | **Types and Constants** | MTLPixelFormat, MTLTypes |
 | **Sampling** | MTLSampler |
 | **Vertex Data** | MTLVertexDescriptor |
+| **Synchronization** | MTLFence |
+| **Presentation** | MTLDrawable |
+| **Memory Management** | MTLHeap |
+| **Argument Buffers** | MTLArgumentEncoder |
 
 ## Priority Implementation Order
 
@@ -45,14 +49,14 @@ Based on the typical Metal application requirements and existing implementation,
    - ✅ Complete MTLResource
 
 2. **Essential for Resource Management**
-   - MTLFence (synchronization)
-   - MTLDrawable
-   - MTLHeap
+   - ✅ MTLFence (synchronization)
+   - ✅ MTLDrawable
+   - ✅ MTLHeap
 
 3. **Essential for Advanced Rendering**
-   - MTLArgumentEncoder
-   - Complete MTLFunctionConstantValues
-   - MTLRenderPass
+   - ✅ MTLArgumentEncoder
+   - ✅ Complete MTLFunctionConstantValues
+   - ✅ MTLRenderPass
 
 4. **Advanced Features**
    - MTLParallelRenderCommandEncoder

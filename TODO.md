@@ -46,9 +46,9 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [ ] Pass descriptor handling
   - [ ] Compute workload management
 
-- [ ] MTLRenderPass
-  - [ ] Pass descriptor handling
-  - [ ] Attachment configuration
+- [x] MTLRenderPass
+  - [x] Pass descriptor handling
+  - [x] Attachment configuration
 
 - [ ] MTLBlitPass
   - [ ] Pass descriptor handling
@@ -77,19 +77,19 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [x] Resource options and state management
   - [x] Proper inheritance for specific resources
 
-- [ ] MTLDrawable
-  - [ ] Drawable presentation
-  - [ ] Frame timing
-  - [ ] Display synchronization
+- [x] MTLDrawable
+  - [x] Drawable presentation
+  - [x] Frame timing
+  - [x] Display synchronization
 
-- [ ] MTLHeap
-  - [ ] Resource allocation from heaps
-  - [ ] Heap sizing and configuration
-  - [ ] Placement resource creation
+- [x] MTLHeap
+  - [x] Resource allocation from heaps
+  - [x] Heap sizing and configuration
+  - [x] Placement resource creation
 
-- [ ] MTLFence
-  - [ ] Cross-encoder synchronization
-  - [ ] Fence creation/updating/waiting
+- [x] MTLFence
+  - [x] Cross-encoder synchronization
+  - [x] Fence creation/updating/waiting
 
 - [ ] MTLEvent
   - [ ] GPU timeline synchronization
@@ -129,15 +129,15 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [ ] Shader reflection
   - [ ] Argument metadata
 
-- [ ] MTLArgumentEncoder
-  - [ ] Resource binding for indirect access
-  - [ ] Argument buffer creation
+- [x] MTLArgumentEncoder
+  - [x] Resource binding for indirect access
+  - [x] Argument buffer creation
 
 ### Function Features
 
-- [ ] Complete MTLFunctionConstantValues
-  - [ ] More methods for setting constant values
-  - [ ] Type-safe constant value management
+- [x] Complete MTLFunctionConstantValues
+  - [x] More methods for setting constant values
+  - [x] Type-safe constant value management
 
 - [ ] MTLFunctionHandle
   - [ ] Function reference management
