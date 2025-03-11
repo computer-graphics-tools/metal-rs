@@ -38,15 +38,13 @@
 //! command_buffer.commit();
 //! ```
 
-use std::fmt;
 use objc::{msg_send, sel, sel_impl};
 use objc::runtime::Object;
 use foreign_types::{ForeignType, ForeignTypeRef};
-use crate::foundation::NSString;
-use crate::metal::command_encoder::{MTLCommandEncoder, MTLCommandEncoderRef};
 use crate::metal::render_pipeline::MTLRenderPipelineState;
 use crate::metal::buffer::MTLBuffer;
 use crate::metal::texture::MTLTexture;
+use crate::metal::fence::MTLFenceRef;
 
 /// Types of primitive for rendering.
 #[allow(non_camel_case_types)]
@@ -325,15 +323,12 @@ unsafe impl ForeignType for MTLRenderCommandEncoder {
 
 impl AsRef<MTLRenderCommandEncoderRef> for MTLRenderCommandEncoder {
     fn as_ref(&self) -> &MTLRenderCommandEncoderRef {
-        unsafe { &*(self.0.cast::<MTLRenderCommandEncoderRef>()) }
+        unsafe { &*(self.0.cast()) }
     }
 }
 
-impl AsRef<MTLCommandEncoderRef> for MTLRenderCommandEncoder {
-    fn as_ref(&self) -> &MTLCommandEncoderRef {
-        unsafe { &*(self.0.cast::<MTLCommandEncoderRef>()) }
-    }
-}
+// Removed the MTLCommandEncoderRef AsRef implementation to avoid ambiguity
+// The MTLRenderCommandEncoder should be used with MTLRenderCommandEncoderRef exclusively
 
 unsafe impl Send for MTLRenderCommandEncoder {}
 unsafe impl Sync for MTLRenderCommandEncoder {}
@@ -640,6 +635,20 @@ impl MTLRenderCommandEncoder {
     pub fn end_encoding(&self) {
         unsafe {
             let _: () = msg_send![self.as_ref(), endEncoding];
+        }
+    }
+    
+    /// Updates a fence to establish a dependency between commands in this encoder and commands in subsequent encoders.
+    pub fn update_fence(&self, fence: &impl AsRef<MTLFenceRef>) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), updateFence:fence.as_ref().as_ptr()];
+        }
+    }
+    
+    /// Makes this encoder wait for a fence from a previous encoder to complete its work.
+    pub fn wait_for_fence(&self, fence: &impl AsRef<MTLFenceRef>) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), waitForFence:fence.as_ref().as_ptr()];
         }
     }
 }

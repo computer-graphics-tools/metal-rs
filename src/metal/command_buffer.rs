@@ -34,6 +34,7 @@ use objc::{msg_send, sel, sel_impl};
 use objc::runtime::Object;
 use foreign_types::{ForeignType, ForeignTypeRef};
 use crate::foundation::NSString;
+use crate::metal::{MTLRenderCommandEncoder, MTLRenderPassDescriptor};
 
 /// Represents the current state of a command buffer.
 #[repr(u64)]
@@ -197,6 +198,23 @@ impl MTLCommandBuffer {
     }
     
     /// Indicates that this command buffer needs to wait until the specified time.
+    
+    /// Creates a render command encoder for rendering to the attachments specified in the render pass descriptor.
+    ///
+    /// # Arguments
+    ///
+    /// * `descriptor` - The render pass descriptor to use.
+    ///
+    /// # Returns
+    ///
+    /// A new render command encoder.
+    #[must_use]
+    pub fn new_render_command_encoder(&self, descriptor: &MTLRenderPassDescriptor) -> MTLRenderCommandEncoder {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), renderCommandEncoderWithDescriptor:descriptor.as_ptr()];
+            MTLRenderCommandEncoder::from_ptr(ptr)
+        }
+    }
     pub fn wait_until_scheduled(&self) {
         unsafe {
             let _: () = msg_send![self.as_ref(), waitUntilScheduled];
