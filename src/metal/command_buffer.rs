@@ -34,7 +34,11 @@ use objc::{msg_send, sel, sel_impl};
 use objc::runtime::Object;
 use foreign_types::{ForeignType, ForeignTypeRef};
 use crate::foundation::NSString;
-use crate::metal::{MTLRenderCommandEncoder, MTLRenderPassDescriptor};
+use crate::metal::{
+    MTLRenderCommandEncoder, MTLRenderPassDescriptor, 
+    MTLParallelRenderCommandEncoder,
+    event::MTLEventRef
+};
 
 /// Represents the current state of a command buffer.
 #[repr(u64)]
@@ -215,6 +219,25 @@ impl MTLCommandBuffer {
             MTLRenderCommandEncoder::from_ptr(ptr)
         }
     }
+    
+    /// Creates a parallel render command encoder for rendering to the attachments specified in the render pass descriptor.
+    ///
+    /// Parallel render command encoders allow you to execute rendering commands in parallel on multiple CPU threads.
+    ///
+    /// # Arguments
+    ///
+    /// * `descriptor` - The render pass descriptor to use.
+    ///
+    /// # Returns
+    ///
+    /// A new parallel render command encoder.
+    #[must_use]
+    pub fn new_parallel_render_command_encoder(&self, descriptor: &MTLRenderPassDescriptor) -> MTLParallelRenderCommandEncoder {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), parallelRenderCommandEncoderWithDescriptor:descriptor.as_ptr()];
+            MTLParallelRenderCommandEncoder::from_ptr(ptr)
+        }
+    }
     pub fn wait_until_scheduled(&self) {
         unsafe {
             let _: () = msg_send![self.as_ref(), waitUntilScheduled];
@@ -250,6 +273,20 @@ impl MTLCommandBuffer {
         unsafe {
             let ptr: *mut Object = msg_send![self.as_ref(), computeCommandEncoder];
             crate::metal::compute_command_encoder::MTLComputeCommandEncoder::from_ptr(ptr)
+        }
+    }
+    
+    /// Encodes a command to signal an event when this command buffer completes execution.
+    pub fn encode_signal_event(&self, event: &impl AsRef<MTLEventRef>, value: u64) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), encodeSignalEvent:event.as_ref().as_ptr() value:value];
+        }
+    }
+    
+    /// Encodes a command to wait for an event to reach a value before executing any further commands.
+    pub fn encode_wait_for_event(&self, event: &impl AsRef<MTLEventRef>, value: u64) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), encodeWaitForEvent:event.as_ref().as_ptr() value:value];
         }
     }
 }

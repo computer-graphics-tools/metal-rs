@@ -8,7 +8,7 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 |----------|---------------------|
 | **Command Encoding** | MTLResourceStateCommandEncoder, MTLComputePass, MTLBlitPass |
 | **Pipeline States** | MTLPipeline |
-| **Resource Management** | MTLEvent, MTLAllocation, MTLResidencySet |
+| **Resource Management** | MTLAllocation, MTLResidencySet |
 | **Descriptors** | MTLStageInputOutputDescriptor, MTLFunctionDescriptor |
 | **Advanced Rendering** | MTLRasterizationRate, MTLLinkedFunctions, MTLCounters |
 | **Function Features** | MTLFunctionHandle, MTLFunctionLog, MTLFunctionStitching |
@@ -27,6 +27,7 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 | **Command Management** | MTLDevice, MTLCommandQueue, MTLCommandBuffer, MTLCommandEncoder |
 | **Resources** | MTLResource, MTLBuffer, MTLTexture, MTLTextureDescriptor |
 | **Rendering** | MTLRenderCommandEncoder (partially), MTLDepthStencilState, MTLRenderPass, MTLParallelRenderCommandEncoder |
+| **Synchronization** | MTLFence, MTLEvent |
 | **Memory Operations** | MTLBlitCommandEncoder |
 | **Shader Code** | MTLLibrary, MTLFunction, MTLFunctionConstantValues |
 | **Compute** | MTLComputeCommandEncoder, MTLComputePipelineState |
@@ -60,7 +61,7 @@ Based on the typical Metal application requirements and existing implementation,
 
 4. **Advanced Features**
    - ✅ MTLParallelRenderCommandEncoder
-   - MTLEvent
+   - ✅ MTLEvent
    - MTLComputePass
    - MTLBlitPass
 

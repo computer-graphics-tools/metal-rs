@@ -49,6 +49,12 @@ pub trait CommandEncoder {
     
     /// Inserts a debug marker into the command encoder.
     fn insert_debug_signpost(&self, name: &str);
+    
+    /// Signals an event with a value when the command buffer reaches this point in the encoder.
+    fn signal_event(&self, event: &impl AsRef<crate::metal::event::MTLEventRef>, value: u64);
+    
+    /// Makes the GPU wait for an event to reach a value before executing further commands.
+    fn wait_for_event(&self, event: &impl AsRef<crate::metal::event::MTLEventRef>, value: u64);
 }
 
 use std::fmt;
@@ -56,6 +62,7 @@ use objc::{msg_send, sel, sel_impl};
 use objc::runtime::Object;
 use foreign_types::{ForeignType, ForeignTypeRef};
 use crate::foundation::NSString;
+use crate::metal::event::MTLEventRef;
 
 /// A reference to an Objective-C `MTLCommandEncoder`.
 pub struct MTLCommandEncoderRef(Object);
@@ -142,6 +149,18 @@ impl CommandEncoder for MTLCommandEncoder {
         }
     }
     
+    fn signal_event(&self, event: &impl AsRef<MTLEventRef>, value: u64) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), signalEvent:event.as_ref().as_ptr() value:value];
+        }
+    }
+    
+    fn wait_for_event(&self, event: &impl AsRef<MTLEventRef>, value: u64) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), waitForEvent:event.as_ref().as_ptr() value:value];
+        }
+    }
+    
     fn end_encoding(&self) {
         unsafe {
             let _: () = msg_send![self.as_ref(), endEncoding];
@@ -186,6 +205,16 @@ impl MTLCommandEncoder {
     /// Marks the end of encoding commands into the command buffer.
     pub fn end_encoding(&self) {
         <Self as CommandEncoder>::end_encoding(self)
+    }
+    
+    /// Signals an event with a value when the command buffer reaches this point in the encoder.
+    pub fn signal_event(&self, event: &impl AsRef<MTLEventRef>, value: u64) {
+        <Self as CommandEncoder>::signal_event(self, event, value)
+    }
+    
+    /// Makes the GPU wait for an event to reach a value before executing further commands.
+    pub fn wait_for_event(&self, event: &impl AsRef<MTLEventRef>, value: u64) {
+        <Self as CommandEncoder>::wait_for_event(self, event, value)
     }
 }
 

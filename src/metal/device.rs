@@ -33,6 +33,7 @@ use objc::runtime::Object;
 use foreign_types::{ForeignType, ForeignTypeRef};
 use crate::foundation::NSString;
 use crate::metal::command_queue::MTLCommandQueue;
+use crate::metal::event::{MTLEvent, MTLSharedEvent};
 
 /// MTLFeatureSet - Enum representing Metal feature sets.
 #[allow(non_camel_case_types)]
@@ -329,6 +330,92 @@ impl MTLDevice {
                 
                 Ok((pipeline_state, reflection_option))
             }
+        }
+    }
+
+    /// Creates a new fence for cross-encoder synchronization.
+    #[must_use]
+    pub fn new_fence(&self) -> crate::metal::fence::MTLFence {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), newFence];
+            crate::metal::fence::MTLFence::from_ptr(ptr)
+        }
+    }
+
+    /// Creates a new heap from a descriptor.
+    #[must_use]
+    pub fn new_heap(&self, descriptor: &impl AsRef<crate::metal::heap::MTLHeapDescriptorRef>) -> crate::metal::heap::MTLHeap {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), newHeapWithDescriptor:descriptor.as_ref().as_ptr()];
+            crate::metal::heap::MTLHeap::from_ptr(ptr)
+        }
+    }
+    
+    /// Creates a new event for GPU timeline synchronization.
+    #[must_use]
+    pub fn new_event(&self) -> MTLEvent {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), newEvent];
+            MTLEvent::from_ptr(ptr)
+        }
+    }
+    
+    /// Creates a new shared event for cross-process GPU synchronization.
+    #[must_use]
+    pub fn new_shared_event(&self) -> MTLSharedEvent {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), newSharedEvent];
+            MTLSharedEvent::from_ptr(ptr)
+        }
+    }
+    
+    /// Creates a new shared event from a shared event handle.
+    #[must_use]
+    pub fn new_shared_event_from_handle(&self, shared_event_handle: &crate::metal::event::MTLSharedEventHandle) -> MTLSharedEvent {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), newSharedEventWithHandle:shared_event_handle.as_ptr()];
+            MTLSharedEvent::from_ptr(ptr)
+        }
+    }
+
+    /// Calculates the allocation size and alignment for a buffer in a heap.
+    #[must_use]
+    pub fn heap_buffer_size_and_align(&self, length: usize, options: crate::metal::MTLResourceOptions) -> (usize, usize) {
+        unsafe {
+            // SizeAndAlign struct
+            #[repr(C)]
+            struct SizeAndAlign {
+                size: usize,
+                align: usize,
+            }
+
+            let result: SizeAndAlign = msg_send![self.as_ref(), heapBufferSizeAndAlignWithLength:length options:options];
+            (result.size, result.align)
+        }
+    }
+
+    /// Calculates the allocation size and alignment for a texture in a heap.
+    #[must_use]
+    pub fn heap_texture_size_and_align(&self, descriptor: &impl AsRef<crate::metal::texture::MTLTextureDescriptorRef>) -> (usize, usize) {
+        unsafe {
+            // SizeAndAlign struct
+            #[repr(C)]
+            struct SizeAndAlign {
+                size: usize,
+                align: usize,
+            }
+
+            let result: SizeAndAlign = msg_send![self.as_ref(), heapTextureSizeAndAlignWithDescriptor:descriptor.as_ref().as_ptr()];
+            (result.size, result.align)
+        }
+    }
+
+    /// Creates a new argument encoder with an array of argument descriptors.
+    #[must_use]
+    pub fn new_argument_encoder(&self, arguments: &impl AsRef<crate::foundation::NSArrayRef>) -> crate::metal::argument_encoder::MTLArgumentEncoder {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), newArgumentEncoderWithArguments:arguments.as_ref().as_ptr()];
+            crate::metal::argument_encoder::MTLArgumentEncoder::from_ptr(ptr)
         }
     }
 }

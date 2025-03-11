@@ -50,6 +50,7 @@ pub mod heap;
 pub mod argument;
 pub mod argument_encoder;
 pub mod render_pass;
+pub mod event;
 
 // Re-export types for public API
 pub use device::{MTLDevice, MTLDeviceRef, MTLCreateSystemDefaultDevice, MTLFeatureSet};
@@ -138,4 +139,10 @@ pub use render_command_encoder::{
 };
 pub use parallel_render_command_encoder::{
     MTLParallelRenderCommandEncoder, MTLParallelRenderCommandEncoderRef
+};
+pub use event::{
+    MTLEvent, MTLEventRef,
+    MTLSharedEvent, MTLSharedEventRef,
+    MTLSharedEventHandle, MTLSharedEventHandleRef,
+    MTLSharedEventListener, MTLSharedEventListenerRef
 };

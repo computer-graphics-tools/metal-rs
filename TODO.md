@@ -91,9 +91,9 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [x] Cross-encoder synchronization
   - [x] Fence creation/updating/waiting
 
-- [ ] MTLEvent
-  - [ ] GPU timeline synchronization
-  - [ ] Event creation/signaling/waiting
+- [x] MTLEvent
+  - [x] GPU timeline synchronization
+  - [x] Event creation/signaling/waiting
 
 - [ ] MTLResidencySet
   - [ ] Residency group management
