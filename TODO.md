@@ -34,9 +34,9 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [x] Buffer/texture binding
   - [x] State setting methods
 
-- [ ] MTLParallelRenderCommandEncoder
-  - [ ] Multicore rendering support
-  - [ ] Child encoder creation/management
+- [x] MTLParallelRenderCommandEncoder
+  - [x] Multicore rendering support
+  - [x] Child encoder creation/management
 
 - [ ] MTLResourceStateCommandEncoder
   - [ ] Resource state tracking

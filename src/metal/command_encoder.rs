@@ -25,6 +25,32 @@
 //! command_buffer.commit();
 //! ```
 
+/// Trait for common command encoder functionality.
+/// 
+/// This trait defines the common methods that all command encoders share.
+pub trait CommandEncoder {
+    /// Returns the label of the command encoder.
+    fn label(&self) -> Option<String>;
+    
+    /// Sets the label of the command encoder.
+    fn set_label(&self, label: &str);
+    
+    /// Returns the device associated with this encoder.
+    fn device(&self) -> crate::metal::MTLDevice;
+    
+    /// Marks the end of encoding commands into the command buffer.
+    fn end_encoding(&self);
+    
+    /// Marks the place in the command encoder when debugging.
+    fn push_debug_group(&self, name: &str);
+    
+    /// Removes the most recently added debug group marker.
+    fn pop_debug_group(&self);
+    
+    /// Inserts a debug marker into the command encoder.
+    fn insert_debug_signpost(&self, name: &str);
+}
+
 use std::fmt;
 use objc::{msg_send, sel, sel_impl};
 use objc::runtime::Object;
@@ -68,10 +94,9 @@ unsafe impl Sync for MTLCommandEncoder {}
 
 unsafe impl objc::Message for MTLCommandEncoderRef {}
 
-impl MTLCommandEncoder {
-    /// Returns the label of the command encoder.
-    #[must_use]
-    pub fn label(&self) -> Option<String> {
+// Implement the CommandEncoder trait for MTLCommandEncoder
+impl CommandEncoder for MTLCommandEncoder {
+    fn label(&self) -> Option<String> {
         unsafe {
             let label: *mut Object = msg_send![self.as_ref(), label];
             if label.is_null() {
@@ -83,42 +108,84 @@ impl MTLCommandEncoder {
         }
     }
     
-    /// Sets the label of the command encoder.
-    pub fn set_label(&self, label: &str) {
+    fn set_label(&self, label: &str) {
         unsafe {
             let ns_string = NSString::from_rust_str(label);
             let _: () = msg_send![self.as_ref(), setLabel:ns_string.as_ptr()];
         }
     }
     
-    /// Marks the place in the command encoder when debugging.
-    pub fn push_debug_group(&self, name: &str) {
+    fn device(&self) -> crate::metal::MTLDevice {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), device];
+            crate::metal::MTLDevice::from_ptr(ptr)
+        }
+    }
+    
+    fn push_debug_group(&self, name: &str) {
         unsafe {
             let ns_string = NSString::from_rust_str(name);
             let _: () = msg_send![self.as_ref(), pushDebugGroup:ns_string.as_ptr()];
         }
     }
     
-    /// Removes the most recently added debug group marker.
-    pub fn pop_debug_group(&self) {
+    fn pop_debug_group(&self) {
         unsafe {
             let _: () = msg_send![self.as_ref(), popDebugGroup];
         }
     }
     
-    /// Inserts a debug marker into the command encoder.
-    pub fn insert_debug_signpost(&self, name: &str) {
+    fn insert_debug_signpost(&self, name: &str) {
         unsafe {
             let ns_string = NSString::from_rust_str(name);
             let _: () = msg_send![self.as_ref(), insertDebugSignpost:ns_string.as_ptr()];
         }
     }
     
-    /// Marks the end of encoding commands into the command buffer.
-    pub fn end_encoding(&self) {
+    fn end_encoding(&self) {
         unsafe {
             let _: () = msg_send![self.as_ref(), endEncoding];
         }
+    }
+}
+
+// Also provide the methods as regular associated functions for backward compatibility
+impl MTLCommandEncoder {
+    /// Returns the label of the command encoder.
+    #[must_use]
+    pub fn label(&self) -> Option<String> {
+        <Self as CommandEncoder>::label(self)
+    }
+    
+    /// Sets the label of the command encoder.
+    pub fn set_label(&self, label: &str) {
+        <Self as CommandEncoder>::set_label(self, label)
+    }
+    
+    /// Returns the device associated with this encoder.
+    #[must_use]
+    pub fn device(&self) -> crate::metal::MTLDevice {
+        <Self as CommandEncoder>::device(self)
+    }
+    
+    /// Marks the place in the command encoder when debugging.
+    pub fn push_debug_group(&self, name: &str) {
+        <Self as CommandEncoder>::push_debug_group(self, name)
+    }
+    
+    /// Removes the most recently added debug group marker.
+    pub fn pop_debug_group(&self) {
+        <Self as CommandEncoder>::pop_debug_group(self)
+    }
+    
+    /// Inserts a debug marker into the command encoder.
+    pub fn insert_debug_signpost(&self, name: &str) {
+        <Self as CommandEncoder>::insert_debug_signpost(self, name)
+    }
+    
+    /// Marks the end of encoding commands into the command buffer.
+    pub fn end_encoding(&self) {
+        <Self as CommandEncoder>::end_encoding(self)
     }
 }
 

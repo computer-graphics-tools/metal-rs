@@ -40,6 +40,7 @@ pub mod depth_stencil;
 pub mod blit_command_encoder;
 pub mod compute_command_encoder;
 pub mod render_command_encoder;
+pub mod parallel_render_command_encoder;
 pub mod sampler;
 pub mod render_pipeline;
 pub mod vertex_descriptor;
@@ -54,7 +55,7 @@ pub mod render_pass;
 pub use device::{MTLDevice, MTLDeviceRef, MTLCreateSystemDefaultDevice, MTLFeatureSet};
 pub use command_queue::{MTLCommandQueue, MTLCommandQueueRef};
 pub use command_buffer::{MTLCommandBuffer, MTLCommandBufferRef, MTLCommandBufferStatus};
-pub use command_encoder::{MTLCommandEncoder, MTLCommandEncoderRef};
+pub use command_encoder::{MTLCommandEncoder, MTLCommandEncoderRef, CommandEncoder};
 pub use types::{MTLPixelFormat};
 pub use texture::{MTLSize, MTLOrigin, MTLRegion};
 pub use buffer::{MTLBuffer, MTLBufferRef};
@@ -122,7 +123,7 @@ pub use argument_encoder::{
     ATTRIBUTE_STRIDE_STATIC
 };
 pub use render_pass::{
-    MTLLoadAction, MTLStoreAction, MTLClearColor,
+    MTLLoadAction, MTLStoreAction, MTLStoreActionOptions, MTLClearColor,
     MTLMultisampleDepthResolveFilter, MTLMultisampleStencilResolveFilter,
     MTLRenderPassDescriptor, MTLRenderPassDescriptorRef,
     MTLRenderPassColorAttachmentDescriptor, MTLRenderPassColorAttachmentDescriptorRef,
@@ -134,4 +135,7 @@ pub use render_command_encoder::{
     MTLRenderCommandEncoder, MTLRenderCommandEncoderRef,
     MTLPrimitiveType, MTLWinding, MTLCullMode, MTLDepthClipMode,
     MTLTriangleFillMode, MTLViewport, MTLScissorRect, MTLIndexType
+};
+pub use parallel_render_command_encoder::{
+    MTLParallelRenderCommandEncoder, MTLParallelRenderCommandEncoderRef
 };
