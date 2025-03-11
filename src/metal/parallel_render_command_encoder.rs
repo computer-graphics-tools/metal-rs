@@ -47,6 +47,7 @@ use crate::foundation::NSString;
 use crate::metal::command_encoder::CommandEncoder;
 use crate::metal::render_command_encoder::MTLRenderCommandEncoder;
 use crate::metal::render_pass::{MTLStoreAction, MTLStoreActionOptions};
+use crate::metal::event::MTLEventRef;
 
 /// A reference to an Objective-C `MTLParallelRenderCommandEncoder`.
 pub struct MTLParallelRenderCommandEncoderRef(Object);
@@ -248,6 +249,18 @@ impl CommandEncoder for MTLParallelRenderCommandEncoder {
         unsafe {
             let ns_string = NSString::from_rust_str(name);
             let _: () = msg_send![self.as_ref(), insertDebugSignpost:ns_string.as_ptr()];
+        }
+    }
+    
+    fn signal_event(&self, event: &impl AsRef<MTLEventRef>, value: u64) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), signalEvent:event.as_ref().as_ptr() value:value];
+        }
+    }
+    
+    fn wait_for_event(&self, event: &impl AsRef<MTLEventRef>, value: u64) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), waitForEvent:event.as_ref().as_ptr() value:value];
         }
     }
 }

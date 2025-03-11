@@ -41,10 +41,10 @@
 //! ```
 
 use std::fmt;
-use objc::{msg_send, sel, sel_impl};
+use objc::{msg_send, sel, sel_impl, class};
 use objc::runtime::Object;
 use foreign_types::{ForeignType, ForeignTypeRef};
-use crate::foundation::{NSString, NSArray};
+use crate::foundation::NSString;
 use crate::metal::MTLDevice;
 
 /// A reference to an Objective-C `MTLEvent`.
@@ -189,7 +189,7 @@ impl MTLSharedEvent {
     #[must_use]
     pub fn device(&self) -> MTLDevice {
         unsafe {
-            let ptr: *mut Object = msg_send![self.as_ref(), device];
+            let ptr: *mut Object = msg_send![self.as_ref() as &MTLSharedEventRef, device];
             MTLDevice::from_ptr(ptr)
         }
     }
@@ -198,7 +198,7 @@ impl MTLSharedEvent {
     #[must_use]
     pub fn label(&self) -> Option<String> {
         unsafe {
-            let label: *mut Object = msg_send![self.as_ref(), label];
+            let label: *mut Object = msg_send![self.as_ref() as &MTLSharedEventRef, label];
             if label.is_null() {
                 None
             } else {
@@ -212,7 +212,7 @@ impl MTLSharedEvent {
     pub fn set_label(&self, label: &str) {
         unsafe {
             let ns_string = NSString::from_rust_str(label);
-            let _: () = msg_send![self.as_ref(), setLabel:ns_string.as_ptr()];
+            let _: () = msg_send![self.as_ref() as &MTLSharedEventRef, setLabel:ns_string.as_ptr()];
         }
     }
     
@@ -220,14 +220,14 @@ impl MTLSharedEvent {
     #[must_use]
     pub fn signaled_value(&self) -> u64 {
         unsafe {
-            msg_send![self.as_ref(), signaledValue]
+            msg_send![self.as_ref() as &MTLSharedEventRef, signaledValue]
         }
     }
     
     /// Sets the signaled value of this shared event.
     pub fn set_signaled_value(&self, value: u64) {
         unsafe {
-            let _: () = msg_send![self.as_ref(), setSignaledValue:value];
+            let _: () = msg_send![self.as_ref() as &MTLSharedEventRef, setSignaledValue:value];
         }
     }
     
@@ -235,7 +235,7 @@ impl MTLSharedEvent {
     #[must_use]
     pub fn new_shared_event_handle(&self) -> MTLSharedEventHandle {
         unsafe {
-            let ptr: *mut Object = msg_send![self.as_ref(), newSharedEventHandle];
+            let ptr: *mut Object = msg_send![self.as_ref() as &MTLSharedEventRef, newSharedEventHandle];
             MTLSharedEventHandle::from_ptr(ptr)
         }
     }
@@ -253,7 +253,7 @@ impl MTLSharedEvent {
     #[must_use]
     pub fn wait_until_signaled_value(&self, value: u64, timeout_ms: u64) -> bool {
         unsafe {
-            msg_send![self.as_ref(), waitUntilSignaledValue:value timeoutMS:timeout_ms]
+            msg_send![self.as_ref() as &MTLSharedEventRef, waitUntilSignaledValue:value timeoutMS:timeout_ms]
         }
     }
 }
