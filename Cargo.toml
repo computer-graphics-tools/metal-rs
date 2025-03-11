@@ -16,6 +16,8 @@ block = "0.1.6"
 foreign-types = "0.5"
 bitflags = "2.9.0"
 core-graphics-types = { version = "0.2.0", default-features = false }
+core-graphics = "0.24.0"
+core-foundation = "0.10.0"
 bytemuck = { version = "1.14.0", features = ["derive"] }
 libc = "0.2"
 malloc_buf = "1.0.0"

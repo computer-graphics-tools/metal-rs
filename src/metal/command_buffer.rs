@@ -267,12 +267,30 @@ impl MTLCommandBuffer {
         }
     }
     
+    /// Creates a new blit command encoder with a blit pass descriptor.
+    #[must_use]
+    pub fn new_blit_command_encoder_with_descriptor(&self, descriptor: &crate::metal::blit_pass::MTLBlitPassDescriptor) -> crate::metal::blit_command_encoder::MTLBlitCommandEncoder {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), blitCommandEncoderWithDescriptor:descriptor.as_ptr()];
+            crate::metal::blit_command_encoder::MTLBlitCommandEncoder::from_ptr(ptr)
+        }
+    }
+    
     /// Creates a new compute command encoder.
     #[must_use]
     pub fn new_compute_command_encoder(&self) -> crate::metal::compute_command_encoder::MTLComputeCommandEncoder {
         unsafe {
             let ptr: *mut Object = msg_send![self.as_ref(), computeCommandEncoder];
             crate::metal::compute_command_encoder::MTLComputeCommandEncoder::from_ptr(ptr)
+        }
+    }
+    
+    /// Creates a new resource state command encoder.
+    #[must_use]
+    pub fn new_resource_state_command_encoder(&self) -> crate::metal::resource_state_command_encoder::MTLResourceStateCommandEncoder {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), resourceStateCommandEncoder];
+            crate::metal::resource_state_command_encoder::MTLResourceStateCommandEncoder::from_ptr(ptr)
         }
     }
     

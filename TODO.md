@@ -38,9 +38,10 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [x] Multicore rendering support
   - [x] Child encoder creation/management
 
-- [ ] MTLResourceStateCommandEncoder
-  - [ ] Resource state tracking
-  - [ ] Barrier operations
+- [x] MTLResourceStateCommandEncoder
+  - [x] Resource state tracking
+  - [x] Barrier operations
+  - [x] Sparse texture mapping
 
 - [x] MTLComputePass
   - [x] Pass descriptor handling
@@ -50,15 +51,15 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [x] Pass descriptor handling
   - [x] Attachment configuration
 
-- [ ] MTLBlitPass
-  - [ ] Pass descriptor handling
-  - [ ] Blit operation configuration
+- [x] MTLBlitPass
+  - [x] Pass descriptor handling
+  - [x] Blit operation configuration
 
 ### Pipeline States
 
-- [ ] MTLPipeline
-  - [ ] Base pipeline functionality
-  - [ ] Common properties and methods
+- [x] MTLPipeline
+  - [x] Base pipeline functionality
+  - [x] Common properties and methods
 
 - [x] Complete MTLRenderPipeline
   - [x] Full descriptor implementation
@@ -69,6 +70,7 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [x] Pipeline state creation
   - [x] Pipeline reflection
   - [x] Kernel function binding
+  - [x] Full descriptor implementation with buffers
 
 ### Resource Management
 

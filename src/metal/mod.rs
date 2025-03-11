@@ -51,7 +51,11 @@ pub mod argument;
 pub mod argument_encoder;
 pub mod render_pass;
 pub mod compute_pass;
+pub mod blit_pass;
 pub mod event;
+pub mod resource_state_command_encoder;
+pub mod pipeline;
+pub mod compute_pipeline;
 
 // Re-export types for public API
 pub use device::{MTLDevice, MTLDeviceRef, MTLCreateSystemDefaultDevice, MTLFeatureSet};
@@ -151,4 +155,21 @@ pub use compute_pass::{
     MTLComputePassDescriptor, MTLComputePassDescriptorRef,
     MTLComputePassSampleBufferAttachmentDescriptor, MTLComputePassSampleBufferAttachmentDescriptorRef,
     MTLComputePassSampleBufferAttachmentDescriptorArray, MTLComputePassSampleBufferAttachmentDescriptorArrayRef
+};
+pub use blit_pass::{
+    MTLBlitPassDescriptor, MTLBlitPassDescriptorRef,
+    MTLBlitPassSampleBufferAttachmentDescriptor, MTLBlitPassSampleBufferAttachmentDescriptorRef,
+    MTLBlitPassSampleBufferAttachmentDescriptorArray, MTLBlitPassSampleBufferAttachmentDescriptorArrayRef
+};
+pub use resource_state_command_encoder::{
+    MTLResourceStateCommandEncoder, MTLResourceStateCommandEncoderRef,
+    MTLSparseTextureMappingMode, MTLSparseTextureRegionUpdateIndirectArguments
+};
+pub use pipeline::{
+    MTLMutability,
+    MTLPipelineBufferDescriptor, MTLPipelineBufferDescriptorRef,
+    MTLPipelineBufferDescriptorArray, MTLPipelineBufferDescriptorArrayRef
+};
+pub use compute_pipeline::{
+    MTLComputePipelineDescriptor, MTLComputePipelineDescriptorRef
 };

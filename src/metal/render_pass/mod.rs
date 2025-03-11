@@ -112,6 +112,17 @@ pub enum MTLStoreAction {
     CustomSampleDepthResolve = 5,
 }
 
+/// Store action options for attachments.
+#[allow(non_camel_case_types)]
+#[repr(u64)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum MTLStoreActionOptions {
+    /// No special options.
+    None = 0,
+    /// Store content in a way that can be used for a custom sample resolve operation.
+    CustomSamplePositions = 1,
+}
+
 /// Multisample depth resolve filter.
 #[allow(non_camel_case_types)]
 #[repr(u64)]

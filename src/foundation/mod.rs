@@ -28,7 +28,9 @@
 
 mod string;
 mod types;
+mod array;
 
 // Re-export
 pub use string::{NSString, NSStringRef, nsstring_from_str, nsstring_as_str};
 pub use types::{NSRange, NSPoint, NSSize, NSRect, NSInteger, NSUInteger};
+pub use array::{NSArray, NSArrayRef};

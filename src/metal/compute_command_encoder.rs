@@ -49,6 +49,7 @@ use crate::metal::{
     MTLSize, MTLRegion,
     MTLResource, MTLResourceRef
 };
+use crate::metal::fence::MTLFenceRef;
 
 /// Dispatch type for compute command encoders.
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -320,6 +321,22 @@ impl MTLComputeCommandEncoder {
             let encoder_ref: &MTLComputeCommandEncoderRef = self.as_ref();
             let count = resources.len();
             let _: () = msg_send![encoder_ref, useResources:resources.as_ptr() count:count usage:usage];
+        }
+    }
+    
+    /// Updates a fence to establish a dependency between commands in this encoder and commands in subsequent encoders.
+    pub fn update_fence(&self, fence: &impl AsRef<MTLFenceRef>) {
+        unsafe {
+            let encoder_ref: &MTLComputeCommandEncoderRef = self.as_ref();
+            let _: () = msg_send![encoder_ref, updateFence:fence.as_ref().as_ptr()];
+        }
+    }
+    
+    /// Makes this encoder wait for a fence from a previous encoder to complete its work.
+    pub fn wait_for_fence(&self, fence: &impl AsRef<MTLFenceRef>) {
+        unsafe {
+            let encoder_ref: &MTLComputeCommandEncoderRef = self.as_ref();
+            let _: () = msg_send![encoder_ref, waitForFence:fence.as_ref().as_ptr()];
         }
     }
 }

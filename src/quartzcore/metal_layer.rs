@@ -1,61 +1,53 @@
 //! CAMetalLayer - A Rust wrapper around QuartzCore's CAMetalLayer class.
 //!
 //! This module provides safe Rust bindings to the CAMetalLayer class from Apple's QuartzCore framework.
-//! CAMetalLayer is used to create a Metal-compatible rendering layer that can be added to a view hierarchy.
+//! CAMetalLayer is used to create Metal drawables that can be presented onscreen.
 //!
 //! # Examples
 //!
 //! ```no_run
-//! use metal_rs::quartzcore::{CAMetalLayer, CGSize, MTLPixelFormat};
+//! use metal_rs::metal::MTLCreateSystemDefaultDevice;
+//! use metal_rs::quartzcore::CAMetalLayer;
 //!
+//! // Get the default system device
+//! let device = MTLCreateSystemDefaultDevice();
+//! 
 //! // Create a metal layer
 //! let layer = CAMetalLayer::new();
+//! layer.set_device(&device);
 //! 
-//! // Configure the layer
-//! layer.set_pixel_format(MTLPixelFormat::BGRA8Unorm);
-//! layer.set_framebuffer_only(true);
+//! // Get next drawable from the layer
+//! let drawable = layer.next_drawable().unwrap();
 //! 
-//! // Set the drawable size
-//! let size = CGSize::new(800.0, 600.0);
-//! layer.set_drawable_size(size);
+//! // Present the drawable
+//! drawable.present();
 //! ```
 
 use std::fmt;
-use objc::{class, msg_send, sel, sel_impl};
+use objc::{msg_send, sel, sel_impl, class};
 use objc::runtime::Object;
 use foreign_types::{ForeignType, ForeignTypeRef};
-use crate::quartzcore::metal_drawable::CAMetalDrawable;
+use crate::metal::{MTLDevice, MTLDeviceRef, MTLPixelFormat, MTLDrawableRef};
 
-/// CGSize from CoreGraphics, we'll define it here for simplicity
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CGSize {
-    pub width: f64,
-    pub height: f64,
-}
+/// A reference to an Objective-C `CAMetalDrawable`.
+pub struct CAMetalDrawableRef(Object);
 
-impl CGSize {
-    #[must_use]
-    pub fn new(width: f64, height: f64) -> Self {
-        CGSize { width, height }
-    }
-}
+/// An owned Objective-C `CAMetalDrawable`.
+pub struct CAMetalDrawable(*mut Object);
 
-// Dummy types for MTL - these will be replaced with actual imports later
-pub struct MTLDeviceRef(Object);
-pub struct MTLDevice(*mut Object);
-
-// Implementation of placeholder MTLDevice
-unsafe impl ForeignTypeRef for MTLDeviceRef {
+unsafe impl ForeignTypeRef for CAMetalDrawableRef {
     type CType = Object;
 }
 
-unsafe impl ForeignType for MTLDevice {
+unsafe impl Send for CAMetalDrawableRef {}
+unsafe impl Sync for CAMetalDrawableRef {}
+
+unsafe impl ForeignType for CAMetalDrawable {
     type CType = Object;
-    type Ref = MTLDeviceRef;
+    type Ref = CAMetalDrawableRef;
     
-    unsafe fn from_ptr(ptr: *mut Object) -> MTLDevice {
-        MTLDevice(ptr)
+    unsafe fn from_ptr(ptr: *mut Object) -> CAMetalDrawable {
+        CAMetalDrawable(ptr)
     }
 
     fn as_ptr(&self) -> *mut Object {
@@ -63,13 +55,70 @@ unsafe impl ForeignType for MTLDevice {
     }
 }
 
-// MTLPixelFormat - using an enum with number representation to match Metal's API
-#[repr(u64)]
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub enum MTLPixelFormat {
-    Invalid = 0,
-    RGBA8Unorm = 70,
-    BGRA8Unorm = 80,
+impl AsRef<CAMetalDrawableRef> for CAMetalDrawable {
+    fn as_ref(&self) -> &CAMetalDrawableRef {
+        unsafe { &*(self.0.cast::<CAMetalDrawableRef>()) }
+    }
+}
+
+unsafe impl Send for CAMetalDrawable {}
+unsafe impl Sync for CAMetalDrawable {}
+
+unsafe impl objc::Message for CAMetalDrawableRef {}
+
+impl CAMetalDrawable {
+    /// Get the texture associated with this drawable.
+    #[must_use]
+    pub fn texture(&self) -> crate::metal::MTLTexture {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref() as &CAMetalDrawableRef, texture];
+            crate::metal::MTLTexture::from_ptr(ptr)
+        }
+    }
+
+    /// Get the layer associated with this drawable.
+    #[must_use]
+    pub fn layer(&self) -> &CAMetalLayerRef {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref() as &CAMetalDrawableRef, layer];
+            &*(ptr as *mut CAMetalLayerRef)
+        }
+    }
+}
+
+impl fmt::Debug for CAMetalDrawable {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "CAMetalDrawable {{ texture: {:?} }}", self.texture())
+    }
+}
+
+impl Drop for CAMetalDrawable {
+    fn drop(&mut self) {
+        unsafe {
+            let _: () = msg_send![self.0, release];
+        }
+    }
+}
+
+impl Clone for CAMetalDrawable {
+    fn clone(&self) -> Self {
+        unsafe {
+            let obj: *mut Object = msg_send![self.0, retain];
+            CAMetalDrawable::from_ptr(obj)
+        }
+    }
+}
+
+impl AsRef<MTLDrawableRef> for CAMetalDrawableRef {
+    fn as_ref(&self) -> &MTLDrawableRef {
+        unsafe { &*(self as *const _ as *const MTLDrawableRef) }
+    }
+}
+
+impl AsRef<MTLDrawableRef> for CAMetalDrawable {
+    fn as_ref(&self) -> &MTLDrawableRef {
+        unsafe { &*(self.0 as *mut Object as *const MTLDrawableRef) }
+    }
 }
 
 /// A reference to an Objective-C `CAMetalLayer`.
@@ -110,101 +159,159 @@ unsafe impl Sync for CAMetalLayer {}
 unsafe impl objc::Message for CAMetalLayerRef {}
 
 impl CAMetalLayer {
-    /// Creates a new `CAMetalLayer` instance.
+    /// Creates a new CAMetalLayer.
     #[must_use]
     pub fn new() -> Self {
-        Self::layer()
-    }
-
-    /// Creates a new `CAMetalLayer`.
-    #[must_use]
-    pub fn layer() -> Self {
         unsafe {
-            let cls = class!(CAMetalLayer);
-            let obj: *mut Object = msg_send![cls, layer];
+            let class = class!(CAMetalLayer);
+            let alloc: *mut Object = msg_send![class, alloc];
+            let obj: *mut Object = msg_send![alloc, init];
             CAMetalLayer::from_ptr(obj)
         }
     }
 
-    /// Returns the Metal device used by the layer.
-    pub fn device(&self) -> MTLDevice {
-        unsafe {
-            let ptr: *mut Object = msg_send![self.as_ref(), device];
-            MTLDevice::from_ptr(ptr)
-        }
-    }
-
-    /// Sets the Metal device to be used by the layer.
+    /// Sets the Metal device used by this layer.
     pub fn set_device(&self, device: &MTLDevice) {
         unsafe {
             let _: () = msg_send![self.as_ref(), setDevice:device.as_ptr()];
         }
     }
 
-    /// Returns the pixel format of textures created by the layer.
+    /// Gets the Metal device used by this layer.
+    #[must_use]
+    pub fn device(&self) -> Option<&MTLDeviceRef> {
+        unsafe {
+            let device: *mut Object = msg_send![self.as_ref(), device];
+            if device.is_null() {
+                None
+            } else {
+                Some(&*(device as *mut MTLDeviceRef))
+            }
+        }
+    }
+
+    /// Sets the pixel format for this layer.
+    pub fn set_pixel_format(&self, pixel_format: MTLPixelFormat) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), setPixelFormat:pixel_format];
+        }
+    }
+
+    /// Gets the pixel format for this layer.
     #[must_use]
     pub fn pixel_format(&self) -> MTLPixelFormat {
         unsafe {
-            let format: MTLPixelFormat = msg_send![self.as_ref(), pixelFormat];
-            format
+            msg_send![self.as_ref(), pixelFormat]
         }
     }
 
-    /// Sets the pixel format of textures created by the layer.
-    pub fn set_pixel_format(&self, format: MTLPixelFormat) {
-        unsafe {
-            let _: () = msg_send![self.as_ref(), setPixelFormat:format];
-        }
-    }
-
-    /// Returns whether the layer's textures are only for framebuffer use.
+    /// Gets the next drawable from this layer.
     #[must_use]
-    pub fn framebuffer_only(&self) -> bool {
+    pub fn next_drawable(&self) -> Option<CAMetalDrawable> {
         unsafe {
-            msg_send![self.as_ref(), framebufferOnly]
+            let drawable: *mut Object = msg_send![self.as_ref(), nextDrawable];
+            if drawable.is_null() {
+                None
+            } else {
+                Some(CAMetalDrawable::from_ptr(drawable))
+            }
         }
     }
 
-    /// Sets whether the layer's textures are only for framebuffer use.
+    /// Sets the frame buffer only flag.
     pub fn set_framebuffer_only(&self, framebuffer_only: bool) {
         unsafe {
             let _: () = msg_send![self.as_ref(), setFramebufferOnly:framebuffer_only];
         }
     }
 
-    /// Returns the drawable size of the layer.
+    /// Gets the frame buffer only flag.
     #[must_use]
-    pub fn drawable_size(&self) -> CGSize {
+    pub fn is_framebuffer_only(&self) -> bool {
         unsafe {
-            msg_send![self.as_ref(), drawableSize]
+            msg_send![self.as_ref(), framebufferOnly]
         }
     }
 
-    /// Sets the drawable size of the layer.
-    pub fn set_drawable_size(&self, size: CGSize) {
+    /// Sets the drawable size.
+    pub fn set_drawable_size(&self, width: f64, height: f64) {
         unsafe {
+            use core_graphics::geometry::CGSize;
+            let size = CGSize::new(width, height);
             let _: () = msg_send![self.as_ref(), setDrawableSize:size];
         }
     }
 
-    /// Returns the next drawable for the layer.
+    /// Gets the drawable size.
     #[must_use]
-    pub fn next_drawable(&self) -> Option<CAMetalDrawable> {
+    pub fn drawable_size(&self) -> (f64, f64) {
         unsafe {
-            let ptr: *mut Object = msg_send![self.as_ref(), nextDrawable];
-            if ptr.is_null() {
-                None
-            } else {
-                Some(CAMetalDrawable::from_ptr(ptr))
-            }
+            use core_graphics::geometry::CGSize;
+            let size: CGSize = msg_send![self.as_ref(), drawableSize];
+            (size.width, size.height)
+        }
+    }
+
+    /// Sets whether the contents are opaque.
+    pub fn set_opaque(&self, opaque: bool) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), setOpaque:opaque];
+        }
+    }
+
+    /// Gets whether the contents are opaque.
+    #[must_use]
+    pub fn is_opaque(&self) -> bool {
+        unsafe {
+            msg_send![self.as_ref(), isOpaque]
+        }
+    }
+
+    /// Sets whether presentation is synchronized with vsync.
+    pub fn set_presents_with_transaction(&self, presents_with_transaction: bool) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), setPresentsWithTransaction:presents_with_transaction];
+        }
+    }
+
+    /// Gets whether presentation is synchronized with vsync.
+    #[must_use]
+    pub fn presents_with_transaction(&self) -> bool {
+        unsafe {
+            msg_send![self.as_ref(), presentsWithTransaction]
+        }
+    }
+
+    /// Sets the maximum number of drawables that can be held by the layer.
+    pub fn set_maximum_drawable_count(&self, count: u64) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), setMaximumDrawableCount:count];
+        }
+    }
+
+    /// Gets the maximum number of drawables that can be held by the layer.
+    #[must_use]
+    pub fn maximum_drawable_count(&self) -> u64 {
+        unsafe {
+            msg_send![self.as_ref(), maximumDrawableCount]
         }
     }
 }
 
 impl fmt::Debug for CAMetalLayer {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let size = self.drawable_size();
-        write!(f, "CAMetalLayer {{ size: {}x{} }}", size.width, size.height)
+        let device = self.device().map_or_else(|| "None".to_string(), |_| "Some(MTLDevice)".to_string());
+        let (width, height) = self.drawable_size();
+        
+        f.debug_struct("CAMetalLayer")
+            .field("device", &device)
+            .field("pixel_format", &self.pixel_format())
+            .field("drawable_size", &format!("({}, {})", width, height))
+            .field("framebuffer_only", &self.is_framebuffer_only())
+            .field("opaque", &self.is_opaque())
+            .field("presents_with_transaction", &self.presents_with_transaction())
+            .field("maximum_drawable_count", &self.maximum_drawable_count())
+            .finish()
     }
 }
 

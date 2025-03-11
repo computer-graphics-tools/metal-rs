@@ -6,8 +6,9 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 
 | Category | Unimplemented Types |
 |----------|---------------------|
-| **Command Encoding** | MTLResourceStateCommandEncoder, MTLBlitPass |
-| **Pipeline States** | MTLPipeline |
+| **Command Encoding** | |
+| **Pipeline States** | |
+| **Pipeline Descriptors** | MTLPipelineBufferDescriptor, MTLPipelineBufferDescriptorArray |
 | **Resource Management** | MTLAllocation, MTLResidencySet |
 | **Descriptors** | MTLStageInputOutputDescriptor, MTLFunctionDescriptor |
 | **Advanced Rendering** | MTLRasterizationRate, MTLLinkedFunctions, MTLCounters |
@@ -28,10 +29,10 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 | **Resources** | MTLResource, MTLBuffer, MTLTexture, MTLTextureDescriptor |
 | **Rendering** | MTLRenderCommandEncoder (partially), MTLDepthStencilState, MTLRenderPass, MTLParallelRenderCommandEncoder |
 | **Synchronization** | MTLFence, MTLEvent |
-| **Pass Descriptors** | MTLRenderPass, MTLComputePass |
-| **Memory Operations** | MTLBlitCommandEncoder |
+| **Pass Descriptors** | MTLRenderPass, MTLComputePass, MTLBlitPass |
+| **Memory Operations** | MTLBlitCommandEncoder, MTLResourceStateCommandEncoder |
 | **Shader Code** | MTLLibrary, MTLFunction, MTLFunctionConstantValues |
-| **Compute** | MTLComputeCommandEncoder, MTLComputePipelineState |
+| **Compute** | MTLComputeCommandEncoder, MTLComputePipelineState, MTLComputePipelineDescriptor |
 | **Types and Constants** | MTLPixelFormat, MTLTypes |
 | **Sampling** | MTLSampler |
 | **Vertex Data** | MTLVertexDescriptor |
@@ -64,7 +65,7 @@ Based on the typical Metal application requirements and existing implementation,
    - ✅ MTLParallelRenderCommandEncoder
    - ✅ MTLEvent
    - ✅ MTLComputePass
-   - MTLBlitPass
+   - ✅ MTLBlitPass
 
 5. **Specialized Features**
    - Ray tracing types (MTLAccelerationStructure, etc.)

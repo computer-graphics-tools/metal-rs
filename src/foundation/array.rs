@@ -1,45 +1,73 @@
-//! NSArray - a static ordered collection of objects.
+//! NSArray - A Rust wrapper around Foundation's NSArray class.
+//!
+//! This module provides safe Rust bindings to the NSArray class from Apple's Foundation framework.
+//! NSArray is an ordered collection of objects.
+//!
+//! # Examples
+//!
+//! ```no_run
+//! use metal_rs::foundation::NSArray;
+//!
+//! // Create an array from a slice
+//! let strings = vec!["Hello", "World"];
+//! let ns_strings: Vec<_> = strings.iter().map(|s| metal_rs::foundation::NSString::from_rust_str(s)).collect();
+//! let array = NSArray::from_refs_slice(&ns_strings);
+//! 
+//! // Get the count
+//! let count = array.count();
+//! 
+//! // Get an object at index
+//! if count > 0 {
+//!     let obj = array.object_at(0);
+//! }
+//! ```
 
-use crate::foreign_obj_type;
-use crate::foundation::object::{NSObject, NSObjectRef};
-use crate::foundation::types::NSUInteger;
-use crate::msg_send_bool;
-use objc::{class, msg_send, sel, sel_impl};
-use objc::runtime::{Class, Object, BOOL};
 use std::fmt;
-use std::marker::PhantomData;
-use std::ops::Index;
+use objc::{msg_send, sel, sel_impl, class};
+use objc::runtime::Object;
+use foreign_types::{ForeignType, ForeignTypeRef};
+use crate::foundation::NSUInteger;
 
 /// A reference to an Objective-C `NSArray`.
-pub enum NSArrayRef {}
+pub struct NSArrayRef(Object);
 
 /// An owned Objective-C `NSArray`.
-pub struct NSArray(foreign_types::ForeignObjectRef<NSArrayRef>);
+pub struct NSArray(*mut Object);
 
-foreign_types::foreign_obj_type! {
-    type CType = objc::runtime::Object;
-    pub struct NSArray;
-    pub struct NSArrayRef;
+unsafe impl ForeignTypeRef for NSArrayRef {
+    type CType = Object;
 }
+
+unsafe impl Send for NSArrayRef {}
+unsafe impl Sync for NSArrayRef {}
+
+unsafe impl ForeignType for NSArray {
+    type CType = Object;
+    type Ref = NSArrayRef;
+    
+    unsafe fn from_ptr(ptr: *mut Object) -> NSArray {
+        NSArray(ptr)
+    }
+
+    fn as_ptr(&self) -> *mut Object {
+        self.0
+    }
+}
+
+impl AsRef<NSArrayRef> for NSArray {
+    fn as_ref(&self) -> &NSArrayRef {
+        unsafe { &*(self.0.cast::<NSArrayRef>()) }
+    }
+}
+
+unsafe impl Send for NSArray {}
+unsafe impl Sync for NSArray {}
 
 unsafe impl objc::Message for NSArrayRef {}
 
-/// A reference to an Objective-C `NSMutableArray`.
-pub enum NSMutableArrayRef {}
-
-/// An owned Objective-C `NSMutableArray`.
-pub struct NSMutableArray(foreign_types::ForeignObjectRef<NSMutableArrayRef>);
-
-foreign_types::foreign_obj_type! {
-    type CType = objc::runtime::Object;
-    pub struct NSMutableArray;
-    pub struct NSMutableArrayRef;
-}
-
-unsafe impl objc::Message for NSMutableArrayRef {}
-
 impl NSArray {
-    /// Creates an empty array.
+    /// Creates a new empty array.
+    #[must_use]
     pub fn new() -> Self {
         unsafe {
             let class = class!(NSArray);
@@ -48,102 +76,84 @@ impl NSArray {
         }
     }
 
-    /// Creates an array with the given objects.
-    pub fn from_slice<T: AsRef<NSObjectRef>>(objects: &[T]) -> Self {
-        let count = objects.len();
-        
-        // Empty array
-        if count == 0 {
-            return Self::new();
-        }
-        
-        // Create a temporary Vec of pointers
-        let mut ptr_array = Vec::with_capacity(count);
-        for obj in objects {
-            ptr_array.push(obj.as_ref() as *const NSObjectRef);
-        }
-        
+    /// Creates a new array from a slice of objects.
+    #[must_use]
+    pub fn from_slice<T: ForeignTypeRef>(objects: &[&T]) -> Self 
+    where T::CType: objc::Message {
         unsafe {
+            let count = objects.len();
             let class = class!(NSArray);
-            let obj: *mut Object = msg_send![class, alloc];
-            let obj: *mut Object = msg_send![obj, initWithObjects: ptr_array.as_ptr() count: count];
+            let ptrs: Vec<*const Object> = objects.iter().map(|obj| obj.as_ptr() as *const Object).collect();
+            let obj: *mut Object = msg_send![class, arrayWithObjects:ptrs.as_ptr() count:count];
             NSArray::from_ptr(obj)
         }
     }
-    
-    /// Creates an NSArray from a raw pointer.
-    pub fn from_ptr(ptr: *mut Object) -> Self {
-        unsafe { Self::from_raw(ptr) }
+
+    /// Creates a new array from a slice of object references that implement AsRef<T>.
+    #[must_use]
+    pub fn from_refs_slice<T, U>(objects: &[T]) -> Self 
+    where 
+        T: AsRef<U>,
+        U: ForeignTypeRef,
+        U::CType: objc::Message 
+    {
+        unsafe {
+            let count = objects.len();
+            let class = class!(NSArray);
+            let ptrs: Vec<*const Object> = objects.iter().map(|obj| obj.as_ref().as_ptr() as *const Object).collect();
+            let obj: *mut Object = msg_send![class, arrayWithObjects:ptrs.as_ptr() count:count];
+            NSArray::from_ptr(obj)
+        }
     }
 
-    /// Returns the number of objects in the array.
+    /// Gets the number of objects in the array.
+    #[must_use]
     pub fn count(&self) -> NSUInteger {
         unsafe {
             msg_send![self.as_ref(), count]
         }
     }
 
-    /// Returns whether the array is empty.
-    pub fn is_empty(&self) -> bool {
-        self.count() == 0
+    /// Gets an object at the specified index.
+    #[must_use]
+    pub fn object_at(&self, index: NSUInteger) -> *mut Object {
+        unsafe {
+            msg_send![self.as_ref(), objectAtIndex:index]
+        }
     }
 
-    /// Returns the object at the given index.
-    pub fn object_at(&self, index: NSUInteger) -> Option<&NSObjectRef> {
-        if index >= self.count() {
-            return None;
-        }
-        
+    /// Gets an object at the specified index as a specific type.
+    #[must_use]
+    pub fn object_at_as<T: ForeignType>(&self, index: NSUInteger) -> T 
+    where T::CType: objc::Message {
         unsafe {
-            let obj: *mut Object = msg_send![self.as_ref(), objectAtIndex:, index];
-            if obj.is_null() {
-                None
-            } else {
-                Some(&*(obj as *const NSObjectRef))
-            }
+            let obj: *mut Object = msg_send![self.as_ref(), objectAtIndex:index];
+            T::from_ptr(obj as *mut T::CType)
         }
     }
 
     /// Returns whether the array contains the given object.
-    pub fn contains_object(&self, object: &NSObjectRef) -> bool {
+    #[must_use]
+    pub fn contains_object<T>(&self, object: &T) -> bool 
+    where 
+        T: ForeignTypeRef,
+        T::CType: objc::Message 
+    {
         unsafe {
-            msg_send_bool!(self.as_ref(), containsObject:, object)
+            let result: bool = msg_send![self.as_ref(), containsObject:object.as_ptr()];
+            result
         }
     }
 
-    /// Returns the index of the given object, or None if it's not found.
-    pub fn index_of_object(&self, object: &NSObjectRef) -> Option<NSUInteger> {
+    /// Returns the first index of the given object.
+    #[must_use]
+    pub fn index_of_object<T>(&self, object: &T) -> NSUInteger 
+    where 
+        T: ForeignTypeRef,
+        T::CType: objc::Message 
+    {
         unsafe {
-            let index: NSUInteger = msg_send![self.as_ref(), indexOfObject:, object];
-            if index == NSUInteger::MAX {
-                None
-            } else {
-                Some(index)
-            }
-        }
-    }
-
-    /// Returns the first object in the array, or None if the array is empty.
-    pub fn first_object(&self) -> Option<&NSObjectRef> {
-        unsafe {
-            let obj: *mut Object = msg_send![self.as_ref(), firstObject];
-            if obj.is_null() {
-                None
-            } else {
-                Some(&*(obj as *const NSObjectRef))
-            }
-        }
-    }
-
-    /// Returns the last object in the array, or None if the array is empty.
-    pub fn last_object(&self) -> Option<&NSObjectRef> {
-        unsafe {
-            let obj: *mut Object = msg_send![self.as_ref(), lastObject];
-            if obj.is_null() {
-                None
-            } else {
-                Some(&*(obj as *const NSObjectRef))
-            }
+            msg_send![self.as_ref(), indexOfObject:object.as_ptr()]
         }
     }
 }
@@ -156,154 +166,16 @@ impl Default for NSArray {
 
 impl fmt::Debug for NSArray {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        unsafe {
-            let description: *mut Object = msg_send![self.as_ref(), description];
-            let nsstring = super::NSString::from_ptr(description);
-            write!(f, "{}", nsstring.to_string())
-        }
+        f.debug_struct("NSArray")
+            .field("count", &self.count())
+            .finish()
     }
 }
 
-impl<'a> IntoIterator for &'a NSArray {
-    type Item = &'a NSObjectRef;
-    type IntoIter = NSArrayIterator<'a>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        NSArrayIterator {
-            array: self,
-            index: 0,
-            count: self.count(),
-        }
-    }
-}
-
-/// Iterator over NSArray elements.
-pub struct NSArrayIterator<'a> {
-    array: &'a NSArray,
-    index: NSUInteger,
-    count: NSUInteger,
-}
-
-impl<'a> Iterator for NSArrayIterator<'a> {
-    type Item = &'a NSObjectRef;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index >= self.count {
-            return None;
-        }
-        
-        let item = self.array.object_at(self.index);
-        self.index += 1;
-        item
-    }
-    
-    fn size_hint(&self) -> (usize, Option<usize>) {
-        let remaining = (self.count - self.index) as usize;
-        (remaining, Some(remaining))
-    }
-}
-
-impl<'a> ExactSizeIterator for NSArrayIterator<'a> {}
-
-impl NSMutableArray {
-    /// Creates a new mutable array.
-    pub fn new() -> Self {
+impl Drop for NSArray {
+    fn drop(&mut self) {
         unsafe {
-            let class = class!(NSMutableArray);
-            let obj: *mut Object = msg_send![class, array];
-            NSMutableArray::from_ptr(obj)
-        }
-    }
-    
-    /// Creates a mutable array with the given objects.
-    pub fn from_slice<T: AsRef<NSObjectRef>>(objects: &[T]) -> Self {
-        let count = objects.len();
-        
-        // Empty array
-        if count == 0 {
-            return Self::new();
-        }
-        
-        // Create a temporary Vec of pointers
-        let mut ptr_array = Vec::with_capacity(count);
-        for obj in objects {
-            ptr_array.push(obj.as_ref() as *const NSObjectRef);
-        }
-        
-        unsafe {
-            let class = class!(NSMutableArray);
-            let obj: *mut Object = msg_send![class, alloc];
-            let obj: *mut Object = msg_send![obj, initWithObjects:count:, 
-                                           ptr_array.as_ptr(), 
-                                           count];
-            NSMutableArray::from_ptr(obj)
-        }
-    }
-    
-    /// Creates a new mutable array with a capacity.
-    pub fn with_capacity(capacity: NSUInteger) -> Self {
-        unsafe {
-            let class = class!(NSMutableArray);
-            let obj: *mut Object = msg_send![class, arrayWithCapacity:, capacity];
-            NSMutableArray::from_ptr(obj)
-        }
-    }
-    
-    /// Adds an object to the end of the array.
-    pub fn add_object(&self, object: &NSObjectRef) {
-        unsafe {
-            msg_send![self.as_ref(), addObject:, object]
-        }
-    }
-    
-    /// Inserts an object at the given index.
-    pub fn insert_object_at(&self, object: &NSObjectRef, index: NSUInteger) {
-        unsafe {
-            msg_send![self.as_ref(), insertObject:atIndex:, object, index]
-        }
-    }
-    
-    /// Removes the object at the given index.
-    pub fn remove_object_at(&self, index: NSUInteger) {
-        unsafe {
-            msg_send![self.as_ref(), removeObjectAtIndex:, index]
-        }
-    }
-    
-    /// Removes the given object from the array.
-    pub fn remove_object(&self, object: &NSObjectRef) {
-        unsafe {
-            msg_send![self.as_ref(), removeObject:, object]
-        }
-    }
-    
-    /// Removes all objects from the array.
-    pub fn remove_all_objects(&self) {
-        unsafe {
-            msg_send![self.as_ref(), removeAllObjects]
-        }
-    }
-    
-    /// Replaces the object at the given index with another object.
-    pub fn replace_object_at(&self, index: NSUInteger, object: &NSObjectRef) {
-        unsafe {
-            msg_send![self.as_ref(), replaceObjectAtIndex:withObject:, index, object]
-        }
-    }
-}
-
-impl Default for NSMutableArray {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl fmt::Debug for NSMutableArray {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        unsafe {
-            let description: *mut Object = msg_send![self.as_ref(), description];
-            let nsstring = super::NSString::from_ptr(description);
-            write!(f, "{}", nsstring.to_string())
+            let _: () = msg_send![self.0, release];
         }
     }
 }
@@ -311,23 +183,8 @@ impl fmt::Debug for NSMutableArray {
 impl Clone for NSArray {
     fn clone(&self) -> Self {
         unsafe {
-            let copy: *mut Object = msg_send![self.as_ref(), copy];
-            NSArray::from_ptr(copy)
-        }
-    }
-}
-
-impl<'a> IntoIterator for &'a NSMutableArray {
-    type Item = &'a NSObjectRef;
-    type IntoIter = NSArrayIterator<'a>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        // We can reuse the NSArray iterator since NSMutableArray is a subclass
-        let array: &NSArray = unsafe { &*(self as *const NSMutableArray as *const NSArray) };
-        NSArrayIterator {
-            array,
-            index: 0,
-            count: array.count(),
+            let obj: *mut Object = msg_send![self.0, retain];
+            NSArray::from_ptr(obj)
         }
     }
 }

@@ -49,6 +49,7 @@ use crate::foundation::NSRange;
 use crate::metal::{MTLBuffer, MTLBufferRef};
 use crate::metal::MTLTexture;
 use crate::metal::texture::{MTLSize, MTLOrigin};
+use crate::metal::fence::MTLFenceRef;
 
 /// MTLBlitOption - Options for blit operations.
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -295,6 +296,22 @@ impl MTLBlitCommandEncoder {
             msg_send![encoder_ref, fillBuffer:buffer.as_ptr()
                                         range:range
                                         value:value]
+        }
+    }
+    
+    /// Updates a fence to establish a dependency between commands in this encoder and commands in subsequent encoders.
+    pub fn update_fence(&self, fence: &impl AsRef<MTLFenceRef>) {
+        unsafe {
+            let encoder_ref: &MTLBlitCommandEncoderRef = self.as_ref();
+            msg_send![encoder_ref, updateFence:fence.as_ref().as_ptr()]
+        }
+    }
+    
+    /// Makes this encoder wait for a fence from a previous encoder to complete its work.
+    pub fn wait_for_fence(&self, fence: &impl AsRef<MTLFenceRef>) {
+        unsafe {
+            let encoder_ref: &MTLBlitCommandEncoderRef = self.as_ref();
+            msg_send![encoder_ref, waitForFence:fence.as_ref().as_ptr()]
         }
     }
     

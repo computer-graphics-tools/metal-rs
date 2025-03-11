@@ -265,6 +265,42 @@ impl MTLDevice {
         }
     }
     
+    /// Creates a new compute pipeline state from a descriptor.
+    ///
+    /// # Arguments
+    ///
+    /// * `descriptor` - The compute pipeline descriptor.
+    /// * `options` - The options to use when creating the compute pipeline state.
+    ///
+    /// # Returns
+    ///
+    /// A result containing the compute pipeline state if successful, or an error message if not.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the compute pipeline state could not be created.
+    pub fn new_compute_pipeline_state_with_descriptor(
+        &self, 
+        descriptor: &crate::metal::compute_pipeline::MTLComputePipelineDescriptor,
+        options: crate::metal::render_pipeline::MTLPipelineOption
+    ) -> Result<crate::metal::compute_command_encoder::MTLComputePipelineState, String> {
+        unsafe {
+            let mut err: *mut Object = std::ptr::null_mut();
+            
+            let ptr: *mut Object = msg_send![self.as_ref(), newComputePipelineStateWithDescriptor:descriptor.as_ptr()
+                                                                options:options as u64
+                                                                  error:&mut err];
+            
+            if !err.is_null() {
+                let error = NSString::from_ptr(msg_send![err, localizedDescription]);
+                let error_str = error.to_rust_string();
+                Err(error_str)
+            } else {
+                Ok(crate::metal::compute_command_encoder::MTLComputePipelineState::from_ptr(ptr))
+            }
+        }
+    }
+    
     /// Creates a new sampler state from a descriptor.
     #[must_use]
     pub fn new_sampler_state(&self, descriptor: &impl AsRef<crate::metal::sampler::MTLSamplerDescriptorRef>) -> crate::metal::sampler::MTLSamplerState {

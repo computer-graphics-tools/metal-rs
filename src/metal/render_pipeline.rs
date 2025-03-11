@@ -39,6 +39,7 @@ use crate::foundation::NSString;
 use crate::metal::types::MTLPixelFormat;
 use crate::metal::library::{MTLFunction};
 use crate::metal::vertex_descriptor::{MTLVertexDescriptor, MTLVertexDescriptorRef};
+use crate::metal::pipeline::{MTLPipelineBufferDescriptorArray};
 
 /// Options for color write operations
 #[allow(non_camel_case_types)]
@@ -663,6 +664,24 @@ impl MTLRenderPipelineDescriptor {
             } else {
                 Some(MTLVertexDescriptor::from_ptr(ptr))
             }
+        }
+    }
+    
+    /// Gets the vertex buffer descriptor array.
+    #[must_use]
+    pub fn vertex_buffers(&self) -> MTLPipelineBufferDescriptorArray {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), vertexBuffers];
+            MTLPipelineBufferDescriptorArray::from_ptr(ptr)
+        }
+    }
+
+    /// Gets the fragment buffer descriptor array.
+    #[must_use]
+    pub fn fragment_buffers(&self) -> MTLPipelineBufferDescriptorArray {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), fragmentBuffers];
+            MTLPipelineBufferDescriptorArray::from_ptr(ptr)
         }
     }
 }
