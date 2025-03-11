@@ -276,6 +276,24 @@ impl MTLCommandBuffer {
         }
     }
     
+    /// Creates a new compute command encoder with a specific dispatch type.
+    #[must_use]
+    pub fn new_compute_command_encoder_with_dispatch_type(&self, dispatch_type: crate::metal::compute_command_encoder::MTLDispatchType) -> crate::metal::compute_command_encoder::MTLComputeCommandEncoder {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), computeCommandEncoderWithDispatchType:dispatch_type];
+            crate::metal::compute_command_encoder::MTLComputeCommandEncoder::from_ptr(ptr)
+        }
+    }
+    
+    /// Creates a new compute command encoder with a compute pass descriptor.
+    #[must_use]
+    pub fn new_compute_command_encoder_with_descriptor(&self, descriptor: &crate::metal::compute_pass::MTLComputePassDescriptor) -> crate::metal::compute_command_encoder::MTLComputeCommandEncoder {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), computeCommandEncoderWithDescriptor:descriptor.as_ptr()];
+            crate::metal::compute_command_encoder::MTLComputeCommandEncoder::from_ptr(ptr)
+        }
+    }
+    
     /// Encodes a command to signal an event when this command buffer completes execution.
     pub fn encode_signal_event(&self, event: &impl AsRef<MTLEventRef>, value: u64) {
         unsafe {

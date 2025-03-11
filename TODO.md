@@ -42,9 +42,9 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [ ] Resource state tracking
   - [ ] Barrier operations
 
-- [ ] MTLComputePass
-  - [ ] Pass descriptor handling
-  - [ ] Compute workload management
+- [x] MTLComputePass
+  - [x] Pass descriptor handling
+  - [x] Compute workload management
 
 - [x] MTLRenderPass
   - [x] Pass descriptor handling

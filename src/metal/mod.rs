@@ -50,6 +50,7 @@ pub mod heap;
 pub mod argument;
 pub mod argument_encoder;
 pub mod render_pass;
+pub mod compute_pass;
 pub mod event;
 
 // Re-export types for public API
@@ -145,4 +146,9 @@ pub use event::{
     MTLSharedEvent, MTLSharedEventRef,
     MTLSharedEventHandle, MTLSharedEventHandleRef,
     MTLSharedEventListener, MTLSharedEventListenerRef
+};
+pub use compute_pass::{
+    MTLComputePassDescriptor, MTLComputePassDescriptorRef,
+    MTLComputePassSampleBufferAttachmentDescriptor, MTLComputePassSampleBufferAttachmentDescriptorRef,
+    MTLComputePassSampleBufferAttachmentDescriptorArray, MTLComputePassSampleBufferAttachmentDescriptorArrayRef
 };

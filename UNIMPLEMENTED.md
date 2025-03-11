@@ -6,7 +6,7 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 
 | Category | Unimplemented Types |
 |----------|---------------------|
-| **Command Encoding** | MTLResourceStateCommandEncoder, MTLComputePass, MTLBlitPass |
+| **Command Encoding** | MTLResourceStateCommandEncoder, MTLBlitPass |
 | **Pipeline States** | MTLPipeline |
 | **Resource Management** | MTLAllocation, MTLResidencySet |
 | **Descriptors** | MTLStageInputOutputDescriptor, MTLFunctionDescriptor |
@@ -28,6 +28,7 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 | **Resources** | MTLResource, MTLBuffer, MTLTexture, MTLTextureDescriptor |
 | **Rendering** | MTLRenderCommandEncoder (partially), MTLDepthStencilState, MTLRenderPass, MTLParallelRenderCommandEncoder |
 | **Synchronization** | MTLFence, MTLEvent |
+| **Pass Descriptors** | MTLRenderPass, MTLComputePass |
 | **Memory Operations** | MTLBlitCommandEncoder |
 | **Shader Code** | MTLLibrary, MTLFunction, MTLFunctionConstantValues |
 | **Compute** | MTLComputeCommandEncoder, MTLComputePipelineState |
@@ -62,7 +63,7 @@ Based on the typical Metal application requirements and existing implementation,
 4. **Advanced Features**
    - ✅ MTLParallelRenderCommandEncoder
    - ✅ MTLEvent
-   - MTLComputePass
+   - ✅ MTLComputePass
    - MTLBlitPass
 
 5. **Specialized Features**
