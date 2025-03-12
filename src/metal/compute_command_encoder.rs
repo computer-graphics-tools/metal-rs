@@ -50,6 +50,7 @@ use crate::metal::{
     MTLResource, MTLResourceRef
 };
 use crate::metal::fence::MTLFenceRef;
+use crate::metal::counters::MTLCounterSampleBufferRef;
 
 /// Dispatch type for compute command encoders.
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -339,6 +340,28 @@ impl MTLComputeCommandEncoder {
             let _: () = msg_send![encoder_ref, waitForFence:fence.as_ref().as_ptr()];
         }
     }
+    
+    /// End encoding of compute commands.
+    pub fn end_encoding(&self) {
+        unsafe {
+            let encoder_ref: &MTLComputeCommandEncoderRef = self.as_ref();
+            let _: () = msg_send![encoder_ref, endEncoding];
+        }
+    }
+    
+    /// Sample GPU performance counters within this encoder.
+    ///
+    /// # Arguments
+    ///
+    /// * `sample_buffer` - The counter sample buffer to store the samples in.
+    /// * `sample_index` - The index into the sample buffer to store the sample at.
+    /// * `barrier` - Whether to insert a barrier before taking the sample.
+    pub fn sample_counters_in_buffer(&self, sample_buffer: &impl AsRef<MTLCounterSampleBufferRef>, sample_index: NSUInteger, barrier: bool) {
+        unsafe {
+            let encoder_ref: &MTLComputeCommandEncoderRef = self.as_ref();
+            let _: () = msg_send![encoder_ref, sampleCountersInBuffer:sample_buffer.as_ref().as_ptr() atSampleIndex:sample_index withBarrier:barrier];
+        }
+    }
 }
 
 
@@ -393,6 +416,57 @@ impl MTLComputePipelineState {
     pub fn thread_execution_width(&self) -> u64 {
         unsafe {
             msg_send![self.as_ref(), threadExecutionWidth]
+        }
+    }
+    
+    /// Returns the function at the specified index.
+    ///
+    /// This method retrieves the function at the specified index in this compute pipeline state.
+    /// The function can be used to get the arguments and other reflection metadata.
+    ///
+    /// # Arguments
+    ///
+    /// * `function_index` - The index of the function to retrieve.
+    ///
+    /// # Returns
+    ///
+    /// An optional `MTLFunction` object. Returns `None` if the index is out of bounds
+    /// or if the function couldn't be retrieved.
+    #[must_use]
+    pub fn function_by_index(&self, function_index: crate::foundation::NSUInteger) -> Option<crate::metal::MTLFunction> {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), functionAtIndex:function_index];
+            if ptr.is_null() {
+                None
+            } else {
+                Some(crate::metal::MTLFunction::from_ptr(ptr))
+            }
+        }
+    }
+    
+    /// Returns the argument at the specified index.
+    ///
+    /// This method directly retrieves the argument at the specified index in this compute 
+    /// pipeline state. This is a more direct way to access arguments than going through
+    /// the function objects.
+    ///
+    /// # Arguments
+    ///
+    /// * `argument_index` - The index of the argument to retrieve.
+    ///
+    /// # Returns
+    ///
+    /// An optional `MTLArgument` object. Returns `None` if the index is out of bounds
+    /// or if the argument couldn't be retrieved.
+    #[must_use]
+    pub fn argument_by_index(&self, argument_index: crate::foundation::NSUInteger) -> Option<crate::metal::MTLArgument> {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), argumentAtIndex:argument_index];
+            if ptr.is_null() {
+                None
+            } else {
+                Some(crate::metal::MTLArgument::from_ptr(ptr))
+            }
         }
     }
 }

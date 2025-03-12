@@ -38,6 +38,7 @@ use foreign_types::{ForeignType, ForeignTypeRef};
 use crate::foundation::NSString;
 use crate::metal::types::MTLPixelFormat;
 use crate::metal::library::{MTLFunction};
+use crate::metal::linked_functions::{MTLLinkedFunctions, MTLLinkedFunctionsRef};
 use crate::metal::vertex_descriptor::{MTLVertexDescriptor, MTLVertexDescriptorRef};
 use crate::metal::pipeline::{MTLPipelineBufferDescriptorArray};
 
@@ -683,6 +684,35 @@ impl MTLRenderPipelineDescriptor {
             let ptr: *mut Object = msg_send![self.as_ref(), fragmentBuffers];
             MTLPipelineBufferDescriptorArray::from_ptr(ptr)
         }
+    }
+
+    /// Gets the linked functions for the render pipeline.
+    #[must_use]
+    pub fn linked_functions(&self) -> Option<MTLLinkedFunctions> {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), linkedFunctions];
+            if ptr.is_null() {
+                None
+            } else {
+                Some(MTLLinkedFunctions::from_ptr(ptr))
+            }
+        }
+    }
+    
+    /// Sets the linked functions for the render pipeline.
+    pub fn set_linked_functions(&self, linked_functions: &impl AsRef<MTLLinkedFunctionsRef>) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), setLinkedFunctions:linked_functions.as_ref().as_ptr()];
+        }
+    }
+}
+
+impl fmt::Debug for MTLRenderPipelineDescriptor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("MTLRenderPipelineDescriptor")
+            .field("label", &self.label())
+            .field("linked_functions", &self.linked_functions())
+            .finish()
     }
 }
 

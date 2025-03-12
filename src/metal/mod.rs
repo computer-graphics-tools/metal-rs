@@ -56,6 +56,31 @@ pub mod event;
 pub mod resource_state_command_encoder;
 pub mod pipeline;
 pub mod compute_pipeline;
+pub mod stage_input_output_descriptor;
+pub mod function_descriptor;
+pub mod allocation;
+pub mod residency_set;
+pub mod rasterization_rate;
+pub mod linked_functions;
+pub mod counters;
+pub mod function_handle;
+pub mod function_log;
+pub mod function_stitching;
+pub mod indirect_command_buffer;
+pub mod indirect_command_encoder;
+pub mod binary_archive;
+pub mod dynamic_library;
+pub mod log;
+pub mod visible_function_table;
+pub mod intersection_function_table;
+pub mod acceleration_structure;
+pub mod acceleration_structure_command_encoder;
+pub mod acceleration_structure_types;
+pub mod capture_manager;
+pub mod log_state;
+pub mod io_command_buffer;
+pub mod io_command_queue;
+pub mod io_compressor;
 
 // Re-export types for public API
 pub use device::{MTLDevice, MTLDeviceRef, MTLCreateSystemDefaultDevice, MTLFeatureSet};
@@ -66,7 +91,24 @@ pub use types::{MTLPixelFormat};
 pub use texture::{MTLSize, MTLOrigin, MTLRegion};
 pub use buffer::{MTLBuffer, MTLBufferRef};
 pub use texture::{MTLTexture, MTLTextureRef, MTLTextureType, MTLTextureUsage, MTLTextureDescriptor, MTLTextureDescriptorRef};
-pub use library::{MTLLibrary, MTLLibraryRef, MTLFunction, MTLFunctionRef, MTLCompileOptions, MTLFunctionConstantValues, MTLFunctionConstantValuesRef};
+pub use library::{
+    MTLLibrary, MTLLibraryRef, 
+    MTLFunction, MTLFunctionRef, 
+    MTLFunctionType,
+    MTLCompileOptions, 
+    MTLFunctionConstantValues, MTLFunctionConstantValuesRef
+};
+pub use function_handle::{MTLFunctionHandle, MTLFunctionHandleRef};
+pub use function_log::{
+    MTLFunctionLog, MTLFunctionLogRef,
+    MTLFunctionLogDebugLocation, MTLFunctionLogDebugLocationRef,
+    MTLFunctionLogType
+};
+pub use log::{
+    MTLLog, MTLLogRef,
+    MTLLogContainer, MTLLogContainerRef,
+    MTLLogType
+};
 pub use depth_stencil::{
     MTLCompareFunction, MTLStencilOperation,
     MTLStencilDescriptor, MTLStencilDescriptorRef,
@@ -122,7 +164,19 @@ pub use heap::{
 };
 pub use argument::{
     MTLDataType, MTLBindingType, MTLArgumentType, MTLBindingAccess,
-    MTLArgumentDescriptor, MTLArgumentDescriptorRef
+    MTLArgumentDescriptor, MTLArgumentDescriptorRef,
+    MTLType, MTLTypeRef,
+    MTLStructMember, MTLStructMemberRef,
+    MTLStructType, MTLStructTypeRef,
+    MTLArrayType, MTLArrayTypeRef,
+    MTLPointerType, MTLPointerTypeRef,
+    MTLTextureReferenceType, MTLTextureReferenceTypeRef,
+    MTLArgument, MTLArgumentRef,
+    MTLBinding, MTLBindingRef,
+    MTLBufferBinding, MTLBufferBindingRef,
+    MTLThreadgroupBinding, MTLThreadgroupBindingRef,
+    MTLTextureBinding, MTLTextureBindingRef,
+    MTLObjectPayloadBinding, MTLObjectPayloadBindingRef
 };
 pub use argument_encoder::{
     MTLArgumentEncoder, MTLArgumentEncoderRef,
@@ -172,4 +226,142 @@ pub use pipeline::{
 };
 pub use compute_pipeline::{
     MTLComputePipelineDescriptor, MTLComputePipelineDescriptorRef
+};
+pub use stage_input_output_descriptor::{
+    MTLAttributeFormat, MTLStepFunction,
+    MTLBufferLayoutDescriptor, MTLBufferLayoutDescriptorRef,
+    MTLBufferLayoutDescriptorArray, MTLBufferLayoutDescriptorArrayRef,
+    MTLAttributeDescriptor, MTLAttributeDescriptorRef,
+    MTLAttributeDescriptorArray, MTLAttributeDescriptorArrayRef,
+    MTLStageInputOutputDescriptor, MTLStageInputOutputDescriptorRef
+};
+pub use function_descriptor::{
+    MTLFunctionOptions,
+    MTLFunctionDescriptor, MTLFunctionDescriptorRef,
+    MTLIntersectionFunctionDescriptor, MTLIntersectionFunctionDescriptorRef
+};
+pub use allocation::{
+    MTLAllocation, MTLAllocationRef
+};
+pub use residency_set::{
+    MTLResidencySetDescriptor, MTLResidencySetDescriptorRef,
+    MTLResidencySet, MTLResidencySetRef
+};
+pub use rasterization_rate::{
+    MTLRasterizationRateSampleArray, MTLRasterizationRateSampleArrayRef,
+    MTLRasterizationRateLayerDescriptor, MTLRasterizationRateLayerDescriptorRef,
+    MTLRasterizationRateLayerArray, MTLRasterizationRateLayerArrayRef,
+    MTLRasterizationRateMapDescriptor, MTLRasterizationRateMapDescriptorRef,
+    MTLRasterizationRateMap, MTLRasterizationRateMapRef
+};
+pub use linked_functions::{
+    MTLLinkedFunctions, MTLLinkedFunctionsRef
+};
+pub use counters::{
+    MTLCounterSamplingPoint, MTLCounterSampleBufferError,
+    MTLCounterResultTimestamp, MTLCounterResultStageUtilization, MTLCounterResultStatistic,
+    MTLCounter, MTLCounterRef,
+    MTLCounterSet, MTLCounterSetRef,
+    MTLCounterSampleBufferDescriptor, MTLCounterSampleBufferDescriptorRef,
+    MTLCounterSampleBuffer, MTLCounterSampleBufferRef,
+    counter_sampling
+};
+pub use function_stitching::{
+    MTLStitchedLibraryOptions, MTLStitchedLibraryOptionFlags,
+    MTLFunctionStitchingAttribute, MTLFunctionStitchingAttributeRef,
+    MTLFunctionStitchingAttributeAlwaysInline, MTLFunctionStitchingAttributeAlwaysInlineRef,
+    MTLFunctionStitchingNode, MTLFunctionStitchingNodeRef,
+    MTLFunctionStitchingInputNode, MTLFunctionStitchingInputNodeRef,
+    MTLFunctionStitchingFunctionNode, MTLFunctionStitchingFunctionNodeRef,
+    MTLFunctionStitchingGraph, MTLFunctionStitchingGraphRef,
+    MTLStitchedLibraryDescriptor, MTLStitchedLibraryDescriptorRef
+};
+pub use indirect_command_buffer::{
+    MTLIndirectCommandType,
+    MTLIndirectCommandBufferExecutionRange,
+    MTLIndirectCommandBufferDescriptor, MTLIndirectCommandBufferDescriptorRef,
+    MTLIndirectCommandBuffer, MTLIndirectCommandBufferRef
+};
+pub use indirect_command_encoder::{
+    MTLIndirectRenderCommand, MTLIndirectRenderCommandRef,
+    MTLIndirectComputeCommand, MTLIndirectComputeCommandRef
+};
+pub use binary_archive::{
+    MTLBinaryArchiveError,
+    MTLBinaryArchiveDescriptor, MTLBinaryArchiveDescriptorRef,
+    MTLBinaryArchive, MTLBinaryArchiveRef
+};
+pub use dynamic_library::{
+    MTLDynamicLibraryError,
+    MTLDynamicLibrary, MTLDynamicLibraryRef
+};
+
+pub use visible_function_table::{
+    MTLVisibleFunctionTable, MTLVisibleFunctionTableRef,
+    MTLVisibleFunctionTableDescriptor, MTLVisibleFunctionTableDescriptorRef
+};
+
+pub use intersection_function_table::{
+    MTLIntersectionFunctionSignature,
+    MTLIntersectionFunctionTable, MTLIntersectionFunctionTableRef,
+    MTLIntersectionFunctionTableDescriptor, MTLIntersectionFunctionTableDescriptorRef
+};
+
+pub use acceleration_structure::{
+    MTLAccelerationStructureUsage,
+    MTLAccelerationStructureSizes,
+    MTLAccelerationStructure, MTLAccelerationStructureRef,
+    MTLAccelerationStructureDescriptor, MTLAccelerationStructureDescriptorRef
+};
+
+pub use acceleration_structure_command_encoder::{
+    MTLAccelerationStructureRefitOptions,
+    MTLAccelerationStructureCommandEncoder, MTLAccelerationStructureCommandEncoderRef,
+    MTLAccelerationStructurePassDescriptor, MTLAccelerationStructurePassDescriptorRef
+};
+
+pub use acceleration_structure_types::{
+    PackedFloat3,
+    PackedFloat4x3,
+    PackedFloatQuaternion,
+    AxisAlignedBoundingBox,
+    ComponentTransform
+};
+
+pub use capture_manager::{
+    MTLCaptureError,
+    MTLCaptureDestination,
+    MTLCaptureDescriptor, MTLCaptureDescriptorRef,
+    MTLCaptureScope, MTLCaptureScopeRef,
+    MTLCaptureManager, MTLCaptureManagerRef
+};
+
+pub use log_state::{
+    MTLLogLevel,
+    MTLLogStateError,
+    MTLLogHandler,
+    MTLLogStateDescriptor, MTLLogStateDescriptorRef,
+    MTLLogState, MTLLogStateRef
+};
+
+pub use io_command_buffer::{
+    MTLIOStatus,
+    MTLIOError,
+    MTLIOFileHandle, MTLIOFileHandleRef,
+    MTLIOScratchBuffer, MTLIOScratchBufferRef,
+    MTLIOScratchBufferAllocator, MTLIOScratchBufferAllocatorRef,
+    MTLIOCommandBuffer, MTLIOCommandBufferRef
+};
+
+pub use io_command_queue::{
+    MTLIOPriority,
+    MTLIOCommandQueueType,
+    MTLIOCommandQueueDescriptor, MTLIOCommandQueueDescriptorRef,
+    MTLIOCommandQueue, MTLIOCommandQueueRef
+};
+
+pub use io_compressor::{
+    MTLIOCompressionMethod,
+    MTLIOCompressionStatus,
+    MTLIOCompressionContext
 };

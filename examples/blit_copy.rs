@@ -18,13 +18,13 @@ fn main() {
     let source_buffer = device.new_buffer_with_data(
         data.as_ptr() as *const _, 
         data_size,
-        MTLResourceOptions::StorageModeSharedCpuCacheModeWriteCombined
+        MTLResourceOptions::StorageModeSharedCPUCacheModeWriteCombined
     );
     
     // Create destination buffer
     let dest_buffer = device.new_buffer(
         data_size,
-        MTLResourceOptions::StorageModeSharedCpuCacheModeWriteCombined
+        MTLResourceOptions::StorageModeSharedCPUCacheModeWriteCombined
     );
     
     // Create command buffer

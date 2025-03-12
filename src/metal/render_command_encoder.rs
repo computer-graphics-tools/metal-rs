@@ -45,6 +45,8 @@ use crate::metal::render_pipeline::MTLRenderPipelineState;
 use crate::metal::buffer::MTLBuffer;
 use crate::metal::texture::MTLTexture;
 use crate::metal::fence::MTLFenceRef;
+use crate::foundation::NSUInteger;
+use crate::metal::counters::MTLCounterSampleBufferRef;
 
 /// Types of primitive for rendering.
 #[allow(non_camel_case_types)]
@@ -635,6 +637,19 @@ impl MTLRenderCommandEncoder {
     pub fn end_encoding(&self) {
         unsafe {
             let _: () = msg_send![self.as_ref(), endEncoding];
+        }
+    }
+    
+    /// Sample GPU performance counters within this encoder.
+    ///
+    /// # Arguments
+    ///
+    /// * `sample_buffer` - The counter sample buffer to store the samples in.
+    /// * `sample_index` - The index into the sample buffer to store the sample at.
+    /// * `barrier` - Whether to insert a barrier before taking the sample.
+    pub fn sample_counters_in_buffer(&self, sample_buffer: &impl AsRef<MTLCounterSampleBufferRef>, sample_index: NSUInteger, barrier: bool) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), sampleCountersInBuffer:sample_buffer.as_ref().as_ptr() atSampleIndex:sample_index withBarrier:barrier];
         }
     }
     

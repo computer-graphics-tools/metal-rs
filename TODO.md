@@ -97,13 +97,13 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [x] GPU timeline synchronization
   - [x] Event creation/signaling/waiting
 
-- [ ] MTLResidencySet
-  - [ ] Residency group management
-  - [ ] Explicit residency tracking
+- [x] MTLResidencySet
+  - [x] Residency group management
+  - [x] Explicit residency tracking
 
-- [ ] MTLAllocation
-  - [ ] Memory allocation management
-  - [ ] Manual resource allocation
+- [x] MTLAllocation
+  - [x] Memory allocation management
+  - [x] Manual resource allocation
 
 ### Descriptors and Data Structures
 
@@ -112,24 +112,24 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [x] Vertex attribute formats
   - [x] Buffer bindings
 
-- [ ] MTLStageInputOutputDescriptor
-  - [ ] Compute stage configuration
-  - [ ] IO buffer bindings
+- [x] MTLStageInputOutputDescriptor
+  - [x] Compute stage configuration
+  - [x] IO buffer bindings
 
 - [x] MTLSampler
   - [x] Filtering options
   - [x] Address modes
   - [x] LOD settings
 
-- [ ] MTLFunctionDescriptor
-  - [ ] Function creation with specialized settings
-  - [ ] Function linkage options
+- [x] MTLFunctionDescriptor
+  - [x] Function creation with specialized settings
+  - [x] Function linkage options
 
 ### Argument Handling
 
-- [ ] MTLArgument
-  - [ ] Shader reflection
-  - [ ] Argument metadata
+- [x] MTLArgument
+  - [x] Shader reflection
+  - [x] Argument metadata
 
 - [x] MTLArgumentEncoder
   - [x] Resource binding for indirect access
@@ -141,101 +141,101 @@ This document outlines the comprehensive todo list for developing a fully-featur
   - [x] More methods for setting constant values
   - [x] Type-safe constant value management
 
-- [ ] MTLFunctionHandle
-  - [ ] Function reference management
-  - [ ] Indirect function calls
+- [~] MTLFunctionHandle
+  - [~] Function reference management (placeholder implementation)
+  - [~] Indirect function calls (placeholder implementation)
 
-- [ ] MTLFunctionLog
-  - [ ] Function log handling
-  - [ ] Compiler feedback
+- [x] MTLFunctionLog
+  - [x] Function log handling
+  - [x] Compiler feedback
 
-- [ ] MTLFunctionStitching
-  - [ ] Function stitching configuration
-  - [ ] Dynamic shader composition
+- [x] MTLFunctionStitching
+  - [x] Function stitching configuration
+  - [x] Dynamic shader composition
 
 ### Advanced Rendering
 
-- [ ] MTLRasterizationRate
-  - [ ] Variable rate rasterization
-  - [ ] Rasterization map configuration
+- [x] MTLRasterizationRate
+  - [x] Variable rate rasterization
+  - [x] Rasterization map configuration
 
-- [ ] MTLLinkedFunctions
-  - [ ] Function linking
-  - [ ] Dynamic function selection
+- [x] MTLLinkedFunctions
+  - [x] Function linking
+  - [x] Dynamic function selection
 
-- [ ] MTLCounters
-  - [ ] Performance counter access
-  - [ ] Statistics gathering
+- [x] MTLCounters
+  - [x] Performance counter access
+  - [x] Statistics gathering
 
 ### Indirect Commands
 
-- [ ] MTLIndirectCommandBuffer
-  - [ ] Indirect command recording
-  - [ ] Command execution
+- [x] MTLIndirectCommandBuffer
+  - [x] Indirect command recording
+  - [x] Command execution
 
-- [ ] MTLIndirectCommandEncoder
-  - [ ] Render command encoding
-  - [ ] Compute command encoding
+- [x] MTLIndirectCommandEncoder
+  - [x] Render command encoding
+  - [x] Compute command encoding
 
 ### Ray Tracing and Acceleration Structures
 
-- [ ] MTLAccelerationStructure
-  - [ ] Acceleration structure creation
-  - [ ] Acceleration structure updates
+- [x] MTLAccelerationStructure
+  - [x] Acceleration structure creation
+  - [x] Acceleration structure updates
 
-- [ ] MTLAccelerationStructureCommandEncoder
-  - [ ] Build commands
-  - [ ] Refitting commands
+- [x] MTLAccelerationStructureCommandEncoder
+  - [x] Build commands
+  - [x] Refitting commands
 
-- [ ] MTLAccelerationStructureTypes
-  - [ ] Data types for acceleration structure
-  - [ ] Geometry descriptors
+- [x] MTLAccelerationStructureTypes
+  - [x] Data types for acceleration structure
+  - [x] Geometry descriptors
 
-- [ ] MTLVisibleFunctionTable
-  - [ ] Function table configuration
-  - [ ] Shader binding
+- [x] MTLVisibleFunctionTable
+  - [x] Function table configuration
+  - [x] Shader binding
 
-- [ ] MTLIntersectionFunctionTable
-  - [ ] Intersection function binding
-  - [ ] Ray-geometry intersection definition
+- [x] MTLIntersectionFunctionTable
+  - [x] Intersection function binding
+  - [x] Ray-geometry intersection definition
 
 ### Binary and Library Management
 
-- [ ] MTLBinaryArchive
-  - [ ] Binary storage for compiled pipelines
-  - [ ] Archive loading/saving
+- [x] MTLBinaryArchive
+  - [x] Binary storage for compiled pipelines
+  - [x] Archive loading/saving
 
-- [ ] MTLDynamicLibrary
-  - [ ] Dynamic function loading
-  - [ ] Shared Metal code modules
+- [x] MTLDynamicLibrary
+  - [x] Dynamic function loading
+  - [x] Shared Metal code modules
 
 ### Debugging and Profiling
 
-- [ ] MTLCaptureManager
-  - [ ] GPU workload capture
-  - [ ] Debugging session management
+- [x] MTLCaptureManager
+  - [x] GPU workload capture
+  - [x] Debugging session management
 
-- [ ] MTLCaptureScope
-  - [ ] Capture scope definition
-  - [ ] Capture boundaries
+- [x] MTLCaptureScope
+  - [x] Capture scope definition
+  - [x] Capture boundaries
 
-- [ ] MTLLogState
-  - [ ] GPU logging configuration
-  - [ ] Debugging feedback
+- [x] MTLLogState
+  - [x] GPU logging configuration
+  - [x] Debugging feedback
 
 ### I/O Operations
 
-- [ ] MTLIOCommandBuffer
-  - [ ] I/O operations command buffer
-  - [ ] Asynchronous data transfer
+- [x] MTLIOCommandBuffer
+  - [x] I/O operations command buffer
+  - [x] Asynchronous data transfer
 
-- [ ] MTLIOCommandQueue
-  - [ ] I/O command queue management
-  - [ ] Command scheduling
+- [x] MTLIOCommandQueue
+  - [x] I/O command queue management
+  - [x] Command scheduling
 
-- [ ] MTLIOCompressor
-  - [ ] Hardware-accelerated compression
-  - [ ] Efficient data transfer
+- [x] MTLIOCompressor
+  - [x] Hardware-accelerated compression
+  - [x] Efficient data transfer
 
 ## Testing and Examples
 

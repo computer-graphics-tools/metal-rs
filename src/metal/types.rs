@@ -58,3 +58,23 @@ pub enum MTLPrimitiveType {
     /// Vertices are treated as a triangle strip.
     TriangleStrip = 4,
 }
+
+/// A structure representing a 2D coordinate.
+#[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct MTLCoordinate2D {
+    /// The x coordinate.
+    pub x: f32,
+    /// The y coordinate.
+    pub y: f32,
+}
+
+/// A structure representing size and alignment requirements.
+#[repr(C)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct MTLSizeAndAlign {
+    /// The size in bytes.
+    pub size: usize,
+    /// The alignment requirement in bytes.
+    pub align: usize,
+}

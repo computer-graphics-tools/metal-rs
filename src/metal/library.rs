@@ -43,6 +43,26 @@ use objc::runtime::Object;
 use foreign_types::{ForeignType, ForeignTypeRef};
 use crate::foundation::NSString;
 
+/// Enum defining the type of a Metal function.
+#[repr(u64)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub enum MTLFunctionType {
+    /// A vertex function
+    Vertex = 1,
+    /// A fragment function
+    Fragment = 2,
+    /// A kernel function
+    Kernel = 3,
+    /// A visible function for ray tracing
+    Visible = 5,
+    /// An intersection function for ray tracing
+    Intersection = 6,
+    /// An object function
+    Object = 8,
+    /// A mesh function
+    Mesh = 9,
+}
+
 /// A reference to an Objective-C `MTLLibrary`.
 pub struct MTLLibraryRef(Object);
 
@@ -63,16 +83,82 @@ pub struct MTLFunctionConstantValues(*mut Object);
 
 /// Options for creating a Metal library.
 #[repr(C)]
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct MTLCompileOptions {
-    // This would normally contain options for the compiler,
-    // but we'll just use default values for simplicity.
-    _private: (),
+    obj: *mut Object,
+}
+
+impl MTLCompileOptions {
+    /// Creates a new MTLCompileOptions instance.
+    #[must_use]
+    pub fn new() -> Self {
+        unsafe {
+            let class = objc::class!(MTLCompileOptions);
+            let alloc: *mut Object = msg_send![class, alloc];
+            let obj: *mut Object = msg_send![alloc, init];
+            MTLCompileOptions { obj }
+        }
+    }
+    
+    /// Sets whether to enable debugging information.
+    pub fn set_fast_math_enabled(&self, enabled: bool) {
+        unsafe {
+            let _: () = msg_send![self.obj, setFastMathEnabled:enabled];
+        }
+    }
+    
+    /// Returns whether fast math is enabled.
+    #[must_use]
+    pub fn fast_math_enabled(&self) -> bool {
+        unsafe {
+            msg_send![self.obj, fastMathEnabled]
+        }
+    }
+    
+    /// Sets whether to enable shader function logging.
+    ///
+    /// When enabled, debug information is generated for the compiled Metal library,
+    /// which allows for logging of shader validation issues.
+    pub fn set_enable_logging(&self, enabled: bool) {
+        unsafe {
+            let _: () = msg_send![self.obj, setLogEnabled:enabled];
+        }
+    }
+    
+    /// Returns whether logging is enabled.
+    #[must_use]
+    pub fn enable_logging(&self) -> bool {
+        unsafe {
+            msg_send![self.obj, logEnabled]
+        }
+    }
+    
+    /// Returns the Objective-C object pointer.
+    pub(crate) fn as_ptr(&self) -> *mut Object {
+        self.obj
+    }
 }
 
 impl Default for MTLCompileOptions {
     fn default() -> Self {
-        MTLCompileOptions { _private: () }
+        Self::new()
+    }
+}
+
+impl Drop for MTLCompileOptions {
+    fn drop(&mut self) {
+        unsafe {
+            let _: () = msg_send![self.obj, release];
+        }
+    }
+}
+
+impl Clone for MTLCompileOptions {
+    fn clone(&self) -> Self {
+        unsafe {
+            let obj: *mut Object = msg_send![self.obj, copy];
+            MTLCompileOptions { obj }
+        }
     }
 }
 
@@ -246,12 +332,50 @@ impl MTLLibrary {
         }
     }
     
+    /// Creates a new function with a function descriptor.
+    pub fn new_function_with_descriptor(&self, descriptor: &crate::metal::function_descriptor::MTLFunctionDescriptor) -> Result<MTLFunction, LibraryError> {
+        unsafe {
+            let mut err: *mut Object = std::ptr::null_mut();
+            
+            let ptr: *mut Object = msg_send![self.as_ref(), newFunctionWithDescriptor:descriptor.as_ptr() 
+                                                                                error:&mut err];
+            
+            if !err.is_null() {
+                let error = NSString::from_ptr(msg_send![err, localizedDescription]);
+                let error_str = error.to_rust_string();
+                Err(LibraryError(error_str))
+            } else if ptr.is_null() {
+                Err(LibraryError("Failed to create function with descriptor".to_string()))
+            } else {
+                Ok(MTLFunction::from_ptr(ptr))
+            }
+        }
+    }
+    
     /// Returns the device that created this library.
     #[must_use]
     pub fn device(&self) -> crate::metal::MTLDevice {
         unsafe {
             let ptr: *mut Object = msg_send![self.as_ref(), device];
             crate::metal::MTLDevice::from_ptr(ptr)
+        }
+    }
+    
+    /// Retrieves a list of function names in the library.
+    #[must_use]
+    pub fn function_names(&self) -> Vec<String> {
+        unsafe {
+            let names: *mut Object = msg_send![self.as_ref(), functionNames];
+            let count: usize = msg_send![names, count];
+            let mut result = Vec::with_capacity(count);
+            
+            for i in 0..count {
+                let name: *mut Object = msg_send![names, objectAtIndex:i];
+                let ns_string = NSString::from_ptr(name);
+                result.push(ns_string.to_rust_string());
+            }
+            
+            result
         }
     }
 }
@@ -304,6 +428,59 @@ impl MTLFunction {
         unsafe {
             let ptr: *mut Object = msg_send![self.as_ref(), device];
             crate::metal::MTLDevice::from_ptr(ptr)
+        }
+    }
+    
+    /// Creates a new function handle from this function.
+    ///
+    /// This method is a placeholder for future Metal API support. Currently, function handles
+    /// are not directly available through the Metal API in this way.
+    ///
+    /// # Panics
+    ///
+    /// This method will panic with a message indicating that function handles are not 
+    /// available in the current Metal API version.
+    pub fn new_function_handle(&self) -> ! {
+        panic!("MTLFunctionHandle creation via 'new_function_handle' is not supported in the current Metal API version")
+    }
+    
+    /// Returns the function type.
+    #[must_use]
+    pub fn function_type(&self) -> crate::metal::MTLFunctionType {
+        unsafe {
+            let function_type: u64 = msg_send![self.as_ref(), functionType];
+            std::mem::transmute(function_type)
+        }
+    }
+    
+    /// Returns the arguments used by this function.
+    ///
+    /// This method retrieves the arguments declared in the function that can be set when
+    /// encoding graphics or compute commands.
+    ///
+    /// # Returns
+    ///
+    /// An optional vector of `MTLArgument` objects. Returns `None` if the function does not
+    /// have any arguments or if arguments couldn't be retrieved.
+    #[must_use]
+    pub fn arguments(&self) -> Option<Vec<crate::metal::MTLArgument>> {
+        use crate::foundation::NSUInteger;
+        
+        unsafe {
+            let array: *mut Object = msg_send![self.as_ref(), arguments];
+            if array.is_null() {
+                return None;
+            }
+            
+            let count: NSUInteger = msg_send![array, count];
+            let mut arguments = Vec::with_capacity(count);
+            
+            for i in 0..count {
+                let argument: *mut Object = msg_send![array, objectAtIndex:i];
+                arguments.push(crate::metal::MTLArgument::from_ptr(argument));
+            }
+            
+            Some(arguments)
         }
     }
 }

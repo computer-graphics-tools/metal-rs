@@ -29,8 +29,15 @@
 mod string;
 mod types;
 mod array;
+mod number;
+mod url;
+mod error;
+// Note: dictionary and object modules need to be refactored
 
 // Re-export
 pub use string::{NSString, NSStringRef, nsstring_from_str, nsstring_as_str};
 pub use types::{NSRange, NSPoint, NSSize, NSRect, NSInteger, NSUInteger};
 pub use array::{NSArray, NSArrayRef};
+pub use number::{NSNumber, NSNumberRef};
+pub use url::{NSURL, NSURLRef};
+pub use error::{NSError, NSErrorRef};

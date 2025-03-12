@@ -32,8 +32,8 @@ use objc::runtime::Object;
 use foreign_types::{ForeignType, ForeignTypeRef};
 use crate::foundation::{NSUInteger, NSString};
 use crate::metal::library::{MTLFunction, MTLFunctionRef};
+use crate::metal::linked_functions::{MTLLinkedFunctions, MTLLinkedFunctionsRef};
 use crate::metal::pipeline::MTLPipelineBufferDescriptorArray;
-use crate::metal::render_pipeline::MTLPipelineOption;
 
 /// A reference to an Objective-C `MTLComputePipelineDescriptor`.
 pub struct MTLComputePipelineDescriptorRef(Object);
@@ -174,6 +174,26 @@ impl MTLComputePipelineDescriptor {
             let _: () = msg_send![self.as_ref(), setSupportIndirectCommandBuffers:value];
         }
     }
+    
+    /// Gets the linked functions for the compute pipeline.
+    #[must_use]
+    pub fn linked_functions(&self) -> Option<MTLLinkedFunctions> {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), linkedFunctions];
+            if ptr.is_null() {
+                None
+            } else {
+                Some(MTLLinkedFunctions::from_ptr(ptr))
+            }
+        }
+    }
+    
+    /// Sets the linked functions for the compute pipeline.
+    pub fn set_linked_functions(&self, linked_functions: &impl AsRef<MTLLinkedFunctionsRef>) {
+        unsafe {
+            let _: () = msg_send![self.as_ref(), setLinkedFunctions:linked_functions.as_ref().as_ptr()];
+        }
+    }
 }
 
 impl fmt::Debug for MTLComputePipelineDescriptor {
@@ -183,6 +203,7 @@ impl fmt::Debug for MTLComputePipelineDescriptor {
             .field("thread_group_size_is_multiple_of_thread_execution_width", &self.thread_group_size_is_multiple_of_thread_execution_width())
             .field("max_total_threads_per_threadgroup", &self.max_total_threads_per_threadgroup())
             .field("supports_indirect_command_buffers", &self.supports_indirect_command_buffers())
+            .field("linked_functions", &self.linked_functions())
             .finish()
     }
 }

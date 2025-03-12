@@ -37,7 +37,8 @@ use crate::foundation::NSString;
 use crate::metal::{
     MTLRenderCommandEncoder, MTLRenderPassDescriptor, 
     MTLParallelRenderCommandEncoder,
-    event::MTLEventRef
+    event::MTLEventRef,
+    log::MTLLogContainer
 };
 
 /// Represents the current state of a command buffer.
@@ -311,6 +312,24 @@ impl MTLCommandBuffer {
             crate::metal::compute_command_encoder::MTLComputeCommandEncoder::from_ptr(ptr)
         }
     }
+
+    /// Creates a new acceleration structure command encoder.
+    #[must_use]
+    pub fn new_acceleration_structure_command_encoder(&self) -> crate::metal::acceleration_structure_command_encoder::MTLAccelerationStructureCommandEncoder {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), accelerationStructureCommandEncoder];
+            crate::metal::acceleration_structure_command_encoder::MTLAccelerationStructureCommandEncoder::from_ptr(ptr)
+        }
+    }
+    
+    /// Creates a new acceleration structure command encoder with a descriptor.
+    #[must_use]
+    pub fn new_acceleration_structure_command_encoder_with_descriptor(&self, descriptor: &crate::metal::acceleration_structure_command_encoder::MTLAccelerationStructurePassDescriptor) -> crate::metal::acceleration_structure_command_encoder::MTLAccelerationStructureCommandEncoder {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), accelerationStructureCommandEncoderWithDescriptor:descriptor.as_ptr()];
+            crate::metal::acceleration_structure_command_encoder::MTLAccelerationStructureCommandEncoder::from_ptr(ptr)
+        }
+    }
     
     /// Encodes a command to signal an event when this command buffer completes execution.
     pub fn encode_signal_event(&self, event: &impl AsRef<MTLEventRef>, value: u64) {
@@ -323,6 +342,27 @@ impl MTLCommandBuffer {
     pub fn encode_wait_for_event(&self, event: &impl AsRef<MTLEventRef>, value: u64) {
         unsafe {
             let _: () = msg_send![self.as_ref(), encodeWaitForEvent:event.as_ref().as_ptr() value:value];
+        }
+    }
+    
+    /// Returns the logs generated during the execution of this command buffer.
+    ///
+    /// Logs are only available when the command buffer has completed execution.
+    /// You need to enable logging when creating the library with MTLCompileOptions.
+    ///
+    /// # Returns
+    ///
+    /// An optional MTLLogContainer containing logs from the command buffer execution,
+    /// or None if logging is disabled or no logs were generated.
+    #[must_use]
+    pub fn logs(&self) -> Option<MTLLogContainer> {
+        unsafe {
+            let ptr: *mut Object = msg_send![self.as_ref(), logs];
+            if ptr.is_null() {
+                None
+            } else {
+                Some(MTLLogContainer::from_ptr(ptr))
+            }
         }
     }
 }

@@ -91,6 +91,8 @@ pub enum MTLResourceOptions {
     /// Write-combined CPU cache mode, Shared storage mode, Default hazard tracking
     CPUCacheModeWriteCombined = 1,
     
+    // StorageModeShared is the same as CPUCacheModeDefaultCache = 0
+    
     /// Managed storage mode with default CPU cache mode
     StorageModeManaged = 16,
     /// Private storage mode with default CPU cache mode

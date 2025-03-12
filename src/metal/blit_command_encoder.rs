@@ -45,11 +45,12 @@ use std::fmt;
 use objc::{msg_send, sel, sel_impl};
 use objc::runtime::Object;
 use foreign_types::{ForeignType, ForeignTypeRef};
-use crate::foundation::NSRange;
+use crate::foundation::{NSRange, NSUInteger};
 use crate::metal::{MTLBuffer, MTLBufferRef};
 use crate::metal::MTLTexture;
 use crate::metal::texture::{MTLSize, MTLOrigin};
 use crate::metal::fence::MTLFenceRef;
+use crate::metal::counters::MTLCounterSampleBufferRef;
 
 /// MTLBlitOption - Options for blit operations.
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -312,6 +313,35 @@ impl MTLBlitCommandEncoder {
         unsafe {
             let encoder_ref: &MTLBlitCommandEncoderRef = self.as_ref();
             msg_send![encoder_ref, waitForFence:fence.as_ref().as_ptr()]
+        }
+    }
+    
+    /// Sample GPU performance counters within this encoder.
+    ///
+    /// # Arguments
+    ///
+    /// * `sample_buffer` - The counter sample buffer to store the samples in.
+    /// * `sample_index` - The index into the sample buffer to store the sample at.
+    /// * `barrier` - Whether to insert a barrier before taking the sample.
+    pub fn sample_counters_in_buffer(&self, sample_buffer: &impl AsRef<MTLCounterSampleBufferRef>, sample_index: NSUInteger, barrier: bool) {
+        unsafe {
+            let encoder_ref: &MTLBlitCommandEncoderRef = self.as_ref();
+            let _: () = msg_send![encoder_ref, sampleCountersInBuffer:sample_buffer.as_ref().as_ptr() atSampleIndex:sample_index withBarrier:barrier];
+        }
+    }
+    
+    /// Resolve counter data from a sample buffer into a destination buffer.
+    ///
+    /// # Arguments
+    ///
+    /// * `sample_buffer` - The counter sample buffer containing the samples.
+    /// * `range` - The range of samples to resolve.
+    /// * `destination_buffer` - The buffer to resolve the counter data into.
+    /// * `destination_offset` - The offset in bytes into the destination buffer.
+    pub fn resolve_counters(&self, sample_buffer: &impl AsRef<MTLCounterSampleBufferRef>, range: NSRange, destination_buffer: &impl AsRef<MTLBufferRef>, destination_offset: NSUInteger) {
+        unsafe {
+            let encoder_ref: &MTLBlitCommandEncoderRef = self.as_ref();
+            let _: () = msg_send![encoder_ref, resolveCounters:sample_buffer.as_ref().as_ptr() inRange:range destinationBuffer:destination_buffer.as_ref().as_ptr() destinationOffset:destination_offset];
         }
     }
     

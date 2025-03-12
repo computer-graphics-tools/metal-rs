@@ -8,18 +8,18 @@ This document tracks Metal types that are available in metal-cpp but not yet imp
 |----------|---------------------|
 | **Command Encoding** | |
 | **Pipeline States** | |
-| **Pipeline Descriptors** | MTLPipelineBufferDescriptor, MTLPipelineBufferDescriptorArray |
-| **Resource Management** | MTLAllocation, MTLResidencySet |
-| **Descriptors** | MTLStageInputOutputDescriptor, MTLFunctionDescriptor |
-| **Advanced Rendering** | MTLRasterizationRate, MTLLinkedFunctions, MTLCounters |
-| **Function Features** | MTLFunctionHandle, MTLFunctionLog, MTLFunctionStitching |
-| **Indirect Commands** | MTLIndirectCommandBuffer, MTLIndirectCommandEncoder |
-| **Binary Archives** | MTLBinaryArchive, MTLDynamicLibrary |
-| **Ray Tracing** | MTLAccelerationStructure, MTLAccelerationStructureCommandEncoder, MTLAccelerationStructureTypes |
-| **Function Tables** | MTLVisibleFunctionTable, MTLIntersectionFunctionTable |
-| **Arguments** | MTLArgument |
-| **Debugging & Profiling** | MTLCaptureManager, MTLCaptureScope, MTLLogState |
-| **I/O Operations** | MTLIOCommandBuffer, MTLIOCommandQueue, MTLIOCompressor |
+| **Pipeline Descriptors** | |
+| **Resource Management** | |
+| **Descriptors** | |
+| **Advanced Rendering** |  |
+| **Function Features** | MTLFunctionHandle (partially implemented) |
+| **Indirect Commands** | *Implemented* |
+| **Binary Archives** | *Implemented* |
+| **Ray Tracing** | *Implemented* |
+| **Function Tables** | *Implemented* |
+| **Arguments** | *Implemented* |
+| **Debugging & Profiling** | *Implemented* |
+| **I/O Operations** | *Implemented* |
 
 ## Completed Types
 
@@ -69,8 +69,8 @@ Based on the typical Metal application requirements and existing implementation,
 
 5. **Specialized Features**
    - Ray tracing types (MTLAccelerationStructure, etc.)
-   - Indirect command buffers
-   - Binary archives
+   - ✅ Indirect command buffers
+   - ✅ Binary archives
    - I/O operations
 
 ## Notes
