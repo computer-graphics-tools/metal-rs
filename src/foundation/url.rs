@@ -1,6 +1,5 @@
 //! NSURL - An object that represents a URL.
 
-use crate::foreign_obj_type;
 use crate::foundation::string::{NSString, NSStringRef};
 use crate::foundation::data::NSData;
 use crate::msg_send_bool;
@@ -31,7 +30,7 @@ impl NSURL {
         
         unsafe {
             let class = class!(NSURL);
-            let url: *mut Object = msg_send![class, URLWithString:, ns_string.as_ref()];
+            let url: *mut Object = msg_send![class, URLWithString:ns_string.as_ref()];
             
             if url.is_null() {
                 None
@@ -48,7 +47,7 @@ impl NSURL {
         
         unsafe {
             let class = class!(NSURL);
-            let url: *mut Object = msg_send![class, fileURLWithPath:, ns_string.as_ref()];
+            let url: *mut Object = msg_send![class, fileURLWithPath:ns_string.as_ref()];
             
             if url.is_null() {
                 None
@@ -126,7 +125,7 @@ impl NSURL {
         let ns_extension = NSString::from_str(extension);
         
         unsafe {
-            let url: *mut Object = msg_send![self.as_ref(), URLByAppendingPathExtension:, ns_extension.as_ref()];
+            let url: *mut Object = msg_send![self.as_ref(), URLByAppendingPathExtension:ns_extension.as_ref()];
             if url.is_null() {
                 None
             } else {
@@ -140,9 +139,7 @@ impl NSURL {
         let ns_component = NSString::from_str(component);
         
         unsafe {
-            let url: *mut Object = msg_send![self.as_ref(), URLByAppendingPathComponent:isDirectory:, 
-                                         ns_component.as_ref(), 
-                                         if is_directory { YES } else { NO }];
+            let url: *mut Object = msg_send![self.as_ref(), URLByAppendingPathComponent:ns_component.as_ref() isDirectory:(if is_directory { YES } else { NO })];
             NSURL::from_ptr(url)
         }
     }
@@ -175,7 +172,7 @@ impl NSURL {
     pub fn check_resource_is_reachable(&self) -> Result<bool, super::NSError> {
         let mut error: *mut objc::runtime::Object = std::ptr::null_mut();
         let result: BOOL = unsafe {
-            msg_send![self.as_ref(), checkResourceIsReachableAndReturnError:, &mut error]
+            msg_send![self.as_ref(), checkResourceIsReachableAndReturnError:&mut error]
         };
         
         if !error.is_null() {
@@ -189,10 +186,7 @@ impl NSURL {
     pub fn load_data_to_memory(&self) -> Result<NSData, super::NSError> {
         let mut error: *mut objc::runtime::Object = std::ptr::null_mut();
         let data: *mut objc::runtime::Object = unsafe {
-            msg_send![class!(NSData), dataWithContentsOfURL:options:error:, 
-                     self.as_ref(), 
-                     0, 
-                     &mut error]
+            msg_send![class!(NSData), dataWithContentsOfURL:self.as_ref() options:0 error:&mut error]
         };
         
         if !error.is_null() {

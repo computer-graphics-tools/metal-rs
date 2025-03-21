@@ -32,7 +32,9 @@ mod array;
 mod number;
 mod url;
 mod error;
-// Note: dictionary and object modules need to be refactored
+mod data;
+mod object;
+mod dictionary;
 
 // Re-export
 pub use string::{NSString, NSStringRef, nsstring_from_str, nsstring_as_str};
@@ -41,3 +43,6 @@ pub use array::{NSArray, NSArrayRef};
 pub use number::{NSNumber, NSNumberRef};
 pub use url::{NSURL, NSURLRef};
 pub use error::{NSError, NSErrorRef};
+pub use data::{NSData, NSDataRef};
+pub use object::{NSObject, NSObjectRef};
+pub use dictionary::{NSDictionary, NSDictionaryRef};

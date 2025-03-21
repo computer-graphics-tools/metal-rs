@@ -1,8 +1,7 @@
 //! NSError - An object that encapsulates information about an error.
 
-use crate::foreign_obj_type;
 use crate::foundation::string::{NSString, NSStringRef};
-use crate::foundation::dictionary::{NSDictionary, NSDictionaryRef};
+use crate::foundation::dictionary::NSDictionaryRef;
 use crate::foundation::types::NSInteger;
 use objc::{class, msg_send, sel, sel_impl};
 use objc::runtime::{Class, Object, BOOL};
@@ -34,10 +33,7 @@ impl NSError {
         
         unsafe {
             let class = class!(NSError);
-            let obj: *mut Object = msg_send![class, errorWithDomain:code:userInfo:, 
-                                           ns_domain.as_ref(), 
-                                           code, 
-                                           user_info_ptr];
+            let obj: *mut Object = msg_send![class, errorWithDomain:ns_domain.as_ref() code:code userInfo:user_info_ptr];
             NSError::from_ptr(obj)
         }
     }
