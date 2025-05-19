@@ -1,76 +1,24 @@
-// Suppress unexpected_cfgs warnings from objc macros
-#![allow(unexpected_cfgs)]
+//! High-level Rust bindings for Apple's Metal GPU framework.
+//!
+//! This crate is **work-in-progress** – we currently expose the most fundamental
+//! building blocks (`Device`, `CommandQueue`, `CommandBuffer`, `Buffer`).  More
+//! APIs arrive as the checklist in `TODO_PORTING_STATUS.md` progresses.
 
-// Helper macros
-#[macro_export]
-macro_rules! foreign_obj_type {
-    (type CType = $raw_ident:ty; pub struct $owned:ident; pub struct $ref_ident:ident; type ParentType = $parent:ty;) => {
-        pub enum $ref_ident {}
+pub use objc2;
+pub use objc2_foundation;
+pub use block2;
 
-        unsafe impl ::foreign_types::ForeignTypeRef for $ref_ident {
-            type CType = $raw_ident;
-        }
+// Public sub-modules
+pub mod prelude;
+mod device;
+mod command_queue;
+mod command_buffer;
+mod buffer;
+pub mod command_buffer_descriptor;
 
-        unsafe impl ::std::marker::Send for $ref_ident {}
-        unsafe impl ::std::marker::Sync for $ref_ident {}
-
-        pub struct $owned(::foreign_types::ForeignObjectRef<$ref_ident>);
-
-        unsafe impl ::foreign_types::ForeignType for $owned {
-            type CType = $raw_ident;
-            type Ref = $ref_ident;
-
-            unsafe fn from_ptr(ptr: *mut Self::CType) -> Self {
-                $owned(::foreign_types::ForeignObjectRef::from_ptr(ptr))
-            }
-
-            fn as_ptr(&self) -> *mut Self::CType {
-                self.0.as_ptr()
-            }
-        }
-
-        impl ::std::ops::Deref for $owned {
-            type Target = $ref_ident;
-
-            fn deref(&self) -> &$ref_ident {
-                &*self.0
-            }
-        }
-
-        impl ::std::borrow::Borrow<$ref_ident> for $owned {
-            fn borrow(&self) -> &$ref_ident {
-                &*self.0
-            }
-        }
-
-        impl ::std::clone::Clone for $owned {
-            fn clone(&self) -> $owned {
-                unsafe {
-                    let ptr = ::objc::msg_send![self.as_ref(), retain];
-                    $owned::from_ptr(ptr)
-                }
-            }
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! msg_send_bool {
-    ($obj:expr, $selector:ident) => {
-        {
-            let result: ::objc::runtime::BOOL = msg_send![$obj, $selector];
-            result != 0
-        }
-    };
-    ($obj:expr, $selector:ident, $($args:expr),+) => {
-        {
-            let result: ::objc::runtime::BOOL = msg_send![$obj, $selector, $($args),+];
-            result != 0
-        }
-    };
-}
-
-// Re-exports
-pub mod foundation;
-pub mod metal;
-pub mod quartzcore;
+// Public re-exports for ergonomic `use metal_rs::*;`
+pub use device::Device;
+pub use command_queue::CommandQueue;
+pub use command_buffer::{CommandBuffer, CommandBufferStatus, CommandBufferError};
+pub use buffer::{Buffer, ResourceOptions as BufferResourceOptions};
+pub use command_buffer_descriptor::{CommandBufferDescriptor, CommandBufferErrorOption};
