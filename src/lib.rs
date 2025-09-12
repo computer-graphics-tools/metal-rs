@@ -7,6 +7,7 @@ mod types;
 mod texture;
 mod pixel_format;
 mod resource;
+mod allocation;
 
 pub use objc2;
 pub use objc2_foundation;
@@ -20,3 +21,4 @@ pub use types::*;
 pub use texture::*;
 pub use pixel_format::*;
 pub use resource::*;
+pub use allocation::*;
