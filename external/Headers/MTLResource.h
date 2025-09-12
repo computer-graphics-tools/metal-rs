@@ -24,12 +24,6 @@ API_AVAILABLE(macos(10.11), ios(8.0))
 @protocol MTLResource <MTLAllocation>
 
 /*!
- @property device
- @abstract The device this resource was created against.  This resource can only be used with this device.
- */
-@property (readonly) id <MTLDevice> device;
-
-/*!
  @property heap
  @abstract The heap from which this resouce was created.
  @discussion Nil when this resource is not backed by a heap.

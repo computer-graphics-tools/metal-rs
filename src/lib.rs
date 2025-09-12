@@ -8,6 +8,7 @@ mod texture;
 mod pixel_format;
 mod resource;
 mod allocation;
+mod heap;
 
 pub use objc2;
 pub use objc2_foundation;
@@ -22,3 +23,4 @@ pub use texture::*;
 pub use pixel_format::*;
 pub use resource::*;
 pub use allocation::*;
+pub use heap::*;
