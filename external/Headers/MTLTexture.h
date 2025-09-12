@@ -17,29 +17,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-
-
-MTL_EXPORT API_AVAILABLE(macos(10.14), ios(13.0))
-@interface MTLSharedTextureHandle : NSObject <NSSecureCoding>
-{
-    struct MTLSharedTextureHandlePrivate *_priv;
-}
-
-/*!
- @property device
- @abstract The device this texture was created against.
- @discussion This shared texture handle can only be used with this device.
- */
-@property (readonly) id <MTLDevice> device;
-
-/*!
- @property label
- @abstract A copy of the original texture's label property, if any
-*/
-@property (readonly, nullable) NSString *label;
-
-@end
-
 MTL_EXPORT API_AVAILABLE(macos(10.11), ios(8.0))
 @interface MTLTextureDescriptor : NSObject <NSCopying>
 
