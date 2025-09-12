@@ -17,37 +17,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(uint8_t, MTLTextureSwizzle) {
-    MTLTextureSwizzleZero = 0,
-    MTLTextureSwizzleOne = 1,
-    MTLTextureSwizzleRed = 2,
-    MTLTextureSwizzleGreen = 3,
-    MTLTextureSwizzleBlue = 4,
-    MTLTextureSwizzleAlpha = 5,
-} API_AVAILABLE(macos(10.15), ios(13.0));
-
-typedef struct
-{
-    MTLTextureSwizzle red;
-    MTLTextureSwizzle green;
-    MTLTextureSwizzle blue;
-    MTLTextureSwizzle alpha;
-} MTLTextureSwizzleChannels API_AVAILABLE(macos(10.15), ios(13.0));
-
-API_AVAILABLE(macos(10.15), ios(13.0)) NS_SWIFT_UNAVAILABLE("Use MTLTextureSwizzleChannels.init instead")
-MTL_INLINE MTLTextureSwizzleChannels MTLTextureSwizzleChannelsMake(MTLTextureSwizzle r, MTLTextureSwizzle g, MTLTextureSwizzle b, MTLTextureSwizzle a)
-{
-    MTLTextureSwizzleChannels swizzle;
-    swizzle.red = r;
-    swizzle.green = g;
-    swizzle.blue = b;
-    swizzle.alpha = a;
-    return swizzle;
-}
-
-#define MTLTextureSwizzleChannelsDefault (MTLTextureSwizzleChannelsMake(MTLTextureSwizzleRed, MTLTextureSwizzleGreen, MTLTextureSwizzleBlue, MTLTextureSwizzleAlpha))
-
-
 
 
 MTL_EXPORT API_AVAILABLE(macos(10.14), ios(13.0))
@@ -70,27 +39,6 @@ MTL_EXPORT API_AVAILABLE(macos(10.14), ios(13.0))
 @property (readonly, nullable) NSString *label;
 
 @end
-
-/*!
- @enum MTLTextureUsage
- @abstract MTLTextureUsage declares how the texture will be used over its lifetime (bitwise OR for multiple uses).
- @discussion This information may be used by the driver to make optimization decisions.
-*/
-typedef NS_OPTIONS(NSUInteger, MTLTextureUsage)
-{
-    MTLTextureUsageUnknown         = 0x0000,
-    MTLTextureUsageShaderRead      = 0x0001,
-    MTLTextureUsageShaderWrite     = 0x0002,
-    MTLTextureUsageRenderTarget    = 0x0004,
-    MTLTextureUsagePixelFormatView = 0x0010,
-    MTLTextureUsageShaderAtomic API_AVAILABLE(macos(14.0), ios(17.0)) = 0x0020,
-} API_AVAILABLE(macos(10.11), ios(9.0));
-
-typedef NS_ENUM(NSInteger, MTLTextureCompressionType)
-{
-    MTLTextureCompressionTypeLossless = 0,
-    MTLTextureCompressionTypeLossy = 1,
-} API_AVAILABLE(macos(12.5), ios(15.0), tvos(16.0));
 
 MTL_EXPORT API_AVAILABLE(macos(10.11), ios(8.0))
 @interface MTLTextureDescriptor : NSObject <NSCopying>
