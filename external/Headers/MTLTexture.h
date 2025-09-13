@@ -17,41 +17,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTL_EXPORT API_AVAILABLE(macos(26.0), ios(26.0))
-@interface MTLTextureViewDescriptor : NSObject <NSCopying>
-
-/*!
- @property pixelFormat
- @abstract A desired pixel format of a texture view.
- */
-@property (readwrite, nonatomic) MTLPixelFormat pixelFormat;
-
-/*!
- @property textureType
- @abstract A desired texture view of a texture view.
- */
-@property (readwrite, nonatomic) MTLTextureType textureType;
-
-/*!
- @property levelRange
- @abstract A desired range of mip levels of a texture view.
- */
-@property (readwrite, nonatomic) NSRange levelRange;
-
-/*!
- @property sliceRange
- @abstract A desired range of slices of a texture view.
- */
-@property (readwrite, nonatomic) NSRange sliceRange;
-
-/*!
- @property swizzle
- @abstract A desired swizzle format of a texture view.
- */
-@property (readwrite, nonatomic) MTLTextureSwizzleChannels swizzle;
- 
-@end
-
 
 /*!
  @protocol MTLTexture
