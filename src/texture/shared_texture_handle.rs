@@ -1,8 +1,9 @@
-use objc2::rc::Retained;
-use objc2::runtime::{NSObject, ProtocolObject};
-use objc2::msg_send;
-use objc2::{extern_class, extern_conformance, extern_methods};
-use objc2_foundation::{NSObjectProtocol, NSCoding, NSSecureCoding, NSString};
+use objc2::{
+    extern_class, extern_conformance, extern_methods, msg_send,
+    rc::Retained,
+    runtime::{NSObject, ProtocolObject},
+};
+use objc2_foundation::{NSCoding, NSObjectProtocol, NSSecureCoding, NSString};
 
 use crate::device::Device;
 
@@ -43,9 +44,7 @@ pub trait SharedTextureHandleExt {
 
 impl SharedTextureHandleExt for SharedTextureHandle {
     fn label(&self) -> Option<String> {
-        let label: Option<Retained<NSString>> = unsafe {
-            msg_send![self, label]
-        };
+        let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
         label.map(|label| label.to_string())
     }
 }
