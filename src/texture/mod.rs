@@ -1,4 +1,5 @@
 mod shared_texture_handle;
+mod texture;
 mod texture_compression_type;
 mod texture_descriptor;
 mod texture_swizzle;
@@ -8,6 +9,7 @@ mod texture_usage;
 mod texture_view_descriptor;
 
 pub use shared_texture_handle::SharedTextureHandle;
+pub use texture::Texture;
 pub use texture_compression_type::TextureCompressionType;
 pub use texture_descriptor::TextureDescriptor;
 pub use texture_swizzle::TextureSwizzle;
