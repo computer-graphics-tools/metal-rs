@@ -2,9 +2,7 @@ use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolO
 use objc2_foundation::{NSRange, NSString};
 use std::{ops::Range, os::raw::c_void, ptr::NonNull};
 
-use crate::{
-    Device, Resource, Texture, TextureDescriptor,
-};
+use crate::{Device, Resource, Texture, TextureDescriptor};
 
 extern_protocol!(
     /// A typeless allocation accessible by both the CPU and the GPU (MTLDevice) or by only the GPU when the storage mode is
@@ -92,21 +90,21 @@ pub trait BufferExt: Buffer + Message {
 
 impl BufferExt for ProtocolObject<dyn Buffer> {
     fn did_modify_range(&self, range: Range<usize>) {
-        let range = NSRange::new(range.start, range.end - range.start);
-        unsafe {
-            msg_send![self, didModifyRange:range];
-        }
-    }
-
-    fn add_debug_marker_range(&self, marker: &str, range: Range<usize>) {
-        let range = NSRange::new(range.start, range.end - range.start);
-        let marker = NSString::from_str(marker);
         let _: () = unsafe {
             msg_send![
                 self,
-                addDebugMarker:marker,
-                range:range,
-            ];
-        }
+                didModifyRange: Into::<NSRange>::into(range),
+            ]
+        };
+    }
+
+    fn add_debug_marker_range(&self, marker: &str, range: Range<usize>) {
+        let _: () = unsafe {
+            msg_send![
+                self,
+                addDebugMarker: &*NSString::from_str(marker),
+                range: Into::<NSRange>::into(range),
+            ]
+        };
     }
 }
