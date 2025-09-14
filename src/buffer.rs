@@ -1,8 +1,11 @@
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::{NSRange, NSString};
+use objc2_foundation::{NSError, NSRange, NSString};
 use std::{ops::Range, os::raw::c_void, ptr::NonNull};
 
-use crate::{BufferSparseTier, Device, Resource, Texture, TextureDescriptor};
+use crate::{
+    BufferSparseTier, Device, Resource, Tensor, Texture, TextureDescriptor,
+    tensor::TensorDescriptor,
+};
 
 extern_protocol!(
     /// A typeless allocation accessible by both the CPU and the GPU (MTLDevice) or by only the GPU when the storage mode is
@@ -66,6 +69,27 @@ extern_protocol!(
         #[unsafe(method(sparseBufferTier))]
         #[unsafe(method_family = none)]
         fn sparse_buffer_tier(&self) -> BufferSparseTier;
+
+        /// Creates a tensor that shares storage with this buffer.
+        ///
+        /// - Parameters:
+        ///   - descriptor: A description of the properties for the new tensor.
+        ///   - offset: Offset into the buffer at which the data of the tensor begins.
+        ///   - error: If an error occurs during creation, Metal populates this parameter to provide you information about it.
+        ///
+        /// If the descriptor specifies `TensorUsage::MACHINE_LEARNING` usage, you need to observe the following restrictions:
+        /// * pass in `0` for the `offset` parameter
+        /// * set the element stride the descriptor to `1`
+        /// * ensure that number of bytes per row is a multiple of `64`
+        /// * for dimensions greater than `2`, make sure `strides[dim] = strides[dim -1] * dimensions[dim - 1]`
+        #[unsafe(method(newTensorWithDescriptor:offset:error:))]
+        #[unsafe(method_family = new)]
+        unsafe fn new_tensor_with_descriptor_offset_error(
+            &self,
+            descriptor: &TensorDescriptor,
+            offset: usize,
+            error: *mut *mut NSError,
+        ) -> Option<Retained<ProtocolObject<dyn Tensor>>>;
     }
 );
 
