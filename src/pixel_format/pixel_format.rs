@@ -2,6 +2,7 @@ use objc2::{Encode, Encoding, RefEncode};
 
 /// Metal pixel formats (from `MTLPixelFormat`).
 #[repr(u64)]
+#[allow(non_camel_case_types)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub enum PixelFormat {
     Invalid = 0,
@@ -200,5 +201,3 @@ unsafe impl Encode for PixelFormat {
 unsafe impl RefEncode for PixelFormat {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-

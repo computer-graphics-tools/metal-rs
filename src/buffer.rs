@@ -2,7 +2,7 @@ use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolO
 use objc2_foundation::{NSRange, NSString};
 use std::{ops::Range, os::raw::c_void, ptr::NonNull};
 
-use crate::{Device, Resource, Texture, TextureDescriptor};
+use crate::{BufferSparseTier, Device, Resource, Texture, TextureDescriptor};
 
 extern_protocol!(
     /// A typeless allocation accessible by both the CPU and the GPU (MTLDevice) or by only the GPU when the storage mode is
@@ -31,7 +31,7 @@ extern_protocol!(
         /// Create a 2D texture or texture buffer that shares storage with this buffer.
         #[unsafe(method(newTextureWithDescriptor:offset:bytesPerRow:))]
         #[unsafe(method_family = new)]
-        fn new_texture_with_descriptor_offset_bytes_per_row(
+        fn new_texture(
             &self,
             descriptor: &TextureDescriptor,
             offset: usize,
@@ -61,6 +61,11 @@ extern_protocol!(
         #[unsafe(method(gpuAddress))]
         #[unsafe(method_family = none)]
         fn gpu_address(&self) -> u64;
+
+        /// Query support tier for sparse buffers.
+        #[unsafe(method(sparseBufferTier))]
+        #[unsafe(method_family = none)]
+        fn sparse_buffer_tier(&self) -> BufferSparseTier;
     }
 );
 
@@ -85,7 +90,7 @@ pub trait BufferExt: Buffer + Message {
     /// Parameter `marker`: A label used for the marker.
     ///
     /// Parameter `range`: The range of bytes the marker is using.
-    fn add_debug_marker_range(&self, marker: &str, range: Range<usize>);
+    fn add_debug_marker(&self, marker: &str, range: Range<usize>);
 }
 
 impl BufferExt for ProtocolObject<dyn Buffer> {
@@ -98,7 +103,7 @@ impl BufferExt for ProtocolObject<dyn Buffer> {
         };
     }
 
-    fn add_debug_marker_range(&self, marker: &str, range: Range<usize>) {
+    fn add_debug_marker(&self, marker: &str, range: Range<usize>) {
         let _: () = unsafe {
             msg_send![
                 self,

@@ -5,7 +5,7 @@ use std::{ops::Range, os::raw::c_void, ptr::NonNull};
 
 use crate::{
     Buffer, Device, PixelFormat, Region, Resource, ResourceID, SharedTextureHandle,
-    TextureCompressionType, TextureSwizzleChannels, TextureType, TextureUsage,
+    TextureCompressionType, TextureSparseTier, TextureSwizzleChannels, TextureType, TextureUsage,
 };
 
 extern_protocol!(
@@ -168,40 +168,6 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn gpu_resource_id(&self) -> ResourceID;
 
-        /// Copies a block of pixels from a texture slice into the application's memory.
-        ///
-        /// # Safety
-        ///
-        /// `pixel_bytes` must be a valid pointer.
-        #[unsafe(method(getBytes:bytesPerRow:bytesPerImage:fromRegion:mipmapLevel:slice:))]
-        #[unsafe(method_family = none)]
-        unsafe fn get_bytes_bytes_per_row_bytes_per_image_from_region_mipmap_level_slice(
-            &self,
-            pixel_bytes: NonNull<c_void>,
-            bytes_per_row: usize,
-            bytes_per_image: usize,
-            region: Region,
-            level: usize,
-            slice: usize,
-        );
-
-        /// Copy a block of pixel data from the caller's pointer into a texture slice.
-        ///
-        /// # Safety
-        ///
-        /// `pixel_bytes` must be a valid pointer.
-        #[unsafe(method(replaceRegion:mipmapLevel:slice:withBytes:bytesPerRow:bytesPerImage:))]
-        #[unsafe(method_family = none)]
-        unsafe fn replace_region_mipmap_level_slice_with_bytes_bytes_per_row_bytes_per_image(
-            &self,
-            region: Region,
-            level: usize,
-            slice: usize,
-            pixel_bytes: NonNull<c_void>,
-            bytes_per_row: usize,
-            bytes_per_image: usize,
-        );
-
         /// Convenience for getBytes:bytesPerRow:bytesPerImage:fromRegion:mipmapLevel:slice: that doesn't require slice related arguments
         ///
         /// # Safety
@@ -209,12 +175,29 @@ extern_protocol!(
         /// `pixel_bytes` must be a valid pointer.
         #[unsafe(method(getBytes:bytesPerRow:fromRegion:mipmapLevel:))]
         #[unsafe(method_family = none)]
-        unsafe fn get_bytes_bytes_per_row_from_region_mipmap_level(
+        unsafe fn get_bytes(
             &self,
             pixel_bytes: NonNull<c_void>,
             bytes_per_row: usize,
             region: Region,
             level: usize,
+        );
+
+        /// Copies a block of pixels from a texture slice into the application's memory.
+        ///
+        /// # Safety
+        ///
+        /// `pixel_bytes` must be a valid pointer.
+        #[unsafe(method(getBytes:bytesPerRow:bytesPerImage:fromRegion:mipmapLevel:slice:))]
+        #[unsafe(method_family = none)]
+        unsafe fn get_bytes_bytes_with_bytes_per_image_slice(
+            &self,
+            pixel_bytes: NonNull<c_void>,
+            bytes_per_row: usize,
+            bytes_per_image: usize,
+            region: Region,
+            level: usize,
+            slice: usize,
         );
 
         /// Convenience for replaceRegion:mipmapLevel:slice:withBytes:bytesPerRow:bytesPerImage: that doesn't require slice related arguments
@@ -224,12 +207,29 @@ extern_protocol!(
         /// `pixel_bytes` must be a valid pointer.
         #[unsafe(method(replaceRegion:mipmapLevel:withBytes:bytesPerRow:))]
         #[unsafe(method_family = none)]
-        unsafe fn replace_region_mipmap_level_with_bytes_bytes_per_row(
+        unsafe fn replace_region(
             &self,
             region: Region,
             level: usize,
             pixel_bytes: NonNull<c_void>,
             bytes_per_row: usize,
+        );
+
+        /// Copy a block of pixel data from the caller's pointer into a texture slice.
+        ///
+        /// # Safety
+        ///
+        /// `pixel_bytes` must be a valid pointer.
+        #[unsafe(method(replaceRegion:mipmapLevel:slice:withBytes:bytesPerRow:bytesPerImage:))]
+        #[unsafe(method_family = none)]
+        unsafe fn replace_region_with_slice_bytes_per_image(
+            &self,
+            region: Region,
+            level: usize,
+            slice: usize,
+            pixel_bytes: NonNull<c_void>,
+            bytes_per_row: usize,
+            bytes_per_image: usize,
         );
 
         /// Create a new texture which shares the same storage as the source texture, but with a different (but compatible) pixel format.
@@ -238,6 +238,18 @@ extern_protocol!(
         fn new_texture_view_with_pixel_format(
             &self,
             pixel_format: PixelFormat,
+        ) -> Option<Retained<ProtocolObject<dyn Texture>>>;
+
+        /// Create a new texture which shares the same storage as the source texture, but with a different (but compatible) pixel format, texture type, levels, slices and swizzle.
+        #[unsafe(method(newTextureViewWithPixelFormat:textureType:levels:slices:swizzle:))]
+        #[unsafe(method_family = new)]
+        unsafe fn new_texture_view_with_pixel_format_texture_type_levels_slices_swizzle(
+            &self,
+            pixel_format: PixelFormat,
+            texture_type: TextureType,
+            level_range: NSRange,
+            slice_range: NSRange,
+            swizzle: TextureSwizzleChannels,
         ) -> Option<Retained<ProtocolObject<dyn Texture>>>;
 
         /// Create a new texture handle, that can be shared across process addres space boundaries.
@@ -264,17 +276,10 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         fn swizzle(&self) -> TextureSwizzleChannels;
 
-        /// Create a new texture which shares the same storage as the source texture, but with a different (but compatible) pixel format, texture type, levels, slices and swizzle.
-        #[unsafe(method(newTextureViewWithPixelFormat:textureType:levels:slices:swizzle:))]
-        #[unsafe(method_family = new)]
-        unsafe fn new_texture_view_with_pixel_format_texture_type_levels_slices_swizzle(
-            &self,
-            pixel_format: PixelFormat,
-            texture_type: TextureType,
-            level_range: NSRange,
-            slice_range: NSRange,
-            swizzle: TextureSwizzleChannels,
-        ) -> Option<Retained<ProtocolObject<dyn Texture>>>;
+        /// Query support tier for sparse textures.
+        #[unsafe(method(sparseTextureTier))]
+        #[unsafe(method_family = none)]
+        fn sparse_texture_tier(&self) -> TextureSparseTier;
     }
 );
 
@@ -297,15 +302,13 @@ impl TextureExt for ProtocolObject<dyn Texture> {
         level_range: Range<usize>,
         slice_range: Range<usize>,
     ) -> Option<Retained<ProtocolObject<dyn Texture>>> {
-        let level_range = NSRange::new(level_range.start, level_range.end - level_range.start);
-        let slice_range = NSRange::new(slice_range.start, slice_range.end - slice_range.start);
         unsafe {
             msg_send![
                 self,
-                newTextureViewWithPixelFormat:pixel_format,
-                textureType:texture_type,
-                levels:level_range,
-                slices:slice_range,
+                newTextureViewWithPixelFormat: pixel_format,
+                textureType: texture_type,
+                levels: Into::<NSRange>::into(level_range),
+                slices: Into::<NSRange>::into(slice_range),
             ]
         }
     }

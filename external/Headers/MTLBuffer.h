@@ -33,38 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 API_AVAILABLE(macos(10.11), ios(8.0))
 @protocol MTLBuffer <MTLResource>
 
-/*!
- @property length
- @abstract The length of the buffer in bytes.
- */
-@property (readonly) NSUInteger length;
-
-/*!
- @method contents
- @abstract Returns the data pointer of this buffer's shared copy.
- */
-- (void*)contents NS_RETURNS_INNER_POINTER;
-
-/*!
- @method didModifyRange:
- @abstract Inform the device of the range of a buffer that the CPU has modified, allowing the implementation to invalidate 
- its caches of the buffer's content.
- @discussion When the application writes to a buffer's sysmem copy via @a contents, that range of the buffer immediately 
- becomes undefined for any accesses by the GPU (MTLDevice).  To restore coherency, the buffer modification must be followed
- by -didModifyRange:, and then followed by a commit of the MTLCommandBuffer that will access the buffer.
- -didModifyRange does not make the contents coherent for any previously committed command buffers.
- Note: This method is only required if buffer is created with a storage mode of MTLResourceStorageModeManaged.
- It is not valid to invoke this method on buffers of other storage modes.
- @param range The range of bytes that have been modified.
- */
-- (void)didModifyRange:(NSRange)range API_AVAILABLE(macos(10.11), macCatalyst(13.0)) API_UNAVAILABLE(ios);
-
-/*!
- @method newTextureWithDescriptor:offset:bytesPerRow:
- @abstract Create a 2D texture or texture buffer that shares storage with this buffer.
- */
-- (nullable id <MTLTexture>)newTextureWithDescriptor:(MTLTextureDescriptor*)descriptor offset:(NSUInteger)offset bytesPerRow:(NSUInteger)bytesPerRow API_AVAILABLE(macos(10.13), ios(8.0));
-
 /// Creates a tensor that shares storage with this buffer.
 ///
 /// - Parameters:
@@ -81,48 +49,6 @@ API_AVAILABLE(macos(10.11), ios(8.0))
 - (nullable id <MTLTensor>)newTensorWithDescriptor:(MTLTensorDescriptor *)descriptor
                                             offset:(NSUInteger)offset
                                              error:(__autoreleasing NSError * _Nullable * _Nullable)error API_AVAILABLE(macos(26.0), ios(26.0));
-
-/*!
- @method addDebugMarker:range:
- @abstract Adds a marker to a specific range in the buffer.
- When inspecting a buffer in the GPU debugging tools the marker will be shown.
- @param marker A label used for the marker.
- @param range The range of bytes the marker is using.
- */
-- (void)addDebugMarker:(NSString*)marker range:(NSRange)range API_AVAILABLE(macos(10.12), ios(10.0));
-
-/*!
- @method removeAllDebugMarkers
- @abstract Removes all debug markers from a buffer.
- */
-- (void)removeAllDebugMarkers API_AVAILABLE(macos(10.12), ios(10.0));
-
-/*!
- @property remoteStorageBuffer
- @abstract For Metal buffer objects that are remote views, this returns the buffer associated with the storage on the originating device.
- */
-@property (nullable, readonly) id<MTLBuffer> remoteStorageBuffer API_AVAILABLE(macos(10.15)) API_UNAVAILABLE(ios);
-
-/*!
- @method newRemoteBufferViewForDevice:
- @abstract On Metal devices that support peer to peer transfers, this method is used to create a remote buffer view on another device
- within the peer group.  The receiver must use MTLStorageModePrivate or be backed by an IOSurface.
- */
-- (nullable id <MTLBuffer>) newRemoteBufferViewForDevice:(id <MTLDevice>)device API_AVAILABLE(macos(10.15)) API_UNAVAILABLE(ios);
-
-
-/*!
- @property gpuAddress
- @abstract Represents the GPU virtual address of a buffer resource
- */
-@property (readonly) MTLGPUAddress gpuAddress API_AVAILABLE(macos(13.0), ios(16.0));
-
-/*!
- @property sparseBufferTier
- @abstract Query support tier for sparse buffers.
- */
-@property (readonly) MTLBufferSparseTier sparseBufferTier API_AVAILABLE(macos(26.0), ios(26.0));
-
 
 @end
 NS_ASSUME_NONNULL_END
