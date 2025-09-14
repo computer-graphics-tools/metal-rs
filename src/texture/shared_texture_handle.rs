@@ -5,11 +5,12 @@ use objc2::{
 };
 use objc2_foundation::{NSCoding, NSObjectProtocol, NSSecureCoding, NSString};
 
-use crate::device::Device;
+use crate::Device;
 
 extern_class!(
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtlsharedtexturehandle?language=objc)
     #[unsafe(super(NSObject))]
+    #[name = "MTLSharedTextureHandle"]
     #[derive(Debug, PartialEq, Eq, Hash)]
     pub struct SharedTextureHandle;
 );
