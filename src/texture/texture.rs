@@ -1,10 +1,11 @@
-use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
+use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
+use objc2_foundation::NSRange;
 use objc2_io_surface::IOSurfaceRef;
-use std::{os::raw::c_void, ptr::NonNull};
+use std::{ops::Range, os::raw::c_void, ptr::NonNull};
 
 use crate::{
-    Device, PixelFormat, Region, Resource, ResourceID, SharedTextureHandle, TextureCompressionType,
-    TextureSwizzleChannels, TextureType, TextureUsage,
+    Buffer, Device, PixelFormat, Region, Resource, ResourceID, SharedTextureHandle,
+    TextureCompressionType, TextureSwizzleChannels, TextureType, TextureUsage,
 };
 
 extern_protocol!(
@@ -191,7 +192,7 @@ extern_protocol!(
         /// `pixel_bytes` must be a valid pointer.
         #[unsafe(method(replaceRegion:mipmapLevel:slice:withBytes:bytesPerRow:bytesPerImage:))]
         #[unsafe(method_family = none)]
-        unsafe fn replace_region_mipmap_level_slice_withBytes_bytesPerRow_bytesPerImage(
+        unsafe fn replace_region_mipmap_level_slice_with_bytes_bytes_per_row_bytes_per_image(
             &self,
             region: Region,
             level: usize,
@@ -239,17 +240,6 @@ extern_protocol!(
             pixel_format: PixelFormat,
         ) -> Option<Retained<ProtocolObject<dyn Texture>>>;
 
-        /// Create a new texture which shares the same storage as the source texture, but with a different (but compatible) pixel format, texture type, levels and slices.
-        #[unsafe(method(newTextureViewWithPixelFormat:textureType:levels:slices:))]
-        #[unsafe(method_family = new)]
-        unsafe fn new_texture_view_with_pixel_format_texture_type_levels_slices(
-            &self,
-            pixel_format: PixelFormat,
-            texture_type: TextureType,
-            level_range: NSRange,
-            slice_range: NSRange,
-        ) -> Option<Retained<ProtocolObject<dyn Texture>>>;
-
         /// Create a new texture handle, that can be shared across process addres space boundaries.
         #[unsafe(method(newSharedTextureHandle))]
         #[unsafe(method_family = new)]
@@ -287,3 +277,36 @@ extern_protocol!(
         ) -> Option<Retained<ProtocolObject<dyn Texture>>>;
     }
 );
+
+pub trait TextureExt: Texture + Message {
+    /// Create a new texture which shares the same storage as the source texture, but with a different (but compatible) pixel format, texture type, levels and slices.
+    unsafe fn new_texture_view_with_pixel_format_texture_type_levels_slices(
+        &self,
+        pixel_format: PixelFormat,
+        texture_type: TextureType,
+        level_range: Range<usize>,
+        slice_range: Range<usize>,
+    ) -> Option<Retained<ProtocolObject<dyn Texture>>>;
+}
+
+impl TextureExt for ProtocolObject<dyn Texture> {
+    unsafe fn new_texture_view_with_pixel_format_texture_type_levels_slices(
+        &self,
+        pixel_format: PixelFormat,
+        texture_type: TextureType,
+        level_range: Range<usize>,
+        slice_range: Range<usize>,
+    ) -> Option<Retained<ProtocolObject<dyn Texture>>> {
+        let level_range = NSRange::new(level_range.start, level_range.end - level_range.start);
+        let slice_range = NSRange::new(slice_range.start, slice_range.end - slice_range.start);
+        unsafe {
+            msg_send![
+                self,
+                newTextureViewWithPixelFormat:pixel_format,
+                textureType:texture_type,
+                levels:level_range,
+                slices:slice_range,
+            ]
+        }
+    }
+}

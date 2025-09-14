@@ -1,0 +1,112 @@
+use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
+use objc2_foundation::{NSRange, NSString};
+use std::{ops::Range, os::raw::c_void, ptr::NonNull};
+
+use crate::{
+    Device, Resource, Texture, TextureDescriptor,
+};
+
+extern_protocol!(
+    /// A typeless allocation accessible by both the CPU and the GPU (MTLDevice) or by only the GPU when the storage mode is
+    /// MTLResourceStorageModePrivate.
+    ///
+    ///
+    /// Unlike in OpenGL and OpenCL, access to buffers is not synchronized.  The caller may use the CPU to modify the data at any time
+    /// but is also responsible for ensuring synchronization and coherency.
+    ///
+    /// The contents become undefined if both the CPU and GPU write to the same buffer without a synchronizing action between those writes.
+    /// This is true even when the regions written do not overlap.
+    ///
+    /// See also [Apple's documentation](https://developer.apple.com/documentation/metal/mtlbuffer?language=objc)
+    #[name = "MTLBuffer"]
+    pub unsafe trait Buffer: Resource {
+        /// The length of the buffer in bytes.
+        #[unsafe(method(length))]
+        #[unsafe(method_family = none)]
+        fn length(&self) -> usize;
+
+        /// Returns the data pointer of this buffer's shared copy.
+        #[unsafe(method(contents))]
+        #[unsafe(method_family = none)]
+        fn contents(&self) -> NonNull<c_void>;
+
+        /// Create a 2D texture or texture buffer that shares storage with this buffer.
+        #[unsafe(method(newTextureWithDescriptor:offset:bytesPerRow:))]
+        #[unsafe(method_family = new)]
+        fn new_texture_with_descriptor_offset_bytes_per_row(
+            &self,
+            descriptor: &TextureDescriptor,
+            offset: usize,
+            bytes_per_row: usize,
+        ) -> Option<Retained<ProtocolObject<dyn Texture>>>;
+
+        /// Removes all debug markers from a buffer.
+        #[unsafe(method(removeAllDebugMarkers))]
+        #[unsafe(method_family = none)]
+        fn remove_all_debug_markers(&self);
+
+        /// For Metal buffer objects that are remote views, this returns the buffer associated with the storage on the originating device.
+        #[unsafe(method(remoteStorageBuffer))]
+        #[unsafe(method_family = none)]
+        fn remote_storage_buffer(&self) -> Option<Retained<ProtocolObject<dyn Buffer>>>;
+
+        /// On Metal devices that support peer to peer transfers, this method is used to create a remote buffer view on another device
+        /// within the peer group.  The receiver must use MTLStorageModePrivate or be backed by an IOSurface.
+        #[unsafe(method(newRemoteBufferViewForDevice:))]
+        #[unsafe(method_family = new)]
+        fn new_remote_buffer_view_for_device(
+            &self,
+            device: &ProtocolObject<dyn Device>,
+        ) -> Option<Retained<ProtocolObject<dyn Buffer>>>;
+
+        /// Represents the GPU virtual address of a buffer resource
+        #[unsafe(method(gpuAddress))]
+        #[unsafe(method_family = none)]
+        fn gpu_address(&self) -> u64;
+    }
+);
+
+pub trait BufferExt: Buffer + Message {
+    /// Inform the device of the range of a buffer that the CPU has modified, allowing the implementation to invalidate
+    /// its caches of the buffer's content.
+    ///
+    /// When the application writes to a buffer's sysmem copy via
+    /// _contents,_that range of the buffer immediately
+    /// becomes undefined for any accesses by the GPU (MTLDevice).  To restore coherency, the buffer modification must be followed
+    /// by -didModifyRange:, and then followed by a commit of the MTLCommandBuffer that will access the buffer.
+    /// -didModifyRange does not make the contents coherent for any previously committed command buffers.
+    /// Note: This method is only required if buffer is created with a storage mode of MTLResourceStorageModeManaged.
+    /// It is not valid to invoke this method on buffers of other storage modes.
+    ///
+    /// Parameter `range`: The range of bytes that have been modified.
+    fn did_modify_range(&self, range: Range<usize>);
+
+    /// Adds a marker to a specific range in the buffer.
+    /// When inspecting a buffer in the GPU debugging tools the marker will be shown.
+    ///
+    /// Parameter `marker`: A label used for the marker.
+    ///
+    /// Parameter `range`: The range of bytes the marker is using.
+    fn add_debug_marker_range(&self, marker: &str, range: Range<usize>);
+}
+
+impl BufferExt for ProtocolObject<dyn Buffer> {
+    fn did_modify_range(&self, range: Range<usize>) {
+        let range = NSRange::new(range.start, range.end - range.start);
+        unsafe {
+            msg_send![self, didModifyRange:range];
+        }
+    }
+
+    fn add_debug_marker_range(&self, marker: &str, range: Range<usize>) {
+        let range = NSRange::new(range.start, range.end - range.start);
+        let marker = NSString::from_str(marker);
+        let _: () = unsafe {
+            msg_send![
+                self,
+                addDebugMarker:marker,
+                range:range,
+            ];
+        }
+    }
+}

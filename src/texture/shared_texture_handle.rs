@@ -37,12 +37,7 @@ impl SharedTextureHandle {
     );
 }
 
-pub trait SharedTextureHandleExt {
-    /// A copy of the original texture's label property, if any.
-    fn label(&self) -> Option<String>;
-}
-
-impl SharedTextureHandleExt for SharedTextureHandle {
+impl SharedTextureHandle {
     fn label(&self) -> Option<String> {
         let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
         label.map(|label| label.to_string())
