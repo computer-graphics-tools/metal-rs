@@ -11,6 +11,7 @@ mod resource;
 mod tensor;
 mod texture;
 mod types;
+mod vertex_descriptor;
 
 pub use block2;
 pub use objc2;
@@ -28,3 +29,4 @@ pub use resource::*;
 pub use tensor::*;
 pub use texture::*;
 pub use types::*;
+pub use vertex_descriptor::*;
