@@ -15,55 +15,6 @@
 #import <Metal/MTLDataType.h>
 
 
-/// The possible data types for the elements of a tensor.
-typedef NS_ENUM(NSInteger, MTLTensorDataType)
-{
-    MTLTensorDataTypeNone     = MTLDataTypeNone,
-    MTLTensorDataTypeFloat32  = MTLDataTypeFloat,
-    MTLTensorDataTypeFloat16  = MTLDataTypeHalf,
-    MTLTensorDataTypeBFloat16 = MTLDataTypeBFloat,
-    MTLTensorDataTypeInt8     = MTLDataTypeChar,
-    MTLTensorDataTypeUInt8    = MTLDataTypeUChar,
-    MTLTensorDataTypeInt16    = MTLDataTypeShort,
-    MTLTensorDataTypeUInt16   = MTLDataTypeUShort,
-    MTLTensorDataTypeInt32    = MTLDataTypeInt,
-    MTLTensorDataTypeUInt32   = MTLDataTypeUInt,
-} API_AVAILABLE(macos(26.0), ios(26.0));
-
-/// The largest rank a tensor can have.
-#define MTL_TENSOR_MAX_RANK 16
-
-/// An array of length matching the rank, holding the dimensions of a tensor.
-///
-/// Supports rank up to ``MTL_TENSOR_MAX_RANK``.
-MTL_EXPORT API_AVAILABLE(macos(26.0), ios(26.0))
-@interface MTLTensorExtents : NSObject
-
-/// Creates a new tensor extents with the rank and extent values you provide.
-///
-/// Zero rank extents represent scalars. `values` can only be `nil`if `rank` is 0.
-/// - Parameters:
-///   - rank: the number of dimensions.
-///   - values: an array of length `rank` that specifies the size of each dimension. The first dimension is the innermost dimension.
-/// - Returns: Tensor extents with the rank and extent values you provide. Returns `nil` if `rank` exceeds 0 and `values` is nil or if `rank` exceeds ``MTL_TENSOR_MAX_RANK``.
-- (nullable instancetype)initWithRank:(NSUInteger)rank values:(nullable const NSInteger *)values;
-
-
-/// Obtains the rank of the tensor.
-///
-/// The rank represents the number of dimensions.
-@property (readonly) NSUInteger rank;
-
-/// Returns the extent at an index.
-///
-/// - Parameters:
-///   - dimensionIndex: the index of the dimension. The first dimension is the innermost dimension.
-/// - Returns: the extent at `dimensionIndex`. This method returns -1 if `dimensionIndex` is greater than or equal to `rank`.
-- (NSInteger)extentAtDimensionIndex:(NSUInteger)dimensionIndex;
-
-@end
-
-
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTLBuffer;

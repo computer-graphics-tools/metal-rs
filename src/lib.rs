@@ -8,6 +8,7 @@ mod heap;
 mod pipeline;
 mod pixel_format;
 mod resource;
+mod tensor;
 mod texture;
 mod types;
 
@@ -24,5 +25,6 @@ pub use heap::*;
 pub use pipeline::*;
 pub use pixel_format::*;
 pub use resource::*;
+pub use tensor::*;
 pub use texture::*;
 pub use types::*;
