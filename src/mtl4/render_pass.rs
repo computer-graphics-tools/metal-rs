@@ -5,10 +5,7 @@ use core::ptr::NonNull;
 use objc2::__framework_prelude::*;
 use objc2_foundation::*;
 
-use crate::{
-    MTL4RenderPassColorAttachmentDescriptorArray, MTL4RenderPassDepthAttachmentDescriptor,
-    MTL4RenderPassStencilAttachmentDescriptor, MTL4VisibilityResultType,
-};
+use crate::*;
 
 extern_class!(
     /// Describes a render pass.
@@ -41,6 +38,7 @@ extern_conformance!(
 
 impl MTL4RenderPassDescriptor {
     extern_methods!(
+        #[cfg(feature = "MTLRenderPass")]
         /// Accesses the array of state information for render attachments that store color data.
         #[unsafe(method(colorAttachments))]
         #[unsafe(method_family = none)]
@@ -48,11 +46,13 @@ impl MTL4RenderPassDescriptor {
             &self,
         ) -> Retained<MTLRenderPassColorAttachmentDescriptorArray>;
 
+        #[cfg(feature = "MTLRenderPass")]
         /// Accesses state information for a render attachment that stores depth data.
         #[unsafe(method(depthAttachment))]
         #[unsafe(method_family = none)]
         pub unsafe fn depthAttachment(&self) -> Retained<MTLRenderPassDepthAttachmentDescriptor>;
 
+        #[cfg(feature = "MTLRenderPass")]
         /// Setter for [`depthAttachment`][Self::depthAttachment].
         ///
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
@@ -63,6 +63,7 @@ impl MTL4RenderPassDescriptor {
             depth_attachment: Option<&MTLRenderPassDepthAttachmentDescriptor>,
         );
 
+        #[cfg(feature = "MTLRenderPass")]
         /// Accesses state information for a render attachment that stores stencil data.
         #[unsafe(method(stencilAttachment))]
         #[unsafe(method_family = none)]
@@ -70,6 +71,7 @@ impl MTL4RenderPassDescriptor {
             &self,
         ) -> Retained<MTLRenderPassStencilAttachmentDescriptor>;
 
+        #[cfg(feature = "MTLRenderPass")]
         /// Setter for [`stencilAttachment`][Self::stencilAttachment].
         ///
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
@@ -184,6 +186,7 @@ impl MTL4RenderPassDescriptor {
         #[unsafe(method_family = none)]
         pub unsafe fn setRenderTargetHeight(&self, render_target_height: NSUInteger);
 
+        #[cfg(feature = "MTLRasterizationRate")]
         /// Assigns an optional variable rasterization rate map that Metal uses in the render pass.
         ///
         /// Enabling variable rasterization rate allows Metal to decrease the rasterization rate, typically in unimportant
@@ -194,35 +197,49 @@ impl MTL4RenderPassDescriptor {
         #[unsafe(method_family = none)]
         pub unsafe fn rasterizationRateMap(
             &self,
-        ) -> Option<Retained<ProtocolObject<dyn RasterizationRateMap>>>;
+        ) -> Option<Retained<ProtocolObject<dyn MTLRasterizationRateMap>>>;
 
+        #[cfg(feature = "MTLRasterizationRate")]
         /// Setter for [`rasterizationRateMap`][Self::rasterizationRateMap].
         #[unsafe(method(setRasterizationRateMap:))]
         #[unsafe(method_family = none)]
         pub unsafe fn setRasterizationRateMap(
             &self,
-            rasterization_rate_map: Option<&ProtocolObject<dyn RasterizationRateMap>>,
+            rasterization_rate_map: Option<&ProtocolObject<dyn MTLRasterizationRateMap>>,
         );
 
+        #[cfg(all(
+            feature = "MTLAllocation",
+            feature = "MTLBuffer",
+            feature = "MTLResource"
+        ))]
         /// Configures a buffer into which Metal writes counts of fragments (pixels) passing the depth and stencil tests.
         #[unsafe(method(visibilityResultBuffer))]
         #[unsafe(method_family = none)]
-        pub unsafe fn visibilityResultBuffer(&self)
-        -> Option<Retained<ProtocolObject<dyn Buffer>>>;
+        pub unsafe fn visibilityResultBuffer(
+            &self,
+        ) -> Option<Retained<ProtocolObject<dyn MTLBuffer>>>;
 
+        #[cfg(all(
+            feature = "MTLAllocation",
+            feature = "MTLBuffer",
+            feature = "MTLResource"
+        ))]
         /// Setter for [`visibilityResultBuffer`][Self::visibilityResultBuffer].
         #[unsafe(method(setVisibilityResultBuffer:))]
         #[unsafe(method_family = none)]
         pub unsafe fn setVisibilityResultBuffer(
             &self,
-            visibility_result_buffer: Option<&ProtocolObject<dyn Buffer>>,
+            visibility_result_buffer: Option<&ProtocolObject<dyn MTLBuffer>>,
         );
 
+        #[cfg(feature = "MTLRenderPass")]
         /// Determines if Metal accumulates visibility results between render encoders or resets them.
         #[unsafe(method(visibilityResultType))]
         #[unsafe(method_family = none)]
         pub unsafe fn visibilityResultType(&self) -> MTLVisibilityResultType;
 
+        #[cfg(feature = "MTLRenderPass")]
         /// Setter for [`visibilityResultType`][Self::visibilityResultType].
         #[unsafe(method(setVisibilityResultType:))]
         #[unsafe(method_family = none)]
@@ -231,6 +248,7 @@ impl MTL4RenderPassDescriptor {
             visibility_result_type: MTLVisibilityResultType,
         );
 
+        #[cfg(feature = "MTLTypes")]
         /// Configures the custom sample positions to use in MSAA rendering.
         ///
         /// - Parameters:
@@ -249,6 +267,7 @@ impl MTL4RenderPassDescriptor {
             count: NSUInteger,
         );
 
+        #[cfg(feature = "MTLTypes")]
         /// Retrieves the previously-configured custom sample positions.
         ///
         /// This method stores the app's last set custom sample positions into an output array. Metal only modifies the array
