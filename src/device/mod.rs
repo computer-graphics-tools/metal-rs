@@ -2,6 +2,7 @@ mod architecture;
 mod argument_buffers_tier;
 mod counter_sampling_point;
 mod device;
+mod device_certification;
 mod device_location;
 mod feature_set;
 mod gpu_family;
@@ -14,6 +15,7 @@ pub use architecture::Architecture;
 pub use argument_buffers_tier::ArgumentBuffersTier;
 pub use counter_sampling_point::CounterSamplingPoint;
 pub use device::*;
+pub use device_certification::DeviceCertification;
 pub use device_location::DeviceLocation;
 pub use feature_set::FeatureSet;
 pub use gpu_family::GpuFamily;
@@ -21,3 +23,12 @@ pub use io_compression_method::IoCompressionMethod;
 pub use read_write_texture_tier::ReadWriteTextureTier;
 pub use size_and_align::SizeAndAlign;
 pub use sparse_texture_region_alignment_mode::SparseTextureRegionAlignmentMode;
+
+mod process_performance_profile;
+pub use process_performance_profile::{
+    process_info_performance_profile_did_change_notification,
+    process_performance_profile_default,
+    process_performance_profile_sustained,
+    NSProcessInfoDeviceCertification,
+    ProcessPerformanceProfile,
+};
