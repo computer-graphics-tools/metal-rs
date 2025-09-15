@@ -1,4 +1,5 @@
 mod data_type;
+mod index_type;
 mod origin;
 mod region;
 mod resource_id;
@@ -6,6 +7,7 @@ mod sample_position;
 mod size;
 
 pub use data_type::DataType;
+pub use index_type::IndexType;
 pub use origin::Origin;
 pub use region::Region;
 pub use resource_id::ResourceID;
