@@ -2,7 +2,9 @@ use core::ffi::c_float;
 use objc2::{extern_protocol, runtime::ProtocolObject};
 use objc2_foundation::NSObjectProtocol;
 
-use crate::render_command_encoder::{CullMode, DepthClipMode, PrimitiveType, TriangleFillMode, Winding};
+use crate::render_command_encoder::{
+    CullMode, DepthClipMode, PrimitiveType, TriangleFillMode, Winding,
+};
 use crate::types::{IndexType, Size};
 use crate::{Buffer, DepthStencilState, RenderPipelineState};
 
@@ -12,7 +14,10 @@ extern_protocol!(
     pub unsafe trait IndirectRenderCommand: NSObjectProtocol {
         #[unsafe(method(setRenderPipelineState:))]
         #[unsafe(method_family = none)]
-        unsafe fn set_render_pipeline_state(&self, pipeline_state: &ProtocolObject<dyn RenderPipelineState>);
+        unsafe fn set_render_pipeline_state(
+            &self,
+            pipeline_state: &ProtocolObject<dyn RenderPipelineState>,
+        );
 
         #[unsafe(method(setVertexBuffer:offset:atIndex:))]
         #[unsafe(method_family = none)]
@@ -108,11 +113,21 @@ extern_protocol!(
 
         #[unsafe(method(setObjectBuffer:offset:atIndex:))]
         #[unsafe(method_family = none)]
-        unsafe fn set_object_buffer_offset_at_index(&self, buffer: &ProtocolObject<dyn Buffer>, offset: usize, index: usize);
+        unsafe fn set_object_buffer_offset_at_index(
+            &self,
+            buffer: &ProtocolObject<dyn Buffer>,
+            offset: usize,
+            index: usize,
+        );
 
         #[unsafe(method(setMeshBuffer:offset:atIndex:))]
         #[unsafe(method_family = none)]
-        unsafe fn set_mesh_buffer_offset_at_index(&self, buffer: &ProtocolObject<dyn Buffer>, offset: usize, index: usize);
+        unsafe fn set_mesh_buffer_offset_at_index(
+            &self,
+            buffer: &ProtocolObject<dyn Buffer>,
+            offset: usize,
+            index: usize,
+        );
 
         #[unsafe(method(drawMeshThreadgroups:threadsPerObjectThreadgroup:threadsPerMeshThreadgroup:))]
         #[unsafe(method_family = none)]
@@ -142,11 +157,19 @@ extern_protocol!(
 
         #[unsafe(method(setDepthStencilState:))]
         #[unsafe(method_family = none)]
-        unsafe fn set_depth_stencil_state(&self, depth_stencil_state: Option<&ProtocolObject<dyn DepthStencilState>>);
+        unsafe fn set_depth_stencil_state(
+            &self,
+            depth_stencil_state: Option<&ProtocolObject<dyn DepthStencilState>>,
+        );
 
         #[unsafe(method(setDepthBias:slopeScale:clamp:))]
         #[unsafe(method_family = none)]
-        unsafe fn set_depth_bias_slope_scale_clamp(&self, depth_bias: c_float, slope_scale: c_float, clamp: c_float);
+        unsafe fn set_depth_bias_slope_scale_clamp(
+            &self,
+            depth_bias: c_float,
+            slope_scale: c_float,
+            clamp: c_float,
+        );
 
         #[unsafe(method(setDepthClipMode:))]
         #[unsafe(method_family = none)]
@@ -169,5 +192,3 @@ extern_protocol!(
         unsafe fn reset(&self);
     }
 );
-
-

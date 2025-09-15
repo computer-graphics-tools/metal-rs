@@ -6,5 +6,3 @@ extern_protocol!(
     #[name = "MTLDepthStencilState"]
     pub unsafe trait DepthStencilState: NSObjectProtocol + Send + Sync {}
 );
-
-

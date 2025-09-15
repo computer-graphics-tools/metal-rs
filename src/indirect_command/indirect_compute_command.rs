@@ -10,11 +10,19 @@ extern_protocol!(
     pub unsafe trait IndirectComputeCommand: NSObjectProtocol {
         #[unsafe(method(setComputePipelineState:))]
         #[unsafe(method_family = none)]
-        unsafe fn set_compute_pipeline_state(&self, pipeline_state: &ProtocolObject<dyn ComputePipelineState>);
+        unsafe fn set_compute_pipeline_state(
+            &self,
+            pipeline_state: &ProtocolObject<dyn ComputePipelineState>,
+        );
 
         #[unsafe(method(setKernelBuffer:offset:atIndex:))]
         #[unsafe(method_family = none)]
-        unsafe fn set_kernel_buffer_offset_at_index(&self, buffer: &ProtocolObject<dyn Buffer>, offset: usize, index: usize);
+        unsafe fn set_kernel_buffer_offset_at_index(
+            &self,
+            buffer: &ProtocolObject<dyn Buffer>,
+            offset: usize,
+            index: usize,
+        );
 
         /// Only call when stride is dynamic per stage input descriptor.
         #[unsafe(method(setKernelBuffer:offset:attributeStride:atIndex:))]
@@ -68,5 +76,3 @@ extern_protocol!(
         unsafe fn set_stage_in_region(&self, region: Region);
     }
 );
-
-
