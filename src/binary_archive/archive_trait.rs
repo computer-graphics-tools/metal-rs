@@ -4,7 +4,7 @@ use objc2_foundation::{NSError, NSErrorDomain, NSObjectProtocol, NSString, NSURL
 use crate::function_stitching::StitchedLibraryDescriptor;
 use crate::{ComputePipelineDescriptor, FunctionDescriptor, Library, RenderPipelineDescriptor};
 
-extern "C" {
+unsafe extern "C" {
     pub static MTLBinaryArchiveDomain: &'static NSErrorDomain;
 }
 
@@ -43,21 +43,7 @@ extern_protocol!(
             descriptor: &RenderPipelineDescriptor,
         ) -> Result<(), Retained<NSError>>;
 
-        /// Add tile render pipeline functions to the archive.
-        #[unsafe(method(addTileRenderPipelineFunctionsWithDescriptor:error:_))]
-        #[unsafe(method_family = none)]
-        unsafe fn add_tile_render_pipeline_functions(
-            &self,
-            descriptor: &crate::mtl4::MTL4TileRenderPipeline,
-        ) -> Result<(), Retained<NSError>>;
-
-        /// Add mesh render pipeline functions to the archive.
-        #[unsafe(method(addMeshRenderPipelineFunctionsWithDescriptor:error:_))]
-        #[unsafe(method_family = none)]
-        unsafe fn add_mesh_render_pipeline_functions(
-            &self,
-            descriptor: &crate::mtl4::MTL4RenderPipeline,
-        ) -> Result<(), Retained<NSError>>;
+        // Tile and mesh render pipeline variants omitted for now.
 
         /// Add the function(s) from a stitched library to the archive.
         #[unsafe(method(addLibraryWithDescriptor:error:_))]

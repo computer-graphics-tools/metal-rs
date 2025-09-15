@@ -1,13 +1,15 @@
 use objc2::{Encode, Encoding, RefEncode};
 use objc2_foundation::NSErrorDomain;
 
-extern "C" {
+unsafe extern "C" {
     /// Apple's documentation: `https://developer.apple.com/documentation/metal/mtlbinaryarchivedomain?language=objc`
     pub static MTLBinaryArchiveDomain: &'static NSErrorDomain;
 }
 
 /// Bridged error domain symbol for `MTLBinaryArchive`.
-pub const BinaryArchiveDomain: &'static NSErrorDomain = unsafe { MTLBinaryArchiveDomain };
+pub unsafe fn binary_archive_domain() -> &'static NSErrorDomain {
+    MTLBinaryArchiveDomain
+}
 
 /// Errors emitted by binary archive operations.
 #[repr(transparent)]

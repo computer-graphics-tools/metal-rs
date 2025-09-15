@@ -296,7 +296,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn sample_counters_in_buffer(
             &self,
-            sample_buffer: &ProtocolObject<dyn CounterSampleBuffer>,
+            sample_buffer: &ProtocolObject<dyn crate::CounterSampleBuffer>,
             sample_index: usize,
             barrier: bool,
         );

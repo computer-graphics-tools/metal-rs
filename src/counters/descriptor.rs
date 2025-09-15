@@ -1,7 +1,7 @@
 use objc2::{
     extern_class, extern_conformance, extern_methods,
     rc::{Allocated, Retained},
-    runtime::NSObject,
+    runtime::{NSObject, ProtocolObject},
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSString};
 

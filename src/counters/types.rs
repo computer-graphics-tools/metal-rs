@@ -4,7 +4,7 @@ use objc2_foundation::{NSErrorDomain, NSString};
 /// Common counters that, when present, have similar meanings across implementations.
 pub type CommonCounter = NSString;
 
-extern "C" {
+unsafe extern "C" {
     pub static MTLCommonCounterTimestamp: &'static CommonCounter;
     pub static MTLCommonCounterTessellationInputPatches: &'static CommonCounter;
     pub static MTLCommonCounterVertexInvocations: &'static CommonCounter;
@@ -25,7 +25,7 @@ extern "C" {
 /// Common counter set names.
 pub type CommonCounterSet = NSString;
 
-extern "C" {
+unsafe extern "C" {
     pub static MTLCommonCounterSetTimestamp: &'static CommonCounterSet;
     pub static MTLCommonCounterSetStageUtilization: &'static CommonCounterSet;
     pub static MTLCommonCounterSetStatistic: &'static CommonCounterSet;
@@ -107,7 +107,7 @@ unsafe impl RefEncode for CounterResultStatistic {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
-extern "C" {
+unsafe extern "C" {
     static MTLCounterErrorDomain: &'static NSErrorDomain;
 }
 
