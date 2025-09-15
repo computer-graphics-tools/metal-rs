@@ -1,8 +1,8 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSError, NSErrorDomain, NSObjectProtocol, NSString, NSURL};
 
-use crate::{ComputePipelineDescriptor, FunctionDescriptor, Library, RenderPipelineDescriptor};
 use crate::function_stitching::StitchedLibraryDescriptor;
+use crate::{ComputePipelineDescriptor, FunctionDescriptor, Library, RenderPipelineDescriptor};
 
 extern "C" {
     pub static MTLBinaryArchiveDomain: &'static NSErrorDomain;
@@ -82,5 +82,3 @@ extern_protocol!(
         ) -> Result<(), Retained<NSError>>;
     }
 );
-
-

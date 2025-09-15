@@ -50,5 +50,3 @@ impl BinaryArchiveDescriptor {
         pub fn new() -> Retained<Self>;
     );
 }
-
-

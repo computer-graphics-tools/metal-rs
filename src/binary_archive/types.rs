@@ -29,5 +29,3 @@ unsafe impl Encode for BinaryArchiveError {
 unsafe impl RefEncode for BinaryArchiveError {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-
