@@ -4,5 +4,5 @@ mod types;
 pub use render_command_encoder::RenderCommandEncoder;
 pub use types::{
     CullMode, DepthClipMode, PrimitiveType, ScissorRect, TriangleFillMode,
-    VertexAmplificationViewMapping, Viewport, VisibilityResultMode,
+    VertexAmplificationViewMapping, Viewport, VisibilityResultMode, Winding,
 };
