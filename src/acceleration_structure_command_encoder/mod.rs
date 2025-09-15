@@ -1,0 +1,3 @@
+mod acceleration_structure_command_encoder;
+
+pub use acceleration_structure_command_encoder::AccelerationStructureCommandEncoder;

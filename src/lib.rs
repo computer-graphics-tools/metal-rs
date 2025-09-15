@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 mod acceleration;
+mod acceleration_structure_command_encoder;
+mod acceleration_structure_pass;
 mod allocation;
 mod argument;
 mod binary_archive;
@@ -58,6 +60,8 @@ pub use objc2;
 pub use objc2_foundation;
 
 pub use acceleration::*;
+pub use acceleration_structure_command_encoder::*;
+pub use acceleration_structure_pass::*;
 pub use allocation::*;
 pub use argument::*;
 pub use binary_archive::*;

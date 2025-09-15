@@ -1,0 +1,7 @@
+mod pass_descriptor;
+mod sample_buffer_attachment_descriptor;
+mod sample_buffer_attachment_descriptor_array;
+
+pub use pass_descriptor::AccelerationStructurePassDescriptor;
+pub use sample_buffer_attachment_descriptor::AccelerationStructurePassSampleBufferAttachmentDescriptor;
+pub use sample_buffer_attachment_descriptor_array::AccelerationStructurePassSampleBufferAttachmentDescriptorArray;
