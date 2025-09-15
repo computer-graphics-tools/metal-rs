@@ -1,4 +1,5 @@
 mod data_type;
+mod gpu_address;
 mod index_type;
 mod origin;
 mod region;
@@ -7,6 +8,7 @@ mod sample_position;
 mod size;
 
 pub use data_type::DataType;
+pub use gpu_address::GpuAddress;
 pub use index_type::IndexType;
 pub use origin::Origin;
 pub use region::Region;
