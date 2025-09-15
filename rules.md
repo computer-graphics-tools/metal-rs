@@ -25,5 +25,3 @@ This document tracks the process of porting Metal Objective-C headers in `extern
 - **Safety audit**: Document unsafe surfaces; prefer safe wrappers when possible.
 - **Tests/examples**: Add unit tests and minimal usage examples.
 - **Docs**: Add rustdoc linking to Apple docs; note differences from ObjC.
-
-

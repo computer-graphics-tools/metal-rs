@@ -1,8 +1,8 @@
 mod constants;
-pub mod vertex_buffer_layout_descriptor;
-pub mod vertex_buffer_layout_descriptor_array;
-pub mod vertex_descriptor;
-pub mod vertex_format;
+mod vertex_buffer_layout_descriptor;
+mod vertex_buffer_layout_descriptor_array;
+mod vertex_descriptor;
+mod vertex_format;
 mod vertex_step_function;
 
 pub use constants::BUFFER_LAYOUT_STRIDE_DYNAMIC;

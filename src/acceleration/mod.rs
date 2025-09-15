@@ -1,5 +1,7 @@
+mod acceleration_structure;
+mod acceleration_structure_descriptor;
 mod acceleration_structure_sizes;
 
+pub use acceleration_structure::AccelerationStructure;
+pub use acceleration_structure_descriptor::AccelerationStructureDescriptor;
 pub use acceleration_structure_sizes::AccelerationStructureSizes;
-
-
