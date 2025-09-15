@@ -1,11 +1,11 @@
 use core::ffi::c_void;
 use core::ptr::NonNull;
 
-use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject, Encode, Encoding, RefEncode};
+use objc2::{Encode, Encoding, RefEncode, extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSError, NSObjectProtocol, NSString, NSUInteger};
 
-use crate::{Buffer, Texture};
 use crate::types::{Origin, Size};
+use crate::{Buffer, Texture};
 
 /// Status of an IO command buffer (ported from `MTLIOStatus`).
 #[repr(i64)]
@@ -73,7 +73,11 @@ extern_protocol!(
         /// Encodes a command that writes the status of this command buffer upon completion to a buffer at a given offset.
         #[unsafe(method(copyStatusToBuffer:offset:))]
         #[unsafe(method_family = none)]
-        unsafe fn copy_status_to_buffer_offset(&self, buffer: &ProtocolObject<dyn Buffer>, offset: NSUInteger);
+        unsafe fn copy_status_to_buffer_offset(
+            &self,
+            buffer: &ProtocolObject<dyn Buffer>,
+            offset: NSUInteger,
+        );
 
         /// Commit so it can be executed as soon as possible.
         #[unsafe(method(commit))]
@@ -116,5 +120,3 @@ extern_protocol!(
         unsafe fn error(&self) -> Option<Retained<NSError>>;
     }
 );
-
-
