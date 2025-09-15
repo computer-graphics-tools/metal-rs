@@ -1,7 +1,7 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSString};
 
-use crate::{Device, CommandBuffer, CommandBufferDescriptor};
+use crate::{CommandBuffer, CommandBufferDescriptor, Device};
 
 extern_protocol!(
     /// A serial queue of command buffers to be executed by the device.
