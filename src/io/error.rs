@@ -25,5 +25,3 @@ unsafe extern "C" {
 pub fn io_error_domain() -> &'static NSErrorDomain {
     unsafe { MTLIOErrorDomain }
 }
-
-

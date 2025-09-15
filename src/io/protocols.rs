@@ -60,5 +60,3 @@ extern_protocol!(
         ) -> Option<Retained<ProtocolObject<dyn IoScratchBuffer>>>;
     }
 );
-
-

@@ -1,4 +1,8 @@
-use objc2::{extern_class, extern_conformance, extern_methods, rc::{Allocated, Retained}, runtime::NSObject};
+use objc2::{
+    extern_class, extern_conformance, extern_methods,
+    rc::{Allocated, Retained},
+    runtime::NSObject,
+};
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSUInteger};
 
 use crate::io::{IoCommandQueueType, IoPriority};
@@ -79,5 +83,3 @@ impl IoCommandQueueDescriptor {
         pub unsafe fn new() -> Retained<Self>;
     );
 }
-
-

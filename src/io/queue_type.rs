@@ -15,5 +15,3 @@ unsafe impl Encode for IoCommandQueueType {
 unsafe impl RefEncode for IoCommandQueueType {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-
