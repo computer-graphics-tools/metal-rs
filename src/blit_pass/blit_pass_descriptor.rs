@@ -54,5 +54,3 @@ impl BlitPassDescriptor {
         pub unsafe fn new() -> Retained<Self>;
     );
 }
-
-

@@ -49,5 +49,3 @@ impl BlitPassSampleBufferAttachmentDescriptorArray {
         pub unsafe fn new() -> Retained<Self>;
     );
 }
-
-
