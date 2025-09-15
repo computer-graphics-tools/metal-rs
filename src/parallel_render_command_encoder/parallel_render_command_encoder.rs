@@ -1,5 +1,4 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::NSObjectProtocol;
 
 use crate::CommandEncoder;
 use crate::render_command_encoder::RenderCommandEncoder;
