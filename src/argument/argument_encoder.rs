@@ -1,7 +1,7 @@
 use core::ffi::c_void;
 use core::ptr::NonNull;
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::{NSRange, NSObjectProtocol, NSString};
+use objc2_foundation::{NSObjectProtocol, NSRange, NSString};
 
 use crate::{
     AccelerationStructure, Buffer, ComputePipelineState, DepthStencilState, Device,
@@ -206,8 +206,9 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_visible_function_tables(
             &self,
-            visible_function_tables:
-                NonNull<*const ProtocolObject<dyn crate::VisibleFunctionTable>>,
+            visible_function_tables: NonNull<
+                *const ProtocolObject<dyn crate::VisibleFunctionTable>,
+            >,
             range: NSRange,
         );
 
@@ -216,8 +217,9 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_intersection_function_table(
             &self,
-            intersection_function_table:
-                Option<&ProtocolObject<dyn crate::IntersectionFunctionTable>>,
+            intersection_function_table: Option<
+                &ProtocolObject<dyn crate::IntersectionFunctionTable>,
+            >,
             index: usize,
         );
 
@@ -227,8 +229,9 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_intersection_function_tables(
             &self,
-            intersection_function_tables:
-                NonNull<*const ProtocolObject<dyn crate::IntersectionFunctionTable>>,
+            intersection_function_tables: NonNull<
+                *const ProtocolObject<dyn crate::IntersectionFunctionTable>,
+            >,
             range: NSRange,
         );
 
@@ -252,5 +255,3 @@ extern_protocol!(
         );
     }
 );
-
-
