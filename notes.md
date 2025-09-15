@@ -1,10 +1,11 @@
 ## Objective-C to Rust API refactor progress
 
 ### Goals
-- Remove generated `MTL*`-prefixed bindings in favor of idiomatic Rust modules and names.
+- Remove generated `MTL*`-prefixed bindings, but leave `MTL4` in favor of idiomatic Rust modules and names.
 - Drop all feature gating (`#[cfg(feature = …)]`) across the public API we port.
 - Map ObjC integer/pointer types to idiomatic Rust types (e.g., `NSUInteger → usize`).
 - Keep raw `objc2` surfaces in low-level wrappers with safe, idiomatic re-exports.
+- Locate MTL4 related types and modules inside ml4 mod
 
 ### New/ported modules
 - visible_function_table/
@@ -58,6 +59,10 @@
 - rasterization_rate/
   - `RasterizationRateSampleArray`, `RasterizationRateLayerDescriptor`, `RasterizationRateLayerArray`.
   - `RasterizationRateMapDescriptor`, `RasterizationRateMap`.
+
+- tile_render_pipeline/
+  - `TileRenderPipelineColorAttachmentDescriptor(+Array)`, `TileRenderPipelineDescriptor`.
+  - Mirrors render pipeline patterns; snake_case methods; re-exported in `lib.rs`.
 
 ### Device updates
 - device/

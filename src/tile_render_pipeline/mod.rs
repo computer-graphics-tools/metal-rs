@@ -1,0 +1,9 @@
+mod tile_render_pipeline_color_attachment_descriptor;
+mod tile_render_pipeline_color_attachment_descriptor_array;
+mod tile_render_pipeline_descriptor;
+
+pub use tile_render_pipeline_color_attachment_descriptor::TileRenderPipelineColorAttachmentDescriptor;
+pub use tile_render_pipeline_color_attachment_descriptor_array::TileRenderPipelineColorAttachmentDescriptorArray;
+pub use tile_render_pipeline_descriptor::TileRenderPipelineDescriptor;
+
+

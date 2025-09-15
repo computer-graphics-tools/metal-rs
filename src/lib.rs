@@ -54,6 +54,7 @@ mod texture;
 mod types;
 mod vertex_descriptor;
 mod visible_function_table;
+mod tile_render_pipeline;
 
 pub use block2;
 pub use objc2;
@@ -114,3 +115,4 @@ pub use texture::*;
 pub use types::*;
 pub use vertex_descriptor::*;
 pub use visible_function_table::*;
+pub use tile_render_pipeline::*;
