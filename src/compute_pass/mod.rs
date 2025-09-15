@@ -1,0 +1,9 @@
+mod sample_buffer_attachment_descriptor;
+mod sample_buffer_attachment_descriptor_array;
+mod compute_pass_descriptor;
+
+pub use compute_pass_descriptor::ComputePassDescriptor;
+pub use sample_buffer_attachment_descriptor::ComputePassSampleBufferAttachmentDescriptor;
+pub use sample_buffer_attachment_descriptor_array::ComputePassSampleBufferAttachmentDescriptorArray;
+
+

@@ -3,6 +3,7 @@ use core::ptr::NonNull;
 use objc2::{extern_protocol, runtime::ProtocolObject};
 use objc2_foundation::NSRange;
 
+use crate::compute_pipeline::ComputePipelineState;
 use crate::intersection_function_table::IntersectionFunctionTable;
 use crate::types::{Region, Size};
 use crate::visible_function_table::VisibleFunctionTable;
@@ -20,10 +21,7 @@ extern_protocol!(
 
         #[unsafe(method(setComputePipelineState:))]
         #[unsafe(method_family = none)]
-        fn set_compute_pipeline_state(
-            &self,
-            state: &ProtocolObject<dyn crate::ComputePipelineState>,
-        );
+        fn set_compute_pipeline_state(&self, state: &ProtocolObject<dyn ComputePipelineState>);
 
         /// Set data for a buffer binding point, by copy.
         /// Safety: `bytes` must be valid.
@@ -298,7 +296,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn sample_counters_in_buffer(
             &self,
-            sample_buffer: &ProtocolObject<dyn crate::CounterSampleBuffer>,
+            sample_buffer: &ProtocolObject<dyn CounterSampleBuffer>,
             sample_index: usize,
             barrier: bool,
         );
