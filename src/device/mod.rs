@@ -26,9 +26,7 @@ pub use sparse_texture_region_alignment_mode::SparseTextureRegionAlignmentMode;
 
 mod process_performance_profile;
 pub use process_performance_profile::{
-    process_info_performance_profile_did_change_notification,
-    process_performance_profile_default,
+    NSProcessInfoDeviceCertification, ProcessPerformanceProfile,
+    process_info_performance_profile_did_change_notification, process_performance_profile_default,
     process_performance_profile_sustained,
-    NSProcessInfoDeviceCertification,
-    ProcessPerformanceProfile,
 };

@@ -1,4 +1,4 @@
-use objc2::{ClassType, extern_methods, Encode, Encoding, RefEncode};
+use objc2::{ClassType, Encode, Encoding, RefEncode, extern_methods};
 use objc2_foundation::NSNotificationName;
 
 /// Process performance profile.
@@ -19,7 +19,8 @@ unsafe impl RefEncode for ProcessPerformanceProfile {
 unsafe extern "C" {
     static NSProcessPerformanceProfileDefault: i64;
     static NSProcessPerformanceProfileSustained: i64;
-    static NSProcessInfoPerformanceProfileDidChangeNotification: Option<&'static NSNotificationName>;
+    static NSProcessInfoPerformanceProfileDidChangeNotification:
+        Option<&'static NSNotificationName>;
 }
 
 /// Default process profile value.
@@ -41,7 +42,9 @@ pub fn process_info_performance_profile_did_change_notification()
     unsafe { NSProcessInfoPerformanceProfileDidChangeNotification }
 }
 
-mod private_nsprocessinfo_device_certification { pub trait Sealed {} }
+mod private_nsprocessinfo_device_certification {
+    pub trait Sealed {}
+}
 
 /// Category "NSDeviceCertification" on `NSProcessInfo`.
 pub unsafe trait NSProcessInfoDeviceCertification:
@@ -50,15 +53,19 @@ pub unsafe trait NSProcessInfoDeviceCertification:
     extern_methods!(
         #[unsafe(method(isDeviceCertifiedFor:))]
         #[unsafe(method_family = none)]
-        unsafe fn is_device_certified_for(&self, performance_tier: super::device_certification::DeviceCertification) -> bool;
+        unsafe fn is_device_certified_for(
+            &self,
+            performance_tier: super::device_certification::DeviceCertification,
+        ) -> bool;
 
         #[unsafe(method(hasPerformanceProfile:))]
         #[unsafe(method_family = none)]
-        unsafe fn has_performance_profile(&self, performance_profile: ProcessPerformanceProfile) -> bool;
+        unsafe fn has_performance_profile(
+            &self,
+            performance_profile: ProcessPerformanceProfile,
+        ) -> bool;
     );
 }
 
 impl private_nsprocessinfo_device_certification::Sealed for objc2_foundation::NSProcessInfo {}
 unsafe impl NSProcessInfoDeviceCertification for objc2_foundation::NSProcessInfo {}
-
-

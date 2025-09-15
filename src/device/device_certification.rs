@@ -24,5 +24,3 @@ unsafe extern "C" {
 pub fn device_certification_iphone_performance_gaming() -> DeviceCertification {
     unsafe { DeviceCertification(NSDeviceCertificationiPhonePerformanceGaming) }
 }
-
-
