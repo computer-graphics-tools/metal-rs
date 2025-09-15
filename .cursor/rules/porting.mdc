@@ -20,3 +20,4 @@ alwaysApply: true
 - **Module re-exports**: Each directory module exposes a clean public surface via its `mod.rs` with `pub use` so consumers can `use crate::device::Device` without reaching into submodules.
 - **Idiomatic Rust naming**: Public types in `PascalCase`, modules/files in `snake_case`. Keep ObjC names only where necessary for selectors and linking; the Rust API should be idiomatic and prefix-free.
 - **Doc comments from headers**: Mirror Objective-C `@brief` and important notes as Rust doc comments on types, fields, and enum variants; link to Apple docs where helpful.
+- **Delete original MTL .rs files**: After porting a type and wiring clean re-exports, delete the corresponding `src/MTL**.rs` file.
