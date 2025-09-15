@@ -1,4 +1,8 @@
-use objc2::{extern_class, extern_conformance, extern_methods, rc::{Allocated, Retained}, runtime::NSObject};
+use objc2::{
+    extern_class, extern_conformance, extern_methods,
+    rc::{Allocated, Retained},
+    runtime::NSObject,
+};
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
 use crate::compute_command_encoder::DispatchType;
@@ -44,8 +48,9 @@ impl ComputePassDescriptor {
         /// An array of sample buffers and associated sample indices.
         #[unsafe(method(sampleBufferAttachments))]
         #[unsafe(method_family = none)]
-        pub fn sample_buffer_attachments(&self)
-            -> Retained<ComputePassSampleBufferAttachmentDescriptorArray>;
+        pub fn sample_buffer_attachments(
+            &self,
+        ) -> Retained<ComputePassSampleBufferAttachmentDescriptorArray>;
     );
 }
 
@@ -60,5 +65,3 @@ impl ComputePassDescriptor {
         pub unsafe fn new() -> Retained<Self>;
     );
 }
-
-

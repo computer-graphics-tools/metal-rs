@@ -1,4 +1,8 @@
-use objc2::{extern_class, extern_conformance, extern_methods, rc::{Allocated, Retained}, runtime::{NSObject, ProtocolObject}};
+use objc2::{
+    extern_class, extern_conformance, extern_methods,
+    rc::{Allocated, Retained},
+    runtime::{NSObject, ProtocolObject},
+};
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
 use crate::counters::CounterSampleBuffer;
@@ -28,12 +32,17 @@ impl ComputePassSampleBufferAttachmentDescriptor {
         /// The sample buffer to store samples for the compute-pass defined samples.
         #[unsafe(method(sampleBuffer))]
         #[unsafe(method_family = none)]
-        pub unsafe fn sample_buffer(&self) -> Option<Retained<ProtocolObject<dyn CounterSampleBuffer>>>;
+        pub unsafe fn sample_buffer(
+            &self,
+        ) -> Option<Retained<ProtocolObject<dyn CounterSampleBuffer>>>;
 
         /// Setter for `sample_buffer`.
         #[unsafe(method(setSampleBuffer:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_sample_buffer(&self, sample_buffer: Option<&ProtocolObject<dyn CounterSampleBuffer>>);
+        pub unsafe fn set_sample_buffer(
+            &self,
+            sample_buffer: Option<&ProtocolObject<dyn CounterSampleBuffer>>,
+        );
 
         /// Sample index for start-of-encoder sample.
         #[unsafe(method(startOfEncoderSampleIndex))]
@@ -66,5 +75,3 @@ impl ComputePassSampleBufferAttachmentDescriptor {
         pub unsafe fn new() -> Retained<Self>;
     );
 }
-
-

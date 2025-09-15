@@ -1,4 +1,8 @@
-use objc2::{extern_class, extern_conformance, extern_methods, rc::{Allocated, Retained}, runtime::NSObject};
+use objc2::{
+    extern_class, extern_conformance, extern_methods,
+    rc::{Allocated, Retained},
+    runtime::NSObject,
+};
 use objc2_foundation::NSObjectProtocol;
 
 use super::ComputePassSampleBufferAttachmentDescriptor;
@@ -19,8 +23,10 @@ impl ComputePassSampleBufferAttachmentDescriptorArray {
     extern_methods!(
         #[unsafe(method(objectAtIndexedSubscript:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn object_at_indexed_subscript(&self, attachment_index: usize)
-            -> Retained<ComputePassSampleBufferAttachmentDescriptor>;
+        pub unsafe fn object_at_indexed_subscript(
+            &self,
+            attachment_index: usize,
+        ) -> Retained<ComputePassSampleBufferAttachmentDescriptor>;
 
         #[unsafe(method(setObject:atIndexedSubscript:))]
         #[unsafe(method_family = none)]
@@ -43,5 +49,3 @@ impl ComputePassSampleBufferAttachmentDescriptorArray {
         pub unsafe fn new() -> Retained<Self>;
     );
 }
-
-
