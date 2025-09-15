@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Describes location and CPU mapping of a resource (from `MTLStorageMode`).
 #[repr(u64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum StorageMode {
+pub enum MTLStorageMode {
     /// In this mode, CPU and device will nominally both use the same underlying memory
     /// when accessing the contents of the resource. However, coherency is only guaranteed
     /// at command buffer boundaries to minimize the required flushing of CPU and GPU caches.
@@ -29,12 +29,10 @@ pub enum StorageMode {
     Memoryless = 3,
 }
 
-unsafe impl Encode for StorageMode {
+unsafe impl Encode for MTLStorageMode {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for StorageMode {
+unsafe impl RefEncode for MTLStorageMode {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-

@@ -8,16 +8,15 @@ use objc2_foundation::{NSNumber, NSObjectProtocol};
 extern_class!(
     /// Helper object for convenient access to samples stored in an array.
     #[unsafe(super(NSObject))]
-    #[name = "MTLRasterizationRateSampleArray"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct RasterizationRateSampleArray;
+    pub struct MTLRasterizationRateSampleArray;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for RasterizationRateSampleArray {}
+    unsafe impl NSObjectProtocol for MTLRasterizationRateSampleArray {}
 );
 
-impl RasterizationRateSampleArray {
+impl MTLRasterizationRateSampleArray {
     extern_methods!(
         /// Retrieves the sample value at the specified index.
         #[unsafe(method(objectAtIndexedSubscript:))]
@@ -32,7 +31,7 @@ impl RasterizationRateSampleArray {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl RasterizationRateSampleArray {
+impl MTLRasterizationRateSampleArray {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

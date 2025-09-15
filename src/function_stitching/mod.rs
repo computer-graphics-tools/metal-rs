@@ -5,9 +5,9 @@ mod input_node;
 mod options;
 mod stitched_library_descriptor;
 
-pub use attribute::{FunctionStitchingAttribute, FunctionStitchingAttributeAlwaysInline};
-pub use function_node::FunctionStitchingFunctionNode;
-pub use graph::FunctionStitchingGraph;
-pub use input_node::{FunctionStitchingInputNode, FunctionStitchingNode};
-pub use options::StitchedLibraryOptions;
-pub use stitched_library_descriptor::StitchedLibraryDescriptor;
+pub use attribute::{MTLFunctionStitchingAttribute, MTLFunctionStitchingAttributeAlwaysInline};
+pub use function_node::MTLFunctionStitchingFunctionNode;
+pub use graph::MTLFunctionStitchingGraph;
+pub use input_node::{MTLFunctionStitchingInputNode, MTLFunctionStitchingNode};
+pub use options::MTLStitchedLibraryOptions;
+pub use stitched_library_descriptor::MTLStitchedLibraryDescriptor;

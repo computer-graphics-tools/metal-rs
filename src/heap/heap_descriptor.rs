@@ -4,35 +4,31 @@ use objc2::{extern_class, extern_conformance, extern_methods};
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
 use crate::{
-    CpuCacheMode,
-    HazardTrackingMode,
-    ResourceOptions,
-    SparsePageSize,
-    StorageMode,
+    MTLCPUCacheMode, MTLHazardTrackingMode, MTLResourceOptions, MTLSparsePageSize, MTLStorageMode,
 };
 
-use super::HeapType;
+use super::MTLHeapType;
 
 extern_class!(
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtlheapdescriptor?language=objc)
     #[unsafe(super(NSObject))]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct HeapDescriptor;
+    pub struct MTLHeapDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for HeapDescriptor {}
+    unsafe impl NSCopying for MTLHeapDescriptor {}
 );
 
-unsafe impl CopyingHelper for HeapDescriptor {
+unsafe impl CopyingHelper for MTLHeapDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for HeapDescriptor {}
+    unsafe impl NSObjectProtocol for MTLHeapDescriptor {}
 );
 
-impl HeapDescriptor {
+impl MTLHeapDescriptor {
     extern_methods!(
         /// Requested size of the heap's backing memory.
         ///
@@ -52,12 +48,12 @@ impl HeapDescriptor {
         /// MTLStorageModeManaged and MTLStorageModeMemoryless are disallowed.
         #[unsafe(method(storageMode))]
         #[unsafe(method_family = none)]
-        pub fn storage_mode(&self) -> StorageMode;
+        pub fn storage_mode(&self) -> MTLStorageMode;
 
         /// Setter for [`storageMode`][Self::storageMode].
         #[unsafe(method(setStorageMode:))]
         #[unsafe(method_family = none)]
-        pub fn set_storage_mode(&self, storage_mode: StorageMode);
+        pub fn set_storage_mode(&self, storage_mode: MTLStorageMode);
 
         /// CPU cache mode for the heap. Default is `CpuCacheMode::DefaultCache`.
         ///
@@ -65,22 +61,22 @@ impl HeapDescriptor {
         /// CPU cache mode is ignored for `StorageMode::Private`.
         #[unsafe(method(cpuCacheMode))]
         #[unsafe(method_family = none)]
-        pub fn cpu_cache_mode(&self) -> CpuCacheMode;
+        pub fn cpu_cache_mode(&self) -> MTLCPUCacheMode;
 
         /// Setter for [`cpuCacheMode`][Self::cpuCacheMode].
         #[unsafe(method(setCpuCacheMode:))]
         #[unsafe(method_family = none)]
-        pub fn set_cpu_cache_mode(&self, cpu_cache_mode: CpuCacheMode);
+        pub fn set_cpu_cache_mode(&self, cpu_cache_mode: MTLCPUCacheMode);
 
         /// The sparse page size to use for resources created from the heap.
         #[unsafe(method(sparsePageSize))]
         #[unsafe(method_family = none)]
-        pub unsafe fn sparse_page_size(&self) -> SparsePageSize;
+        pub unsafe fn sparse_page_size(&self) -> MTLSparsePageSize;
 
         /// Setter for [`sparsePageSize`][Self::sparsePageSize].
         #[unsafe(method(setSparsePageSize:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_sparse_page_size(&self, sparse_page_size: SparsePageSize);
+        pub unsafe fn set_sparse_page_size(&self, sparse_page_size: MTLSparsePageSize);
 
         /// Set hazard tracking mode for the heap. The default value is `HazardTrackingMode::Default`.
         ///
@@ -92,36 +88,36 @@ impl HeapDescriptor {
         /// All resources created from this heap shared the same hazard tracking mode.
         #[unsafe(method(hazardTrackingMode))]
         #[unsafe(method_family = none)]
-        pub fn hazard_tracking_mode(&self) -> HazardTrackingMode;
+        pub fn hazard_tracking_mode(&self) -> MTLHazardTrackingMode;
 
         /// Setter for [`hazardTrackingMode`][Self::hazardTrackingMode].
         #[unsafe(method(setHazardTrackingMode:))]
         #[unsafe(method_family = none)]
-        pub fn set_hazard_tracking_mode(&self, hazard_tracking_mode: HazardTrackingMode);
+        pub fn set_hazard_tracking_mode(&self, hazard_tracking_mode: MTLHazardTrackingMode);
 
         /// A packed tuple of the storageMode, cpuCacheMode and hazardTrackingMode properties.
         ///
         /// Modifications to this property are reflected in the other properties and vice versa.
         #[unsafe(method(resourceOptions))]
         #[unsafe(method_family = none)]
-        pub fn resource_options(&self) -> ResourceOptions;
+        pub fn resource_options(&self) -> MTLResourceOptions;
 
         /// Setter for [`resourceOptions`][Self::resourceOptions].
         #[unsafe(method(setResourceOptions:))]
         #[unsafe(method_family = none)]
-        pub fn set_resource_options(&self, resource_options: ResourceOptions);
+        pub fn set_resource_options(&self, resource_options: MTLResourceOptions);
 
         /// The type of the heap. The default value is `HeapType::Automatic`.
         ///
         /// This constrains the resource creation functions that are available.
         #[unsafe(method(type))]
         #[unsafe(method_family = none)]
-        pub unsafe fn r#type(&self) -> HeapType;
+        pub unsafe fn r#type(&self) -> MTLHeapType;
 
         /// Setter for [`type`][Self::type].
         #[unsafe(method(setType:))]
         #[unsafe(method_family = none)]
-        pub fn set_type(&self, r#type: HeapType);
+        pub fn set_type(&self, r#type: MTLHeapType);
 
         /// Specifies the largest sparse page size that the Metal heap supports.
         ///
@@ -134,17 +130,20 @@ impl HeapDescriptor {
         ///
         #[unsafe(method(maxCompatiblePlacementSparsePageSize))]
         #[unsafe(method_family = none)]
-        pub unsafe fn max_compatible_placement_sparse_page_size(&self) -> SparsePageSize;
+        pub unsafe fn max_compatible_placement_sparse_page_size(&self) -> MTLSparsePageSize;
 
         /// Setter for [`maxCompatiblePlacementSparsePageSize`][Self::maxCompatiblePlacementSparsePageSize].
         #[unsafe(method(setMaxCompatiblePlacementSparsePageSize:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_max_compatible_placement_sparse_page_size(&self, page_size: SparsePageSize);
+        pub unsafe fn set_max_compatible_placement_sparse_page_size(
+            &self,
+            page_size: MTLSparsePageSize,
+        );
     );
 }
 
 /// Methods declared on superclass `NSObject`.
-impl HeapDescriptor {
+impl MTLHeapDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

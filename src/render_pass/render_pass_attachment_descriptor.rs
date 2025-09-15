@@ -5,30 +5,29 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use super::{LoadAction, StoreAction, StoreActionOptions};
-use crate::Texture;
+use super::{MTLLoadAction, MTLStoreAction, MTLStoreActionOptions};
+use crate::MTLTexture;
 
 extern_class!(
     /// Common attachment descriptor fields.
     #[unsafe(super(NSObject))]
-    #[name = "MTLRenderPassAttachmentDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct RenderPassAttachmentDescriptor;
+    pub struct MTLRenderPassAttachmentDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for RenderPassAttachmentDescriptor {}
+    unsafe impl NSCopying for MTLRenderPassAttachmentDescriptor {}
 );
 
-unsafe impl CopyingHelper for RenderPassAttachmentDescriptor {
+unsafe impl CopyingHelper for MTLRenderPassAttachmentDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for RenderPassAttachmentDescriptor {}
+    unsafe impl NSObjectProtocol for MTLRenderPassAttachmentDescriptor {}
 );
 
-impl RenderPassAttachmentDescriptor {
+impl MTLRenderPassAttachmentDescriptor {
     extern_methods!(
         /// The mipmap level of the texture to be used for rendering. Default is zero.
         #[unsafe(method(level))]
@@ -63,31 +62,31 @@ impl RenderPassAttachmentDescriptor {
         /// The action to be performed at the beginning of a render pass.
         #[unsafe(method(loadAction))]
         #[unsafe(method_family = none)]
-        pub fn load_action(&self) -> LoadAction;
+        pub fn load_action(&self) -> MTLLoadAction;
 
         /// Setter for [`load_action`][Self::load_action].
         #[unsafe(method(setLoadAction:))]
         #[unsafe(method_family = none)]
-        pub fn set_load_action(&self, load_action: LoadAction);
+        pub fn set_load_action(&self, load_action: MTLLoadAction);
 
         /// The action to be performed at the end of a render pass.
         #[unsafe(method(storeAction))]
         #[unsafe(method_family = none)]
-        pub fn store_action(&self) -> StoreAction;
+        pub fn store_action(&self) -> MTLStoreAction;
 
         /// Setter for [`store_action`][Self::store_action].
         #[unsafe(method(setStoreAction:))]
         #[unsafe(method_family = none)]
-        pub fn set_store_action(&self, store_action: StoreAction);
+        pub fn set_store_action(&self, store_action: MTLStoreAction);
 
         /// Optional configuration for the store action performed at the end of a render pass.
         #[unsafe(method(storeActionOptions))]
         #[unsafe(method_family = none)]
-        pub fn store_action_options(&self) -> StoreActionOptions;
+        pub fn store_action_options(&self) -> MTLStoreActionOptions;
 
         /// Setter for [`store_action_options`][Self::store_action_options].
         #[unsafe(method(setStoreActionOptions:))]
         #[unsafe(method_family = none)]
-        pub fn set_store_action_options(&self, options: StoreActionOptions);
+        pub fn set_store_action_options(&self, options: MTLStoreActionOptions);
     );
 }

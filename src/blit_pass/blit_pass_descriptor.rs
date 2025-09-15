@@ -5,45 +5,44 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use super::BlitPassSampleBufferAttachmentDescriptorArray;
+use super::MTLBlitPassSampleBufferAttachmentDescriptorArray;
 
 extern_class!(
     /// Represents a collection of attachments used to create a blit command encoder.
     #[unsafe(super(NSObject))]
-    #[name = "MTLBlitPassDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct BlitPassDescriptor;
+    pub struct MTLBlitPassDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for BlitPassDescriptor {}
+    unsafe impl NSCopying for MTLBlitPassDescriptor {}
 );
 
-unsafe impl CopyingHelper for BlitPassDescriptor {
+unsafe impl CopyingHelper for MTLBlitPassDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for BlitPassDescriptor {}
+    unsafe impl NSObjectProtocol for MTLBlitPassDescriptor {}
 );
 
-impl BlitPassDescriptor {
+impl MTLBlitPassDescriptor {
     extern_methods!(
         /// Create a default blit pass descriptor.
         #[unsafe(method(blitPassDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn blit_pass_descriptor() -> Retained<BlitPassDescriptor>;
+        pub unsafe fn blit_pass_descriptor() -> Retained<MTLBlitPassDescriptor>;
 
         /// An array of sample buffers and associated sample indices.
         #[unsafe(method(sampleBufferAttachments))]
         #[unsafe(method_family = none)]
         pub fn sample_buffer_attachments(
             &self,
-        ) -> Retained<BlitPassSampleBufferAttachmentDescriptorArray>;
+        ) -> Retained<MTLBlitPassSampleBufferAttachmentDescriptorArray>;
     );
 }
 
-impl BlitPassDescriptor {
+impl MTLBlitPassDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

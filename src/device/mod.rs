@@ -11,18 +11,18 @@ mod read_write_texture_tier;
 mod size_and_align;
 mod sparse_texture_region_alignment_mode;
 
-pub use architecture::Architecture;
-pub use argument_buffers_tier::ArgumentBuffersTier;
-pub use counter_sampling_point::CounterSamplingPoint;
+pub use architecture::MTLArchitecture;
+pub use argument_buffers_tier::MTLArgumentBuffersTier;
+pub use counter_sampling_point::MTLCounterSamplingPoint;
 pub use device::*;
 pub use device_certification::DeviceCertification;
-pub use device_location::DeviceLocation;
-pub use feature_set::FeatureSet;
-pub use gpu_family::GpuFamily;
-pub use io_compression_method::IoCompressionMethod;
-pub use read_write_texture_tier::ReadWriteTextureTier;
-pub use size_and_align::SizeAndAlign;
-pub use sparse_texture_region_alignment_mode::SparseTextureRegionAlignmentMode;
+pub use device_location::MTLDeviceLocation;
+pub use feature_set::MTLFeatureSet;
+pub use gpu_family::MTLGPUFamily;
+pub use io_compression_method::MTLIOCompressionMethod;
+pub use read_write_texture_tier::MTLReadWriteTextureTier;
+pub use size_and_align::MTLSizeAndAlign;
+pub use sparse_texture_region_alignment_mode::MTLSparseTextureRegionAlignmentMode;
 
 mod process_performance_profile;
 pub use process_performance_profile::{

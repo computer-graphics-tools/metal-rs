@@ -5,29 +5,28 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use super::StepFunction;
+use super::MTLStepFunction;
 
 extern_class!(
     /// Buffer layout descriptor
     #[unsafe(super(NSObject))]
-    #[name = "MTLBufferLayoutDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct BufferLayoutDescriptor;
+    pub struct MTLBufferLayoutDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for BufferLayoutDescriptor {}
+    unsafe impl NSCopying for MTLBufferLayoutDescriptor {}
 );
 
-unsafe impl CopyingHelper for BufferLayoutDescriptor {
+unsafe impl CopyingHelper for MTLBufferLayoutDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for BufferLayoutDescriptor {}
+    unsafe impl NSObjectProtocol for MTLBufferLayoutDescriptor {}
 );
 
-impl BufferLayoutDescriptor {
+impl MTLBufferLayoutDescriptor {
     extern_methods!(
         #[unsafe(method(stride))]
         #[unsafe(method_family = none)]
@@ -40,12 +39,12 @@ impl BufferLayoutDescriptor {
 
         #[unsafe(method(stepFunction))]
         #[unsafe(method_family = none)]
-        pub fn step_function(&self) -> StepFunction;
+        pub fn step_function(&self) -> MTLStepFunction;
 
         /// Setter for [`step_function`][Self::step_function].
         #[unsafe(method(setStepFunction:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_step_function(&self, step_function: StepFunction);
+        pub unsafe fn set_step_function(&self, step_function: MTLStepFunction);
 
         #[unsafe(method(stepRate))]
         #[unsafe(method_family = none)]
@@ -59,7 +58,7 @@ impl BufferLayoutDescriptor {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl BufferLayoutDescriptor {
+impl MTLBufferLayoutDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

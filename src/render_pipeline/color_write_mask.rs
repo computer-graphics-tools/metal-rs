@@ -3,10 +3,10 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Color write mask (from `MTLColorWriteMask`).
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct ColorWriteMask(pub u64);
+pub struct MTLColorWriteMask(pub u64);
 
 bitflags::bitflags! {
-    impl ColorWriteMask: u64 {
+    impl MTLColorWriteMask: u64 {
         const None = 0;
         const Red = 0x1<<3;
         const Green = 0x1<<2;
@@ -18,10 +18,10 @@ bitflags::bitflags! {
     }
 }
 
-unsafe impl Encode for ColorWriteMask {
+unsafe impl Encode for MTLColorWriteMask {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for ColorWriteMask {
+unsafe impl RefEncode for MTLColorWriteMask {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

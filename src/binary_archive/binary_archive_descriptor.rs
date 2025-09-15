@@ -8,24 +8,23 @@ use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSURL};
 extern_class!(
     /// A class used to indicate how an archive should be created.
     #[unsafe(super(NSObject))]
-    #[name = "MTLBinaryArchiveDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct BinaryArchiveDescriptor;
+    pub struct MTLBinaryArchiveDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for BinaryArchiveDescriptor {}
+    unsafe impl NSCopying for MTLBinaryArchiveDescriptor {}
 );
 
-unsafe impl CopyingHelper for BinaryArchiveDescriptor {
+unsafe impl CopyingHelper for MTLBinaryArchiveDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for BinaryArchiveDescriptor {}
+    unsafe impl NSObjectProtocol for MTLBinaryArchiveDescriptor {}
 );
 
-impl BinaryArchiveDescriptor {
+impl MTLBinaryArchiveDescriptor {
     extern_methods!(
         /// The file URL from which to open a BinaryArchive, or nil to create an empty BinaryArchive.
         #[unsafe(method(url))]
@@ -39,7 +38,7 @@ impl BinaryArchiveDescriptor {
     );
 }
 
-impl BinaryArchiveDescriptor {
+impl MTLBinaryArchiveDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

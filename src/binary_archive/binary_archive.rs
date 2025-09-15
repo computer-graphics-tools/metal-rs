@@ -1,8 +1,10 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSError, NSErrorDomain, NSObjectProtocol, NSString, NSURL};
 
-use crate::function_stitching::StitchedLibraryDescriptor;
-use crate::{ComputePipelineDescriptor, FunctionDescriptor, Library, RenderPipelineDescriptor};
+use crate::function_stitching::MTLStitchedLibraryDescriptor;
+use crate::{
+    MTLComputePipelineDescriptor, MTLFunctionDescriptor, MTLLibrary, MTLRenderPipelineDescriptor,
+};
 
 unsafe extern "C" {
     pub static MTLBinaryArchiveDomain: &'static NSErrorDomain;
@@ -10,8 +12,7 @@ unsafe extern "C" {
 
 extern_protocol!(
     /// A container of pipeline state descriptors and their associated compiled code.
-    #[name = "MTLBinaryArchive"]
-    pub unsafe trait BinaryArchive: NSObjectProtocol {
+    pub unsafe trait MTLBinaryArchive: NSObjectProtocol {
         /// A string to help identify this object.
         #[unsafe(method(label))]
         #[unsafe(method_family = none)]
@@ -25,14 +26,14 @@ extern_protocol!(
         /// The device this resource was created against.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
-        fn device(&self) -> Retained<ProtocolObject<dyn crate::Device>>;
+        fn device(&self) -> Retained<ProtocolObject<dyn crate::MTLDevice>>;
 
         /// Add compute pipeline functions to the archive.
         #[unsafe(method(addComputePipelineFunctionsWithDescriptor:error:_))]
         #[unsafe(method_family = none)]
         fn add_compute_pipeline_functions(
             &self,
-            descriptor: &ComputePipelineDescriptor,
+            descriptor: &MTLComputePipelineDescriptor,
         ) -> Result<(), Retained<NSError>>;
 
         /// Add render pipeline functions to the archive.
@@ -40,7 +41,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         fn add_render_pipeline_functions(
             &self,
-            descriptor: &RenderPipelineDescriptor,
+            descriptor: &MTLRenderPipelineDescriptor,
         ) -> Result<(), Retained<NSError>>;
 
         // Tile and mesh render pipeline variants omitted for now.
@@ -50,7 +51,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn add_library_with_descriptor(
             &self,
-            descriptor: &StitchedLibraryDescriptor,
+            descriptor: &MTLStitchedLibraryDescriptor,
         ) -> Result<(), Retained<NSError>>;
 
         /// Write the contents of a BinaryArchive to a file.
@@ -63,8 +64,8 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn add_function_with_descriptor_library(
             &self,
-            descriptor: &FunctionDescriptor,
-            library: &ProtocolObject<dyn Library>,
+            descriptor: &MTLFunctionDescriptor,
+            library: &ProtocolObject<dyn MTLLibrary>,
         ) -> Result<(), Retained<NSError>>;
     }
 );

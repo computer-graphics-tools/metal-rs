@@ -8,30 +8,29 @@ use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 extern_class!(
     /// Intersection function table descriptor
     #[unsafe(super(NSObject))]
-    #[name = "MTLIntersectionFunctionTableDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct IntersectionFunctionTableDescriptor;
+    pub struct MTLIntersectionFunctionTableDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for IntersectionFunctionTableDescriptor {}
+    unsafe impl NSCopying for MTLIntersectionFunctionTableDescriptor {}
 );
 
-unsafe impl CopyingHelper for IntersectionFunctionTableDescriptor {
+unsafe impl CopyingHelper for MTLIntersectionFunctionTableDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for IntersectionFunctionTableDescriptor {}
+    unsafe impl NSObjectProtocol for MTLIntersectionFunctionTableDescriptor {}
 );
 
-impl IntersectionFunctionTableDescriptor {
+impl MTLIntersectionFunctionTableDescriptor {
     extern_methods!(
         /// Create a descriptor
         #[unsafe(method(intersectionFunctionTableDescriptor))]
         #[unsafe(method_family = none)]
         pub unsafe fn intersection_function_table_descriptor()
-        -> Retained<IntersectionFunctionTableDescriptor>;
+        -> Retained<MTLIntersectionFunctionTableDescriptor>;
 
         /// The number of functions in the table.
         #[unsafe(method(functionCount))]

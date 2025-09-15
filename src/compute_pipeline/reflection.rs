@@ -4,11 +4,10 @@ use objc2_foundation::NSObjectProtocol;
 extern_class!(
     /// Reflection info for a compute pipeline.
     #[unsafe(super(NSObject))]
-    #[name = "MTLComputePipelineReflection"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct ComputePipelineReflection;
+    pub struct MTLComputePipelineReflection;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for ComputePipelineReflection {}
+    unsafe impl NSObjectProtocol for MTLComputePipelineReflection {}
 );

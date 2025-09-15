@@ -5,7 +5,7 @@ bitflags! {
     #[repr(transparent)]
     #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
     /// The type that represents the different contexts for a tensor.
-    pub struct TensorUsage: usize {
+    pub struct MTLTensorUsage: usize {
         /// A tensor context that applies to compute encoders.
         ///
         /// You can use tensors with this context in ``MTL4ComputeCommandEncoder`` or ``MTLComputeCommandEncoder`` instances.
@@ -21,10 +21,10 @@ bitflags! {
     }
 }
 
-unsafe impl Encode for TensorUsage {
+unsafe impl Encode for MTLTensorUsage {
     const ENCODING: Encoding = usize::ENCODING;
 }
 
-unsafe impl RefEncode for TensorUsage {
+unsafe impl RefEncode for MTLTensorUsage {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

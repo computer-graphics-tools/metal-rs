@@ -3,8 +3,7 @@ use objc2_foundation::{NSObjectProtocol, NSString, NSUInteger};
 
 extern_protocol!(
     /// Represents a queue that schedules IO command buffers.
-    #[name = "MTLIOCommandQueue"]
-    pub unsafe trait IoCommandQueue: NSObjectProtocol + Send + Sync {
+    pub unsafe trait MTLIOCommandQueue: NSObjectProtocol + Send + Sync {
         /// Insert a barrier to order prior and subsequent command buffers.
         #[unsafe(method(enqueueBarrier))]
         #[unsafe(method_family = none)]

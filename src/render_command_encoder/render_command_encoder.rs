@@ -3,64 +3,60 @@ use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSRange};
 
 use super::{
-    CullMode, DepthClipMode, PrimitiveType, ScissorRect, TriangleFillMode,
-    VertexAmplificationViewMapping, Viewport, VisibilityResultMode,
+    MTLCullMode, MTLDepthClipMode, MTLPrimitiveType, MTLScissorRect, MTLTriangleFillMode,
+    MTLVertexAmplificationViewMapping, MTLViewport, MTLVisibilityResultMode,
 };
-use crate::command_encoder::{BarrierScope as MTLBarrierScope, Stages as MTLRenderStages};
-use crate::render_pipeline::{
-    LogicalToPhysicalColorAttachmentMap as MTLLogicalToPhysicalColorAttachmentMap,
-    RenderPipelineState,
-};
-use crate::texture::Texture as MTLTexture;
-use crate::types::{IndexType as MTLIndexType, ResourceID, Size as MTLSize};
+use crate::command_encoder::{MTLBarrierScope, MTLStages as MTLRenderStages};
+use crate::render_pipeline::{MTLLogicalToPhysicalColorAttachmentMap, MTLRenderPipelineState};
+use crate::texture::MTLTexture;
+use crate::types::{MTLIndexType, MTLResourceID, MTLSize};
 use crate::{
-    AccelerationStructure, Buffer, CommandEncoder, CounterSampleBuffer, Fence,
-    IntersectionFunctionTable, RasterizationRateMap, Resource, ResourceUsage, SamplerState,
-    VisibleFunctionTable,
+    MTLAccelerationStructure, MTLBuffer, MTLCommandEncoder, MTLCounterSampleBuffer, MTLFence,
+    MTLIntersectionFunctionTable, MTLRasterizationRateMap, MTLResource, MTLResourceUsage,
+    MTLSamplerState, MTLVisibleFunctionTable,
 };
 
 extern_protocol!(
     /// Render command encoder interface.
-    #[name = "MTLRenderCommandEncoder"]
-    pub unsafe trait RenderCommandEncoder: CommandEncoder {
+    pub unsafe trait MTLRenderCommandEncoder: MTLCommandEncoder {
         #[unsafe(method(setRenderPipelineState:))]
         #[unsafe(method_family = none)]
         fn set_render_pipeline_state(
             &self,
-            pipeline_state: &ProtocolObject<dyn RenderPipelineState>,
+            pipeline_state: &ProtocolObject<dyn MTLRenderPipelineState>,
         );
 
         #[unsafe(method(setViewport:))]
         #[unsafe(method_family = none)]
-        fn set_viewport(&self, viewport: Viewport);
+        fn set_viewport(&self, viewport: MTLViewport);
 
         #[unsafe(method(setViewports:count:))]
         #[unsafe(method_family = none)]
-        unsafe fn set_viewports(&self, viewports: NonNull<Viewport>, count: usize);
+        unsafe fn set_viewports(&self, viewports: NonNull<MTLViewport>, count: usize);
 
         #[unsafe(method(setFrontFacingWinding:))]
         #[unsafe(method_family = none)]
-        fn set_front_facing_winding(&self, winding: super::types::Winding);
+        fn set_front_facing_winding(&self, winding: super::types::MTLWinding);
 
         #[unsafe(method(setCullMode:))]
         #[unsafe(method_family = none)]
-        fn set_cull_mode(&self, cull_mode: CullMode);
+        fn set_cull_mode(&self, cull_mode: MTLCullMode);
 
         #[unsafe(method(setDepthClipMode:))]
         #[unsafe(method_family = none)]
-        fn set_depth_clip_mode(&self, mode: DepthClipMode);
+        fn set_depth_clip_mode(&self, mode: MTLDepthClipMode);
 
         #[unsafe(method(setTriangleFillMode:))]
         #[unsafe(method_family = none)]
-        fn set_triangle_fill_mode(&self, mode: TriangleFillMode);
+        fn set_triangle_fill_mode(&self, mode: MTLTriangleFillMode);
 
         #[unsafe(method(setScissorRect:))]
         #[unsafe(method_family = none)]
-        fn set_scissor_rect(&self, rect: ScissorRect);
+        fn set_scissor_rect(&self, rect: MTLScissorRect);
 
         #[unsafe(method(setScissorRects:count:))]
         #[unsafe(method_family = none)]
-        unsafe fn set_scissor_rects(&self, rects: NonNull<ScissorRect>, count: usize);
+        unsafe fn set_scissor_rects(&self, rects: NonNull<MTLScissorRect>, count: usize);
 
         #[unsafe(method(setBlendColorRed:green:blue:alpha:))]
         #[unsafe(method_family = none)]
@@ -76,7 +72,7 @@ extern_protocol!(
 
         #[unsafe(method(setVisibilityResultMode:offset:))]
         #[unsafe(method_family = none)]
-        fn set_visibility_result_mode(&self, mode: VisibilityResultMode, offset: usize);
+        fn set_visibility_result_mode(&self, mode: MTLVisibilityResultMode, offset: usize);
 
         #[unsafe(method(setColorAttachmentMap:))]
         #[unsafe(method_family = none)]

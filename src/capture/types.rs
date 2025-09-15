@@ -3,30 +3,30 @@ use objc2_foundation::NSErrorDomain;
 
 #[repr(i64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum CaptureError {
+pub enum MTLCaptureError {
     NotSupported = 1,
     AlreadyCapturing = 2,
     InvalidDescriptor = 3,
 }
 
-unsafe impl Encode for CaptureError {
+unsafe impl Encode for MTLCaptureError {
     const ENCODING: Encoding = i64::ENCODING;
 }
-unsafe impl RefEncode for CaptureError {
+unsafe impl RefEncode for MTLCaptureError {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 #[repr(i64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum CaptureDestination {
+pub enum MTLCaptureDestination {
     DeveloperTools = 1,
     GPUTraceDocument = 2,
 }
 
-unsafe impl Encode for CaptureDestination {
+unsafe impl Encode for MTLCaptureDestination {
     const ENCODING: Encoding = i64::ENCODING;
 }
-unsafe impl RefEncode for CaptureDestination {
+unsafe impl RefEncode for MTLCaptureDestination {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 

@@ -5,29 +5,28 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSURL};
 
-use crate::capture::types::CaptureDestination;
+use crate::capture::types::MTLCaptureDestination;
 
 extern_class!(
     /// Parameters for starting a capture.
     #[unsafe(super(NSObject))]
-    #[name = "MTLCaptureDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct CaptureDescriptor;
+    pub struct MTLCaptureDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for CaptureDescriptor {}
+    unsafe impl NSCopying for MTLCaptureDescriptor {}
 );
 
-unsafe impl CopyingHelper for CaptureDescriptor {
+unsafe impl CopyingHelper for MTLCaptureDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for CaptureDescriptor {}
+    unsafe impl NSObjectProtocol for MTLCaptureDescriptor {}
 );
 
-impl CaptureDescriptor {
+impl MTLCaptureDescriptor {
     extern_methods!(
         /// The object that is captured (Device/CommandQueue/CaptureScope).
         #[unsafe(method(captureObject))]
@@ -42,11 +41,11 @@ impl CaptureDescriptor {
         /// The destination where to capture the GPU trace.
         #[unsafe(method(destination))]
         #[unsafe(method_family = none)]
-        pub fn destination(&self) -> CaptureDestination;
+        pub fn destination(&self) -> MTLCaptureDestination;
 
         #[unsafe(method(setDestination:))]
         #[unsafe(method_family = none)]
-        pub fn set_destination(&self, destination: CaptureDestination);
+        pub fn set_destination(&self, destination: MTLCaptureDestination);
 
         /// Output URL if using `GPUTraceDocument`.
         #[unsafe(method(outputURL))]
@@ -59,7 +58,7 @@ impl CaptureDescriptor {
     );
 }
 
-impl CaptureDescriptor {
+impl MTLCaptureDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

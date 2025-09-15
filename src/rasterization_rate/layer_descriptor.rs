@@ -7,30 +7,29 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use super::RasterizationRateSampleArray;
-use crate::types::Size;
+use super::MTLRasterizationRateSampleArray;
+use crate::types::MTLSize;
 
 extern_class!(
     /// Describes the minimum rasterization rate screen space using two piecewise linear functions.
     #[unsafe(super(NSObject))]
-    #[name = "MTLRasterizationRateLayerDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct RasterizationRateLayerDescriptor;
+    pub struct MTLRasterizationRateLayerDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for RasterizationRateLayerDescriptor {}
+    unsafe impl NSCopying for MTLRasterizationRateLayerDescriptor {}
 );
 
-unsafe impl CopyingHelper for RasterizationRateLayerDescriptor {
+unsafe impl CopyingHelper for MTLRasterizationRateLayerDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for RasterizationRateLayerDescriptor {}
+    unsafe impl NSObjectProtocol for MTLRasterizationRateLayerDescriptor {}
 );
 
-impl RasterizationRateLayerDescriptor {
+impl MTLRasterizationRateLayerDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]
@@ -41,7 +40,7 @@ impl RasterizationRateLayerDescriptor {
         #[unsafe(method_family = init)]
         pub unsafe fn init_with_sample_count(
             this: Allocated<Self>,
-            sample_count: Size,
+            sample_count: MTLSize,
         ) -> Retained<Self>;
 
         /// Initialize a descriptor for a layer with the given number of quality samples and initial values.
@@ -50,7 +49,7 @@ impl RasterizationRateLayerDescriptor {
         #[unsafe(method_family = init)]
         pub unsafe fn init_with_sample_count_horizontal_vertical(
             this: Allocated<Self>,
-            sample_count: Size,
+            sample_count: MTLSize,
             horizontal: NonNull<c_float>,
             vertical: NonNull<c_float>,
         ) -> Retained<Self>;
@@ -58,7 +57,7 @@ impl RasterizationRateLayerDescriptor {
         /// The maximum number of quality samples this descriptor can use for the horizontal and vertical axes.
         #[unsafe(method(maxSampleCount))]
         #[unsafe(method_family = none)]
-        pub unsafe fn max_sample_count(&self) -> Size;
+        pub unsafe fn max_sample_count(&self) -> MTLSize;
 
         /// Pointer to mutable storage array for horizontal samples.
         #[unsafe(method(horizontalSampleStorage))]
@@ -73,16 +72,16 @@ impl RasterizationRateLayerDescriptor {
         /// Bounds-checked access helper for horizontal samples.
         #[unsafe(method(horizontal))]
         #[unsafe(method_family = none)]
-        pub unsafe fn horizontal(&self) -> Retained<RasterizationRateSampleArray>;
+        pub unsafe fn horizontal(&self) -> Retained<MTLRasterizationRateSampleArray>;
 
         /// Bounds-checked access helper for vertical samples.
         #[unsafe(method(vertical))]
         #[unsafe(method_family = none)]
-        pub unsafe fn vertical(&self) -> Retained<RasterizationRateSampleArray>;
+        pub unsafe fn vertical(&self) -> Retained<MTLRasterizationRateSampleArray>;
 
         /// Setter for `sampleCount`.
         #[unsafe(method(setSampleCount:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_sample_count(&self, sample_count: Size);
+        pub unsafe fn set_sample_count(&self, sample_count: MTLSize);
     );
 }

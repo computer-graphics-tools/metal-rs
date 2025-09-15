@@ -5,29 +5,28 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use super::vertex_step_function::VertexStepFunction;
+use super::vertex_step_function::MTLVertexStepFunction;
 
 extern_class!(
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtlvertexbufferlayoutdescriptor?language=objc)
     #[unsafe(super(NSObject))]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    #[name = "MTLVertexBufferLayoutDescriptor"]
-    pub struct VertexBufferLayoutDescriptor;
+    pub struct MTLVertexBufferLayoutDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for VertexBufferLayoutDescriptor {}
+    unsafe impl NSCopying for MTLVertexBufferLayoutDescriptor {}
 );
 
-unsafe impl CopyingHelper for VertexBufferLayoutDescriptor {
+unsafe impl CopyingHelper for MTLVertexBufferLayoutDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for VertexBufferLayoutDescriptor {}
+    unsafe impl NSObjectProtocol for MTLVertexBufferLayoutDescriptor {}
 );
 
-impl VertexBufferLayoutDescriptor {
+impl MTLVertexBufferLayoutDescriptor {
     extern_methods!(
         #[unsafe(method(stride))]
         #[unsafe(method_family = none)]
@@ -40,12 +39,12 @@ impl VertexBufferLayoutDescriptor {
 
         #[unsafe(method(stepFunction))]
         #[unsafe(method_family = none)]
-        pub fn step_function(&self) -> VertexStepFunction;
+        pub fn step_function(&self) -> MTLVertexStepFunction;
 
         /// Setter for [`stepFunction`][Self::stepFunction].
         #[unsafe(method(setStepFunction:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_step_function(&self, step_function: VertexStepFunction);
+        pub unsafe fn set_step_function(&self, step_function: MTLVertexStepFunction);
 
         #[unsafe(method(stepRate))]
         #[unsafe(method_family = none)]
@@ -59,7 +58,7 @@ impl VertexBufferLayoutDescriptor {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl VertexBufferLayoutDescriptor {
+impl MTLVertexBufferLayoutDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

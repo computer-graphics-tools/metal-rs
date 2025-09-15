@@ -5,45 +5,44 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use crate::{CpuCacheMode, HazardTrackingMode, ResourceOptions, StorageMode};
+use crate::{MTLCPUCacheMode, MTLHazardTrackingMode, MTLResourceOptions, MTLStorageMode};
 
-use super::{TensorDataType, TensorExtents, TensorUsage};
+use super::{MTLTensorDataType, MTLTensorExtents, MTLTensorUsage};
 
 extern_class!(
     /// A configuration type for creating new tensor instances.
     ///
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtltensordescriptor?language=objc)
     #[unsafe(super(NSObject))]
-    #[name = "MTLTensorDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct TensorDescriptor;
+    pub struct MTLTensorDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for TensorDescriptor {}
+    unsafe impl NSCopying for MTLTensorDescriptor {}
 );
 
-unsafe impl CopyingHelper for TensorDescriptor {
+unsafe impl CopyingHelper for MTLTensorDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for TensorDescriptor {}
+    unsafe impl NSObjectProtocol for MTLTensorDescriptor {}
 );
 
-impl TensorDescriptor {
+impl MTLTensorDescriptor {
     extern_methods!(
         /// An array of sizes, in elements, one for each dimension of the tensors you create with this descriptor.
         ///
         /// The default value of this property is a rank one extents with size one.
         #[unsafe(method(dimensions))]
         #[unsafe(method_family = none)]
-        pub fn dimensions(&self) -> Retained<TensorExtents>;
+        pub fn dimensions(&self) -> Retained<MTLTensorExtents>;
 
         /// Setter for [`dimensions`][Self::dimensions].
         #[unsafe(method(setDimensions:))]
         #[unsafe(method_family = none)]
-        pub fn set_dimensions(&self, dimensions: &TensorExtents);
+        pub fn set_dimensions(&self, dimensions: &MTLTensorExtents);
 
         /// An array of strides, in elements, one for each dimension in the tensors you create with this descriptor, if applicable.
         ///
@@ -54,87 +53,87 @@ impl TensorDescriptor {
         /// - If `usage` contains `TensorUsage::MACHINE_LEARNING`, the second element of `strides` is aligned to 64 bytes, and for any `i` larger than one, `strides[i]` is equal to `strides[i-1] * dimensions[i-1]`.
         #[unsafe(method(strides))]
         #[unsafe(method_family = none)]
-        pub fn strides(&self) -> Option<Retained<TensorExtents>>;
+        pub fn strides(&self) -> Option<Retained<MTLTensorExtents>>;
 
         /// Setter for [`strides`][Self::strides].
         #[unsafe(method(setStrides:))]
         #[unsafe(method_family = none)]
-        pub fn set_strides(&self, strides: Option<&TensorExtents>);
+        pub fn set_strides(&self, strides: Option<&MTLTensorExtents>);
 
         /// A data format for the tensors you create with this descriptor.
         ///
         /// The default value of this property is `TensorDataType::Float32`.
         #[unsafe(method(dataType))]
         #[unsafe(method_family = none)]
-        pub fn data_type(&self) -> TensorDataType;
+        pub fn data_type(&self) -> MTLTensorDataType;
 
         /// Setter for [`dataType`][Self::dataType].
         #[unsafe(method(setDataType:))]
         #[unsafe(method_family = none)]
-        pub fn set_data_type(&self, data_type: TensorDataType);
+        pub fn set_data_type(&self, data_type: MTLTensorDataType);
 
         /// A set of contexts in which you can use tensors you create with this descriptor.
         ///
         /// The default value for this property is a bitwise OR of: `TensorUsage::RENDER | TensorUsage::COMPUTE`.
         #[unsafe(method(usage))]
         #[unsafe(method_family = none)]
-        pub fn usage(&self) -> TensorUsage;
+        pub fn usage(&self) -> MTLTensorUsage;
 
         /// Setter for [`usage`][Self::usage].
         #[unsafe(method(setUsage:))]
         #[unsafe(method_family = none)]
-        pub fn set_usage(&self, usage: TensorUsage);
+        pub fn set_usage(&self, usage: MTLTensorUsage);
 
         /// A packed set of the `storageMode`, `cpuCacheMode` and `hazardTrackingMode` properties.
         #[unsafe(method(resourceOptions))]
         #[unsafe(method_family = none)]
-        pub fn resource_options(&self) -> ResourceOptions;
+        pub fn resource_options(&self) -> MTLResourceOptions;
 
         /// Setter for [`resourceOptions`][Self::resourceOptions].
         #[unsafe(method(setResourceOptions:))]
         #[unsafe(method_family = none)]
-        pub fn set_resource_options(&self, resource_options: ResourceOptions);
+        pub fn set_resource_options(&self, resource_options: MTLResourceOptions);
 
         /// A value that configures the cache mode of CPU mapping of tensors you create with this descriptor.
         ///
         /// The default value of this property is `CpuCacheMode::DefaultCache`.
         #[unsafe(method(cpuCacheMode))]
         #[unsafe(method_family = none)]
-        pub fn cpu_cache_mode(&self) -> CpuCacheMode;
+        pub fn cpu_cache_mode(&self) -> MTLCPUCacheMode;
 
         /// Setter for [`cpuCacheMode`][Self::cpuCacheMode].
         #[unsafe(method(setCpuCacheMode:))]
         #[unsafe(method_family = none)]
-        pub fn set_cpu_cache_mode(&self, cpu_cache_mode: CpuCacheMode);
+        pub fn set_cpu_cache_mode(&self, cpu_cache_mode: MTLCPUCacheMode);
 
         /// A value that configures the memory location and access permissions of tensors you create with this descriptor.
         ///
         /// The default value of this property defaults to `StorageMode::Shared`.
         #[unsafe(method(storageMode))]
         #[unsafe(method_family = none)]
-        pub fn storage_mode(&self) -> StorageMode;
+        pub fn storage_mode(&self) -> MTLStorageMode;
 
         /// Setter for [`storageMode`][Self::storageMode].
         #[unsafe(method(setStorageMode:))]
         #[unsafe(method_family = none)]
-        pub fn set_storage_mode(&self, storage_mode: StorageMode);
+        pub fn set_storage_mode(&self, storage_mode: MTLStorageMode);
 
         /// A value that configures the hazard tracking of tensors you create with this descriptor.
         ///
         /// The default value of this property is `HazardTrackingMode::Default`.
         #[unsafe(method(hazardTrackingMode))]
         #[unsafe(method_family = none)]
-        pub fn hazard_tracking_mode(&self) -> HazardTrackingMode;
+        pub fn hazard_tracking_mode(&self) -> MTLHazardTrackingMode;
 
         /// Setter for [`hazardTrackingMode`][Self::hazardTrackingMode].
         #[unsafe(method(setHazardTrackingMode:))]
         #[unsafe(method_family = none)]
-        pub fn set_hazard_tracking_mode(&self, hazard_tracking_mode: HazardTrackingMode);
+        pub fn set_hazard_tracking_mode(&self, hazard_tracking_mode: MTLHazardTrackingMode);
     );
 }
 
 /// Methods declared on superclass `NSObject`.
-impl TensorDescriptor {
+impl MTLTensorDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]
@@ -150,15 +149,15 @@ impl TensorDescriptor {
 mod tests {
     use super::*;
     use crate::{
-        CpuCacheMode, HazardTrackingMode, ResourceOptions, StorageMode,
-        tensor::{TensorDataType, TensorExtents, TensorUsage},
+        MTLCPUCacheMode, MTLHazardTrackingMode, MTLResourceOptions, MTLStorageMode,
+        tensor::{MTLTensorDataType, MTLTensorExtents, MTLTensorUsage},
     };
     use core::ffi::CStr;
     use objc2::runtime::AnyClass;
 
-    fn make_extents(vals: &[isize]) -> Retained<TensorExtents> {
+    fn make_extents(vals: &[isize]) -> Retained<MTLTensorExtents> {
         // Safety: We pass a correct pointer or null based on rank.
-        TensorExtents::new_with_rank_values(vals.len(), Some(vals)).expect("init extents")
+        MTLTensorExtents::new_with_rank_values(vals.len(), Some(vals)).expect("init extents")
     }
 
     #[test]
@@ -168,7 +167,7 @@ mod tests {
             return;
         }
 
-        let desc = unsafe { TensorDescriptor::new() };
+        let desc = unsafe { MTLTensorDescriptor::new() };
 
         // dimensions
         let dims_in = make_extents(&[2, 3, 4]);
@@ -189,33 +188,36 @@ mod tests {
         assert_eq!(strides_out.extent_at_dimension_index(2), 6);
 
         // data type
-        desc.set_data_type(TensorDataType::Float16);
-        assert_eq!(desc.data_type(), TensorDataType::Float16);
+        desc.set_data_type(MTLTensorDataType::Float16);
+        assert_eq!(desc.data_type(), MTLTensorDataType::Float16);
 
         // usage
-        let usage = TensorUsage::COMPUTE | TensorUsage::RENDER;
+        let usage = MTLTensorUsage::COMPUTE | MTLTensorUsage::RENDER;
         desc.set_usage(usage);
         let usage_out = desc.usage();
-        assert!(usage_out.contains(TensorUsage::COMPUTE));
-        assert!(usage_out.contains(TensorUsage::RENDER));
+        assert!(usage_out.contains(MTLTensorUsage::COMPUTE));
+        assert!(usage_out.contains(MTLTensorUsage::RENDER));
 
         // cpu cache mode
-        desc.set_cpu_cache_mode(CpuCacheMode::WriteCombined);
-        assert_eq!(desc.cpu_cache_mode(), CpuCacheMode::WriteCombined);
+        desc.set_cpu_cache_mode(MTLCPUCacheMode::WriteCombined);
+        assert_eq!(desc.cpu_cache_mode(), MTLCPUCacheMode::WriteCombined);
 
         // storage mode
-        desc.set_storage_mode(StorageMode::Private);
-        assert_eq!(desc.storage_mode(), StorageMode::Private);
+        desc.set_storage_mode(MTLStorageMode::Private);
+        assert_eq!(desc.storage_mode(), MTLStorageMode::Private);
 
         // hazard tracking
-        desc.set_hazard_tracking_mode(HazardTrackingMode::Untracked);
-        assert_eq!(desc.hazard_tracking_mode(), HazardTrackingMode::Untracked);
+        desc.set_hazard_tracking_mode(MTLHazardTrackingMode::Untracked);
+        assert_eq!(
+            desc.hazard_tracking_mode(),
+            MTLHazardTrackingMode::Untracked
+        );
 
         // resource options should reflect the above modes
         let ro = desc.resource_options();
-        let expected = ResourceOptions::CPU_CACHE_MODE_WRITE_COMBINED
-            | ResourceOptions::STORAGE_MODE_PRIVATE
-            | ResourceOptions::HAZARD_TRACKING_MODE_UNTRACKED;
+        let expected = MTLResourceOptions::CPU_CACHE_MODE_WRITE_COMBINED
+            | MTLResourceOptions::STORAGE_MODE_PRIVATE
+            | MTLResourceOptions::HAZARD_TRACKING_MODE_UNTRACKED;
         assert!(ro.contains(expected));
     }
 }

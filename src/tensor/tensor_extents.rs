@@ -11,16 +11,15 @@ extern_class!(
     ///
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtltensorextents?language=objc)
     #[unsafe(super(NSObject))]
-    #[name = "MTLTensorExtents"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct TensorExtents;
+    pub struct MTLTensorExtents;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for TensorExtents {}
+    unsafe impl NSObjectProtocol for MTLTensorExtents {}
 );
 
-impl TensorExtents {
+impl MTLTensorExtents {
     extern_methods!(
         /// Obtains the rank of the tensor.
         ///
@@ -40,7 +39,7 @@ impl TensorExtents {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl TensorExtents {
+impl MTLTensorExtents {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]
@@ -52,7 +51,7 @@ impl TensorExtents {
     );
 }
 
-impl TensorExtents {
+impl MTLTensorExtents {
     /// Creates a new tensor extents with the rank and extent values you provide.
     ///
     /// Zero rank extents represent scalars. `values` can only be `nil`if `rank` is 0.

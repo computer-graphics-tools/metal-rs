@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Blend operation (from `MTLBlendOperation`).
 #[repr(u64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum BlendOperation {
+pub enum MTLBlendOperation {
     Add = 0,
     Subtract = 1,
     ReverseSubtract = 2,
@@ -13,10 +13,10 @@ pub enum BlendOperation {
     Unspecialized = 5,
 }
 
-unsafe impl Encode for BlendOperation {
+unsafe impl Encode for MTLBlendOperation {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for BlendOperation {
+unsafe impl RefEncode for MTLBlendOperation {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

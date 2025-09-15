@@ -4,8 +4,8 @@ mod map;
 mod map_descriptor;
 mod sample_array;
 
-pub use layer_array::RasterizationRateLayerArray;
-pub use layer_descriptor::RasterizationRateLayerDescriptor;
-pub use map::RasterizationRateMap;
-pub use map_descriptor::RasterizationRateMapDescriptor;
-pub use sample_array::RasterizationRateSampleArray;
+pub use layer_array::MTLRasterizationRateLayerArray;
+pub use layer_descriptor::MTLRasterizationRateLayerDescriptor;
+pub use map::MTLRasterizationRateMap;
+pub use map_descriptor::MTLRasterizationRateMapDescriptor;
+pub use sample_array::MTLRasterizationRateSampleArray;

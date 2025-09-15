@@ -5,43 +5,45 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use super::AccelerationStructurePassSampleBufferAttachmentDescriptorArray;
+use super::MTLAccelerationStructurePassSampleBufferAttachmentDescriptorArray;
 
 extern_class!(
     /// Pass descriptor for creating acceleration structure command encoders.
     #[unsafe(super(NSObject))]
-    #[name = "MTLAccelerationStructurePassDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct AccelerationStructurePassDescriptor;
+    pub struct MTLAccelerationStructurePassDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for AccelerationStructurePassDescriptor {}
+    unsafe impl NSCopying for MTLAccelerationStructurePassDescriptor {}
 );
 
-unsafe impl CopyingHelper for AccelerationStructurePassDescriptor {
+unsafe impl CopyingHelper for MTLAccelerationStructurePassDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for AccelerationStructurePassDescriptor {}
+    unsafe impl NSObjectProtocol for MTLAccelerationStructurePassDescriptor {}
 );
 
-impl AccelerationStructurePassDescriptor {
+impl MTLAccelerationStructurePassDescriptor {
     extern_methods!(
         /// Create a default acceleration structure pass descriptor.
         #[unsafe(method(accelerationStructurePassDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn acceleration_structure_pass_descriptor() -> Retained<AccelerationStructurePassDescriptor>;
+        pub unsafe fn acceleration_structure_pass_descriptor()
+        -> Retained<MTLAccelerationStructurePassDescriptor>;
 
         /// An array of sample buffers and associated sample indices.
         #[unsafe(method(sampleBufferAttachments))]
         #[unsafe(method_family = none)]
-        pub unsafe fn sample_buffer_attachments(&self) -> Retained<AccelerationStructurePassSampleBufferAttachmentDescriptorArray>;
+        pub unsafe fn sample_buffer_attachments(
+            &self,
+        ) -> Retained<MTLAccelerationStructurePassSampleBufferAttachmentDescriptorArray>;
     );
 }
 
-impl AccelerationStructurePassDescriptor {
+impl MTLAccelerationStructurePassDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]
@@ -52,5 +54,3 @@ impl AccelerationStructurePassDescriptor {
         pub unsafe fn new() -> Retained<Self>;
     );
 }
-
-

@@ -3,7 +3,7 @@ mod manager;
 mod scope;
 mod types;
 
-pub use descriptor::CaptureDescriptor;
-pub use manager::CaptureManager;
-pub use scope::CaptureScope;
-pub use types::{CaptureDestination, CaptureError, capture_error_domain};
+pub use descriptor::MTLCaptureDescriptor;
+pub use manager::MTLCaptureManager;
+pub use scope::MTLCaptureScope;
+pub use types::{MTLCaptureDestination, MTLCaptureError, capture_error_domain};

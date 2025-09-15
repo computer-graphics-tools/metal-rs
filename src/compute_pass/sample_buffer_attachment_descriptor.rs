@@ -5,43 +5,42 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use crate::counters::CounterSampleBuffer;
+use crate::counters::MTLCounterSampleBuffer;
 
 extern_class!(
     /// The sample buffer attachment descriptor for compute passes.
     #[unsafe(super(NSObject))]
-    #[name = "MTLComputePassSampleBufferAttachmentDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct ComputePassSampleBufferAttachmentDescriptor;
+    pub struct MTLComputePassSampleBufferAttachmentDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for ComputePassSampleBufferAttachmentDescriptor {}
+    unsafe impl NSCopying for MTLComputePassSampleBufferAttachmentDescriptor {}
 );
 
-unsafe impl CopyingHelper for ComputePassSampleBufferAttachmentDescriptor {
+unsafe impl CopyingHelper for MTLComputePassSampleBufferAttachmentDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for ComputePassSampleBufferAttachmentDescriptor {}
+    unsafe impl NSObjectProtocol for MTLComputePassSampleBufferAttachmentDescriptor {}
 );
 
-impl ComputePassSampleBufferAttachmentDescriptor {
+impl MTLComputePassSampleBufferAttachmentDescriptor {
     extern_methods!(
         /// The sample buffer to store samples for the compute-pass defined samples.
         #[unsafe(method(sampleBuffer))]
         #[unsafe(method_family = none)]
         pub unsafe fn sample_buffer(
             &self,
-        ) -> Option<Retained<ProtocolObject<dyn CounterSampleBuffer>>>;
+        ) -> Option<Retained<ProtocolObject<dyn MTLCounterSampleBuffer>>>;
 
         /// Setter for `sample_buffer`.
         #[unsafe(method(setSampleBuffer:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_sample_buffer(
             &self,
-            sample_buffer: Option<&ProtocolObject<dyn CounterSampleBuffer>>,
+            sample_buffer: Option<&ProtocolObject<dyn MTLCounterSampleBuffer>>,
         );
 
         /// Sample index for start-of-encoder sample.
@@ -64,7 +63,7 @@ impl ComputePassSampleBufferAttachmentDescriptor {
     );
 }
 
-impl ComputePassSampleBufferAttachmentDescriptor {
+impl MTLComputePassSampleBufferAttachmentDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

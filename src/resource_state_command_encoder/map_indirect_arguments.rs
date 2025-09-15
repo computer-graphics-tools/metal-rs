@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Structure describing an indirect mapping region (from `MTLMapIndirectArguments`).
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq)]
-pub struct MapIndirectArguments {
+pub struct MTLMapIndirectArguments {
     pub region_origin_x: u32,
     pub region_origin_y: u32,
     pub region_origin_z: u32,
@@ -14,7 +14,7 @@ pub struct MapIndirectArguments {
     pub slice_id: u32,
 }
 
-unsafe impl Encode for MapIndirectArguments {
+unsafe impl Encode for MTLMapIndirectArguments {
     const ENCODING: Encoding = Encoding::Struct(
         "{MTLMapIndirectArguments=IIIIIIII}",
         &[
@@ -30,6 +30,6 @@ unsafe impl Encode for MapIndirectArguments {
     );
 }
 
-unsafe impl RefEncode for MapIndirectArguments {
+unsafe impl RefEncode for MTLMapIndirectArguments {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

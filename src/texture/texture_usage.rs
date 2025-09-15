@@ -9,7 +9,7 @@ bitflags! {
     /// Availability: API_AVAILABLE(macos(10.11), ios(9.0))
     #[repr(transparent)]
     #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-    pub struct TextureUsage: usize {
+    pub struct MTLTextureUsage: usize {
         /// Unknown usage
         const UNKNOWN = 0x0000;
         /// Readable from shader stages
@@ -27,12 +27,10 @@ bitflags! {
     }
 }
 
-unsafe impl Encode for TextureUsage {
+unsafe impl Encode for MTLTextureUsage {
     const ENCODING: Encoding = usize::ENCODING;
 }
 
-unsafe impl RefEncode for TextureUsage {
+unsafe impl RefEncode for MTLTextureUsage {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-

@@ -1,17 +1,16 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSString};
 
-use super::Stages;
-use crate::device::Device;
+use super::MTLStages;
+use crate::device::MTLDevice;
 
 extern_protocol!(
     /// Common interface for objects that write commands into command buffers.
-    #[name = "MTLCommandEncoder"]
-    pub unsafe trait CommandEncoder: NSObjectProtocol {
+    pub unsafe trait MTLCommandEncoder: NSObjectProtocol {
         /// The device this resource was created against.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
-        unsafe fn device(&self) -> Retained<ProtocolObject<dyn Device>>;
+        unsafe fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
 
         /// A string to help identify this object.
         #[unsafe(method(label))]
@@ -33,8 +32,8 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn barrier_after_queue_stages_before_stages(
             &self,
-            after_queue_stages: Stages,
-            before_stages: Stages,
+            after_queue_stages: MTLStages,
+            before_stages: MTLStages,
         );
 
         /// Inserts a debug string into the command buffer.

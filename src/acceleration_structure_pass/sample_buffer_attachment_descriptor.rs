@@ -5,41 +5,42 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use crate::CounterSampleBuffer;
+use crate::MTLCounterSampleBuffer;
 
 extern_class!(
     /// Sample buffer attachment descriptor for acceleration structure passes.
     #[unsafe(super(NSObject))]
-    #[name = "MTLAccelerationStructurePassSampleBufferAttachmentDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct AccelerationStructurePassSampleBufferAttachmentDescriptor;
+    pub struct MTLAccelerationStructurePassSampleBufferAttachmentDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for AccelerationStructurePassSampleBufferAttachmentDescriptor {}
+    unsafe impl NSCopying for MTLAccelerationStructurePassSampleBufferAttachmentDescriptor {}
 );
 
-unsafe impl CopyingHelper for AccelerationStructurePassSampleBufferAttachmentDescriptor {
+unsafe impl CopyingHelper for MTLAccelerationStructurePassSampleBufferAttachmentDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for AccelerationStructurePassSampleBufferAttachmentDescriptor {}
+    unsafe impl NSObjectProtocol for MTLAccelerationStructurePassSampleBufferAttachmentDescriptor {}
 );
 
-impl AccelerationStructurePassSampleBufferAttachmentDescriptor {
+impl MTLAccelerationStructurePassSampleBufferAttachmentDescriptor {
     extern_methods!(
         /// The sample buffer to store samples for the encoder-defined samples.
         #[unsafe(method(sampleBuffer))]
         #[unsafe(method_family = none)]
-        pub unsafe fn sample_buffer(&self) -> Option<Retained<ProtocolObject<dyn CounterSampleBuffer>>>;
+        pub unsafe fn sample_buffer(
+            &self,
+        ) -> Option<Retained<ProtocolObject<dyn MTLCounterSampleBuffer>>>;
 
         /// Setter for `sample_buffer`.
         #[unsafe(method(setSampleBuffer:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_sample_buffer(
             &self,
-            sample_buffer: Option<&ProtocolObject<dyn CounterSampleBuffer>>,
+            sample_buffer: Option<&ProtocolObject<dyn MTLCounterSampleBuffer>>,
         );
 
         /// Sample index for start-of-encoder sample.
@@ -62,7 +63,7 @@ impl AccelerationStructurePassSampleBufferAttachmentDescriptor {
     );
 }
 
-impl AccelerationStructurePassSampleBufferAttachmentDescriptor {
+impl MTLAccelerationStructurePassSampleBufferAttachmentDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]
@@ -73,5 +74,3 @@ impl AccelerationStructurePassSampleBufferAttachmentDescriptor {
         pub unsafe fn new() -> Retained<Self>;
     );
 }
-
-

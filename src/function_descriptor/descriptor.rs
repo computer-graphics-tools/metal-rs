@@ -5,34 +5,33 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSString};
 
-use super::FunctionOptions;
+use super::MTLFunctionOptions;
 
 extern_class!(
     /// Descriptor for locating and specializing a visible function.
     #[unsafe(super(NSObject))]
-    #[name = "MTLFunctionDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct FunctionDescriptor;
+    pub struct MTLFunctionDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for FunctionDescriptor {}
+    unsafe impl NSCopying for MTLFunctionDescriptor {}
 );
 
-unsafe impl CopyingHelper for FunctionDescriptor {
+unsafe impl CopyingHelper for MTLFunctionDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for FunctionDescriptor {}
+    unsafe impl NSObjectProtocol for MTLFunctionDescriptor {}
 );
 
-impl FunctionDescriptor {
+impl MTLFunctionDescriptor {
     extern_methods!(
         /// Create an autoreleased function descriptor.
         #[unsafe(method(functionDescriptor))]
         #[unsafe(method_family = none)]
-        pub fn function_descriptor() -> Retained<FunctionDescriptor>;
+        pub fn function_descriptor() -> Retained<MTLFunctionDescriptor>;
 
         /// The name of the visible function to find.
         #[unsafe(method(name))]
@@ -57,17 +56,17 @@ impl FunctionDescriptor {
         /// Options for creating the Function.
         #[unsafe(method(options))]
         #[unsafe(method_family = none)]
-        pub fn options(&self) -> FunctionOptions;
+        pub fn options(&self) -> MTLFunctionOptions;
 
         /// Setter for [`options`][Self::options].
         #[unsafe(method(setOptions:))]
         #[unsafe(method_family = none)]
-        pub fn set_options(&self, options: FunctionOptions);
+        pub fn set_options(&self, options: MTLFunctionOptions);
     );
 }
 
 /// Methods declared on superclass `NSObject`.
-impl FunctionDescriptor {
+impl MTLFunctionDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Describes the organization and types of components for each vertex in a vertex buffer (from `MTLVertexFormat`).
 #[repr(u64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum VertexFormat {
+pub enum MTLVertexFormat {
     Invalid = 0,
     UChar2 = 1,
     UChar3 = 2,
@@ -60,10 +60,10 @@ pub enum VertexFormat {
     FloatRGB9E5 = 55,
 }
 
-unsafe impl Encode for VertexFormat {
+unsafe impl Encode for MTLVertexFormat {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for VertexFormat {
+unsafe impl RefEncode for MTLVertexFormat {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

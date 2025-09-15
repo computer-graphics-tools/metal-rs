@@ -1,12 +1,11 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSArray, NSObjectProtocol, NSString};
 
-use super::{Function, FunctionReflection, LibraryType};
+use super::{MTLFunction, MTLFunctionReflection, MTLLibraryType};
 
 extern_protocol!(
     /// Metal library interface.
-    #[name = "MTLLibrary"]
-    pub unsafe trait Library: NSObjectProtocol + Send + Sync {
+    pub unsafe trait MTLLibrary: NSObjectProtocol + Send + Sync {
         #[unsafe(method(label))]
         #[unsafe(method_family = none)]
         fn label(&self) -> Option<Retained<NSString>>;
@@ -20,14 +19,14 @@ extern_protocol!(
         fn new_function_with_name(
             &self,
             function_name: &NSString,
-        ) -> Option<Retained<ProtocolObject<dyn Function>>>;
+        ) -> Option<Retained<ProtocolObject<dyn MTLFunction>>>;
 
         #[unsafe(method(reflectionForFunctionWithName:))]
         #[unsafe(method_family = none)]
         unsafe fn reflection_for_function_with_name(
             &self,
             function_name: &NSString,
-        ) -> Option<Retained<FunctionReflection>>;
+        ) -> Option<Retained<MTLFunctionReflection>>;
 
         #[unsafe(method(functionNames))]
         #[unsafe(method_family = none)]
@@ -35,7 +34,7 @@ extern_protocol!(
 
         #[unsafe(method(type))]
         #[unsafe(method_family = none)]
-        unsafe fn r#type(&self) -> LibraryType;
+        unsafe fn r#type(&self) -> MTLLibraryType;
 
         #[unsafe(method(installName))]
         #[unsafe(method_family = none)]

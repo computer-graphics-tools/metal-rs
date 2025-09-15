@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Enumerates the different support levels for sparse buffers (from `MTLBufferSparseTier`).
 #[repr(i64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum BufferSparseTier {
+pub enum MTLBufferSparseTier {
     /// Indicates that the buffer is not sparse.
     None = 0,
     /// Indicates support for sparse buffers tier 1.
@@ -20,12 +20,10 @@ pub enum BufferSparseTier {
     Tier1 = 1,
 }
 
-unsafe impl Encode for BufferSparseTier {
+unsafe impl Encode for MTLBufferSparseTier {
     const ENCODING: Encoding = i64::ENCODING;
 }
 
-unsafe impl RefEncode for BufferSparseTier {
+unsafe impl RefEncode for MTLBufferSparseTier {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-

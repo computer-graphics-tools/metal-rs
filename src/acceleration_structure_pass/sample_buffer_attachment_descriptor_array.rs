@@ -5,40 +5,39 @@ use objc2::{
 };
 use objc2_foundation::NSObjectProtocol;
 
-use super::AccelerationStructurePassSampleBufferAttachmentDescriptor;
+use super::MTLAccelerationStructurePassSampleBufferAttachmentDescriptor;
 
 extern_class!(
     /// Array of acceleration structure pass sample buffer attachment descriptors.
     #[unsafe(super(NSObject))]
-    #[name = "MTLAccelerationStructurePassSampleBufferAttachmentDescriptorArray"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct AccelerationStructurePassSampleBufferAttachmentDescriptorArray;
+    pub struct MTLAccelerationStructurePassSampleBufferAttachmentDescriptorArray;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for AccelerationStructurePassSampleBufferAttachmentDescriptorArray {}
+    unsafe impl NSObjectProtocol for MTLAccelerationStructurePassSampleBufferAttachmentDescriptorArray {}
 );
 
-impl AccelerationStructurePassSampleBufferAttachmentDescriptorArray {
+impl MTLAccelerationStructurePassSampleBufferAttachmentDescriptorArray {
     extern_methods!(
         #[unsafe(method(objectAtIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn object_at_indexed_subscript(
             &self,
             attachment_index: usize,
-        ) -> Retained<AccelerationStructurePassSampleBufferAttachmentDescriptor>;
+        ) -> Retained<MTLAccelerationStructurePassSampleBufferAttachmentDescriptor>;
 
         #[unsafe(method(setObject:atIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_object_at_indexed_subscript(
             &self,
-            attachment: Option<&AccelerationStructurePassSampleBufferAttachmentDescriptor>,
+            attachment: Option<&MTLAccelerationStructurePassSampleBufferAttachmentDescriptor>,
             attachment_index: usize,
         );
     );
 }
 
-impl AccelerationStructurePassSampleBufferAttachmentDescriptorArray {
+impl MTLAccelerationStructurePassSampleBufferAttachmentDescriptorArray {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]
@@ -49,5 +48,3 @@ impl AccelerationStructurePassSampleBufferAttachmentDescriptorArray {
         pub unsafe fn new() -> Retained<Self>;
     );
 }
-
-

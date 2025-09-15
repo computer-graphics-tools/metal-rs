@@ -2,19 +2,18 @@ use core::ptr::NonNull;
 use objc2::{extern_protocol, runtime::ProtocolObject};
 use objc2_foundation::NSRange;
 
-use super::IntersectionFunctionSignature;
-use crate::types::ResourceID;
-use crate::{Buffer, FunctionHandle, Resource, VisibleFunctionTable};
+use super::MTLIntersectionFunctionSignature;
+use crate::types::MTLResourceID;
+use crate::{MTLBuffer, MTLFunctionHandle, MTLResource, MTLVisibleFunctionTable};
 
 extern_protocol!(
     /// Intersection function table
-    #[name = "MTLIntersectionFunctionTable"]
-    pub unsafe trait IntersectionFunctionTable: Resource {
+    pub unsafe trait MTLIntersectionFunctionTable: MTLResource {
         #[unsafe(method(setBuffer:offset:atIndex:))]
         #[unsafe(method_family = none)]
         unsafe fn set_buffer(
             &self,
-            buffer: Option<&ProtocolObject<dyn Buffer>>,
+            buffer: Option<&ProtocolObject<dyn MTLBuffer>>,
             offset: usize,
             index: usize,
         );
@@ -24,7 +23,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_buffers(
             &self,
-            buffers: NonNull<*const ProtocolObject<dyn Buffer>>,
+            buffers: NonNull<*const ProtocolObject<dyn MTLBuffer>>,
             offsets: NonNull<usize>,
             range: NSRange,
         );
@@ -32,13 +31,13 @@ extern_protocol!(
         /// Handle of the GPU resource suitable for storing in an Argument Buffer
         #[unsafe(method(gpuResourceID))]
         #[unsafe(method_family = none)]
-        unsafe fn gpu_resource_id(&self) -> ResourceID;
+        unsafe fn gpu_resource_id(&self) -> MTLResourceID;
 
         #[unsafe(method(setFunction:atIndex:))]
         #[unsafe(method_family = none)]
         fn set_function_at_index(
             &self,
-            function: Option<&ProtocolObject<dyn FunctionHandle>>,
+            function: Option<&ProtocolObject<dyn MTLFunctionHandle>>,
             index: usize,
         );
 
@@ -47,7 +46,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_functions_with_range(
             &self,
-            functions: NonNull<*const ProtocolObject<dyn FunctionHandle>>,
+            functions: NonNull<*const ProtocolObject<dyn MTLFunctionHandle>>,
             range: NSRange,
         );
 
@@ -55,7 +54,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_opaque_triangle_intersection_function_with_signature_at_index(
             &self,
-            signature: IntersectionFunctionSignature,
+            signature: MTLIntersectionFunctionSignature,
             index: usize,
         );
 
@@ -63,7 +62,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_opaque_triangle_intersection_function_with_signature_with_range(
             &self,
-            signature: IntersectionFunctionSignature,
+            signature: MTLIntersectionFunctionSignature,
             range: NSRange,
         );
 
@@ -71,7 +70,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_opaque_curve_intersection_function_with_signature_at_index(
             &self,
-            signature: IntersectionFunctionSignature,
+            signature: MTLIntersectionFunctionSignature,
             index: usize,
         );
 
@@ -79,7 +78,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_opaque_curve_intersection_function_with_signature_with_range(
             &self,
-            signature: IntersectionFunctionSignature,
+            signature: MTLIntersectionFunctionSignature,
             range: NSRange,
         );
 
@@ -87,7 +86,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_visible_function_table_at_buffer_index(
             &self,
-            function_table: Option<&ProtocolObject<dyn VisibleFunctionTable>>,
+            function_table: Option<&ProtocolObject<dyn MTLVisibleFunctionTable>>,
             buffer_index: usize,
         );
 
@@ -96,7 +95,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_visible_function_tables_with_buffer_range(
             &self,
-            function_tables: NonNull<*const ProtocolObject<dyn VisibleFunctionTable>>,
+            function_tables: NonNull<*const ProtocolObject<dyn MTLVisibleFunctionTable>>,
             buffer_range: NSRange,
         );
     }

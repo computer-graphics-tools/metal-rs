@@ -3,29 +3,28 @@ use core::ptr::NonNull;
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::NSObjectProtocol;
 
-use super::Event;
-use super::{SharedEventHandle, SharedEventListener};
+use super::MTLEvent;
+use super::{MTLSharedEventHandle, MTLSharedEventListener};
 
 pub type SharedEventNotificationBlock =
-    *mut block2::DynBlock<dyn Fn(NonNull<ProtocolObject<dyn SharedEvent>>, u64)>;
+    *mut block2::DynBlock<dyn Fn(NonNull<ProtocolObject<dyn MTLSharedEvent>>, u64)>;
 
 extern_protocol!(
     /// Shared event that can be signaled and waited on across devices.
-    #[name = "MTLSharedEvent"]
-    pub unsafe trait SharedEvent: Event {
+    pub unsafe trait MTLSharedEvent: MTLEvent {
         /// Register a callback for when the event reaches a value.
         #[unsafe(method(notifyListener:atValue:block:))]
         #[unsafe(method_family = none)]
         unsafe fn notify_listener_at_value_block(
             &self,
-            listener: &SharedEventListener,
+            listener: &MTLSharedEventListener,
             value: u64,
             block: SharedEventNotificationBlock,
         );
 
         #[unsafe(method(newSharedEventHandle))]
         #[unsafe(method_family = new)]
-        unsafe fn new_shared_event_handle(&self) -> Retained<SharedEventHandle>;
+        unsafe fn new_shared_event_handle(&self) -> Retained<MTLSharedEventHandle>;
 
         #[unsafe(method(waitUntilSignaledValue:timeoutMS:))]
         #[unsafe(method_family = none)]

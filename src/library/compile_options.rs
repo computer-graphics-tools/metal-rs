@@ -6,32 +6,31 @@ use objc2::{
 use objc2_foundation::{CopyingHelper, NSCopying, NSDictionary, NSObjectProtocol, NSString};
 
 use super::{
-    CompileSymbolVisibility, LanguageVersion, LibraryOptimizationLevel, LibraryType,
-    MathFloatingPointFunctions, MathMode,
+    MLTLanguageVersion, MTLCompileSymbolVisibility, MTLLibraryOptimizationLevel, MTLLibraryType,
+    MTLMathFloatingPointFunctions, MTLMathMode,
 };
-use crate::types::Size as MTLSize;
+use crate::types::MTLSize;
 
 extern_class!(
     /// Options for compiling Metal libraries.
     #[unsafe(super(NSObject))]
-    #[name = "MTLCompileOptions"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct CompileOptions;
+    pub struct MTLCompileOptions;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for CompileOptions {}
+    unsafe impl NSCopying for MTLCompileOptions {}
 );
 
-unsafe impl CopyingHelper for CompileOptions {
+unsafe impl CopyingHelper for MTLCompileOptions {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for CompileOptions {}
+    unsafe impl NSObjectProtocol for MTLCompileOptions {}
 );
 
-impl CompileOptions {
+impl MTLCompileOptions {
     extern_methods!(
         #[unsafe(method(preprocessorMacros))]
         #[unsafe(method_family = none)]
@@ -46,35 +45,35 @@ impl CompileOptions {
 
         #[unsafe(method(mathMode))]
         #[unsafe(method_family = none)]
-        pub unsafe fn math_mode(&self) -> MathMode;
+        pub unsafe fn math_mode(&self) -> MTLMathMode;
 
         #[unsafe(method(setMathMode:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_math_mode(&self, math_mode: MathMode);
+        pub unsafe fn set_math_mode(&self, math_mode: MTLMathMode);
 
         #[unsafe(method(mathFloatingPointFunctions))]
         #[unsafe(method_family = none)]
-        pub unsafe fn math_floating_point_functions(&self) -> MathFloatingPointFunctions;
+        pub unsafe fn math_floating_point_functions(&self) -> MTLMathFloatingPointFunctions;
 
         #[unsafe(method(setMathFloatingPointFunctions:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_math_floating_point_functions(&self, val: MathFloatingPointFunctions);
+        pub unsafe fn set_math_floating_point_functions(&self, val: MTLMathFloatingPointFunctions);
 
         #[unsafe(method(languageVersion))]
         #[unsafe(method_family = none)]
-        pub fn language_version(&self) -> LanguageVersion;
+        pub fn language_version(&self) -> MLTLanguageVersion;
 
         #[unsafe(method(setLanguageVersion:))]
         #[unsafe(method_family = none)]
-        pub fn set_language_version(&self, v: LanguageVersion);
+        pub fn set_language_version(&self, v: MLTLanguageVersion);
 
         #[unsafe(method(libraryType))]
         #[unsafe(method_family = none)]
-        pub fn library_type(&self) -> LibraryType;
+        pub fn library_type(&self) -> MTLLibraryType;
 
         #[unsafe(method(setLibraryType:))]
         #[unsafe(method_family = none)]
-        pub fn set_library_type(&self, v: LibraryType);
+        pub fn set_library_type(&self, v: MTLLibraryType);
 
         #[unsafe(method(installName))]
         #[unsafe(method_family = none)]
@@ -94,19 +93,19 @@ impl CompileOptions {
 
         #[unsafe(method(optimizationLevel))]
         #[unsafe(method_family = none)]
-        pub unsafe fn optimization_level(&self) -> LibraryOptimizationLevel;
+        pub unsafe fn optimization_level(&self) -> MTLLibraryOptimizationLevel;
 
         #[unsafe(method(setOptimizationLevel:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_optimization_level(&self, v: LibraryOptimizationLevel);
+        pub unsafe fn set_optimization_level(&self, v: MTLLibraryOptimizationLevel);
 
         #[unsafe(method(compileSymbolVisibility))]
         #[unsafe(method_family = none)]
-        pub unsafe fn compile_symbol_visibility(&self) -> CompileSymbolVisibility;
+        pub unsafe fn compile_symbol_visibility(&self) -> MTLCompileSymbolVisibility;
 
         #[unsafe(method(setCompileSymbolVisibility:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_compile_symbol_visibility(&self, v: CompileSymbolVisibility);
+        pub unsafe fn set_compile_symbol_visibility(&self, v: MTLCompileSymbolVisibility);
 
         #[unsafe(method(allowReferencingUndefinedSymbols))]
         #[unsafe(method_family = none)]
@@ -142,7 +141,7 @@ impl CompileOptions {
     );
 }
 
-impl CompileOptions {
+impl MTLCompileOptions {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

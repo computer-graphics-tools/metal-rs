@@ -4,16 +4,15 @@ use objc2_foundation::NSObjectProtocol;
 extern_class!(
     /// Logical to physical color attachment mapping helper.
     #[unsafe(super(NSObject))]
-    #[name = "MTLLogicalToPhysicalColorAttachmentMap"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct LogicalToPhysicalColorAttachmentMap;
+    pub struct MTLLogicalToPhysicalColorAttachmentMap;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for LogicalToPhysicalColorAttachmentMap {}
+    unsafe impl NSObjectProtocol for MTLLogicalToPhysicalColorAttachmentMap {}
 );
 
-impl LogicalToPhysicalColorAttachmentMap {
+impl MTLLogicalToPhysicalColorAttachmentMap {
     extern_methods!(
         #[unsafe(method(setPhysicalIndex:forLogicalIndex:))]
         #[unsafe(method_family = none)]

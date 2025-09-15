@@ -1,5 +1,5 @@
-use super::command_buffer::CommandBufferErrorOption;
-use crate::log_state::LogState;
+use super::command_buffer::MTLCommandBufferErrorOption;
+use crate::log_state::MTLLogState;
 use objc2::{
     extern_class, extern_conformance, extern_methods,
     rc::{Allocated, Retained},
@@ -10,24 +10,23 @@ use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 extern_class!(
     /// Properties for creating a `CommandBuffer`.
     #[unsafe(super(NSObject))]
-    #[name = "MTLCommandBufferDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct CommandBufferDescriptor;
+    pub struct MTLCommandBufferDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for CommandBufferDescriptor {}
+    unsafe impl NSCopying for MTLCommandBufferDescriptor {}
 );
 
-unsafe impl CopyingHelper for CommandBufferDescriptor {
+unsafe impl CopyingHelper for MTLCommandBufferDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for CommandBufferDescriptor {}
+    unsafe impl NSObjectProtocol for MTLCommandBufferDescriptor {}
 );
 
-impl CommandBufferDescriptor {
+impl MTLCommandBufferDescriptor {
     extern_methods!(
         /// If true, holds strong references to objects needed for execution.
         #[unsafe(method(retainedReferences))]
@@ -41,20 +40,20 @@ impl CommandBufferDescriptor {
         /// Options configuring error reporting of the created command buffer.
         #[unsafe(method(errorOptions))]
         #[unsafe(method_family = none)]
-        pub fn error_options(&self) -> CommandBufferErrorOption;
+        pub fn error_options(&self) -> MTLCommandBufferErrorOption;
 
         #[unsafe(method(setErrorOptions:))]
         #[unsafe(method_family = none)]
-        pub fn set_error_options(&self, opts: CommandBufferErrorOption);
+        pub fn set_error_options(&self, opts: MTLCommandBufferErrorOption);
 
         /// Contains information related to shader logging.
         #[unsafe(method(logState))]
         #[unsafe(method_family = none)]
-        pub fn log_state(&self) -> Option<Retained<ProtocolObject<dyn LogState>>>;
+        pub fn log_state(&self) -> Option<Retained<ProtocolObject<dyn MTLLogState>>>;
 
         #[unsafe(method(setLogState:))]
         #[unsafe(method_family = none)]
-        pub fn set_log_state(&self, log_state: Option<&ProtocolObject<dyn LogState>>);
+        pub fn set_log_state(&self, log_state: Option<&ProtocolObject<dyn MTLLogState>>);
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]
         pub unsafe fn init(this: Allocated<Self>) -> Retained<Self>;

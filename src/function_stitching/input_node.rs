@@ -7,35 +7,33 @@ use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSUInteger};
 
 extern_protocol!(
     /// Node used in a graph for stitching.
-    #[name = "MTLFunctionStitchingNode"]
-    pub unsafe trait FunctionStitchingNode: NSObjectProtocol + NSCopying {}
+    pub unsafe trait MTLFunctionStitchingNode: NSObjectProtocol + NSCopying {}
 );
 
 extern_class!(
     /// Indexed input node of the produced stitched function.
     #[unsafe(super(NSObject))]
-    #[name = "MTLFunctionStitchingInputNode"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct FunctionStitchingInputNode;
+    pub struct MTLFunctionStitchingInputNode;
 );
 
 extern_conformance!(
-    unsafe impl FunctionStitchingNode for FunctionStitchingInputNode {}
+    unsafe impl MTLFunctionStitchingNode for MTLFunctionStitchingInputNode {}
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for FunctionStitchingInputNode {}
+    unsafe impl NSCopying for MTLFunctionStitchingInputNode {}
 );
 
-unsafe impl CopyingHelper for FunctionStitchingInputNode {
+unsafe impl CopyingHelper for MTLFunctionStitchingInputNode {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for FunctionStitchingInputNode {}
+    unsafe impl NSObjectProtocol for MTLFunctionStitchingInputNode {}
 );
 
-impl FunctionStitchingInputNode {
+impl MTLFunctionStitchingInputNode {
     extern_methods!(
         #[unsafe(method(argumentIndex))]
         #[unsafe(method_family = none)]

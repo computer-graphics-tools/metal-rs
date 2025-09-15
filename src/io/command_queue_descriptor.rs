@@ -5,29 +5,28 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSUInteger};
 
-use crate::io::{IoCommandQueueType, IoPriority};
+use crate::io::{MTLIOCommandQueueType, MTLIOPriority};
 
 extern_class!(
     /// Descriptor for creating an IO command queue.
     #[unsafe(super(NSObject))]
-    #[name = "MTLIOCommandQueueDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct IoCommandQueueDescriptor;
+    pub struct MTLIOCommandQueueDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for IoCommandQueueDescriptor {}
+    unsafe impl NSCopying for MTLIOCommandQueueDescriptor {}
 );
 
-unsafe impl CopyingHelper for IoCommandQueueDescriptor {
+unsafe impl CopyingHelper for MTLIOCommandQueueDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for IoCommandQueueDescriptor {}
+    unsafe impl NSObjectProtocol for MTLIOCommandQueueDescriptor {}
 );
 
-impl IoCommandQueueDescriptor {
+impl MTLIOCommandQueueDescriptor {
     extern_methods!(
         /// Maximum number of command buffers in flight.
         #[unsafe(method(maxCommandBufferCount))]
@@ -42,22 +41,22 @@ impl IoCommandQueueDescriptor {
         /// Priority of this queue.
         #[unsafe(method(priority))]
         #[unsafe(method_family = none)]
-        pub unsafe fn priority(&self) -> IoPriority;
+        pub unsafe fn priority(&self) -> MTLIOPriority;
 
         /// Setter for [`priority`][Self::priority].
         #[unsafe(method(setPriority:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_priority(&self, priority: IoPriority);
+        pub unsafe fn set_priority(&self, priority: MTLIOPriority);
 
         /// Type (serial or concurrent) of queue.
         #[unsafe(method(r#type))]
         #[unsafe(method_family = none)]
-        pub unsafe fn queue_type(&self) -> IoCommandQueueType;
+        pub unsafe fn queue_type(&self) -> MTLIOCommandQueueType;
 
         /// Setter for [`queue_type`][Self::queue_type].
         #[unsafe(method(setType:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_queue_type(&self, t: IoCommandQueueType);
+        pub unsafe fn set_queue_type(&self, t: MTLIOCommandQueueType);
 
         /// Maximum number of IO commands in flight.
         #[unsafe(method(maxCommandsInFlight))]
@@ -72,7 +71,7 @@ impl IoCommandQueueDescriptor {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl IoCommandQueueDescriptor {
+impl MTLIOCommandQueueDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

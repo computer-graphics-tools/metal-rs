@@ -4,7 +4,7 @@ use objc2::{Encode, Encoding, RefEncode};
 #[repr(u64)]
 #[allow(non_camel_case_types)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum PixelFormat {
+pub enum MTLPixelFormat {
     Invalid = 0,
 
     // Normal 8 bit formats
@@ -194,10 +194,10 @@ pub enum PixelFormat {
     BGRA10_XR_sRGB = 553,
 }
 
-unsafe impl Encode for PixelFormat {
+unsafe impl Encode for MTLPixelFormat {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for PixelFormat {
+unsafe impl RefEncode for MTLPixelFormat {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

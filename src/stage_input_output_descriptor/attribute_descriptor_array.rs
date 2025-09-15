@@ -5,41 +5,40 @@ use objc2::{
 };
 use objc2_foundation::NSObjectProtocol;
 
-use super::AttributeDescriptor;
+use super::MTLAttributeDescriptor;
 
 extern_class!(
     /// Array of attribute descriptors
     #[unsafe(super(NSObject))]
-    #[name = "MTLAttributeDescriptorArray"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct AttributeDescriptorArray;
+    pub struct MTLAttributeDescriptorArray;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for AttributeDescriptorArray {}
+    unsafe impl NSObjectProtocol for MTLAttributeDescriptorArray {}
 );
 
-impl AttributeDescriptorArray {
+impl MTLAttributeDescriptorArray {
     extern_methods!(
         #[unsafe(method(objectAtIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn object_at_indexed_subscript(
             &self,
             index: usize,
-        ) -> Retained<AttributeDescriptor>;
+        ) -> Retained<MTLAttributeDescriptor>;
 
         #[unsafe(method(setObject:atIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_object_at_indexed_subscript(
             &self,
-            attribute_desc: Option<&AttributeDescriptor>,
+            attribute_desc: Option<&MTLAttributeDescriptor>,
             index: usize,
         );
     );
 }
 
 /// Methods declared on superclass `NSObject`.
-impl AttributeDescriptorArray {
+impl MTLAttributeDescriptorArray {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

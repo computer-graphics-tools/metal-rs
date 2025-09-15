@@ -5,33 +5,32 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSArray, NSCopying, NSObjectProtocol, NSString};
 
-use super::FunctionStitchingNode;
+use super::MTLFunctionStitchingNode;
 
 extern_class!(
     /// Function node that calls a specified function.
     #[unsafe(super(NSObject))]
-    #[name = "MTLFunctionStitchingFunctionNode"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct FunctionStitchingFunctionNode;
+    pub struct MTLFunctionStitchingFunctionNode;
 );
 
 extern_conformance!(
-    unsafe impl FunctionStitchingNode for FunctionStitchingFunctionNode {}
+    unsafe impl MTLFunctionStitchingNode for MTLFunctionStitchingFunctionNode {}
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for FunctionStitchingFunctionNode {}
+    unsafe impl NSCopying for MTLFunctionStitchingFunctionNode {}
 );
 
-unsafe impl CopyingHelper for FunctionStitchingFunctionNode {
+unsafe impl CopyingHelper for MTLFunctionStitchingFunctionNode {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for FunctionStitchingFunctionNode {}
+    unsafe impl NSObjectProtocol for MTLFunctionStitchingFunctionNode {}
 );
 
-impl FunctionStitchingFunctionNode {
+impl MTLFunctionStitchingFunctionNode {
     extern_methods!(
         #[unsafe(method(name))]
         #[unsafe(method_family = none)]
@@ -46,28 +45,28 @@ impl FunctionStitchingFunctionNode {
         #[unsafe(method_family = none)]
         pub unsafe fn arguments(
             &self,
-        ) -> Retained<NSArray<ProtocolObject<dyn super::FunctionStitchingNode>>>;
+        ) -> Retained<NSArray<ProtocolObject<dyn super::MTLFunctionStitchingNode>>>;
 
         /// Setter for [`arguments`][Self::arguments].
         #[unsafe(method(setArguments:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_arguments(
             &self,
-            arguments: &NSArray<ProtocolObject<dyn super::FunctionStitchingNode>>,
+            arguments: &NSArray<ProtocolObject<dyn super::MTLFunctionStitchingNode>>,
         );
 
         #[unsafe(method(controlDependencies))]
         #[unsafe(method_family = none)]
         pub unsafe fn control_dependencies(
             &self,
-        ) -> Retained<NSArray<FunctionStitchingFunctionNode>>;
+        ) -> Retained<NSArray<MTLFunctionStitchingFunctionNode>>;
 
         /// Setter for [`control_dependencies`][Self::control_dependencies].
         #[unsafe(method(setControlDependencies:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_control_dependencies(
             &self,
-            control_dependencies: &NSArray<FunctionStitchingFunctionNode>,
+            control_dependencies: &NSArray<MTLFunctionStitchingFunctionNode>,
         );
 
         #[unsafe(method(initWithName:arguments:controlDependencies:))]
@@ -75,8 +74,8 @@ impl FunctionStitchingFunctionNode {
         pub unsafe fn init_with_name_arguments_control_dependencies(
             this: Allocated<Self>,
             name: &NSString,
-            arguments: &NSArray<ProtocolObject<dyn super::FunctionStitchingNode>>,
-            control_dependencies: &NSArray<FunctionStitchingFunctionNode>,
+            arguments: &NSArray<ProtocolObject<dyn super::MTLFunctionStitchingNode>>,
+            control_dependencies: &NSArray<MTLFunctionStitchingFunctionNode>,
         ) -> Retained<Self>;
     );
 }

@@ -6,31 +6,30 @@ use objc2::{
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
 use super::{
-    vertex_buffer_layout_descriptor_array::VertexBufferLayoutDescriptorArray,
-    vertex_format::VertexFormat,
+    vertex_buffer_layout_descriptor_array::MTLVertexBufferLayoutDescriptorArray,
+    vertex_format::MTLVertexFormat,
 };
 
 extern_class!(
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtlvertexdescriptor?language=objc)
     #[unsafe(super(NSObject))]
-    #[name = "MTLVertexDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct VertexDescriptor;
+    pub struct MTLVertexDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for VertexDescriptor {}
+    unsafe impl NSCopying for MTLVertexDescriptor {}
 );
 
-unsafe impl CopyingHelper for VertexDescriptor {
+unsafe impl CopyingHelper for MTLVertexDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for VertexDescriptor {}
+    unsafe impl NSObjectProtocol for MTLVertexDescriptor {}
 );
 
-impl VertexDescriptor {
+impl MTLVertexDescriptor {
     extern_methods!(
         /// Returns a new default vertex descriptor.
         #[unsafe(method(vertexDescriptor))]
@@ -40,12 +39,12 @@ impl VertexDescriptor {
         /// Describes the layout of vertex buffer data for each buffer binding.
         #[unsafe(method(layouts))]
         #[unsafe(method_family = none)]
-        pub fn layouts(&self) -> Retained<VertexBufferLayoutDescriptorArray>;
+        pub fn layouts(&self) -> Retained<MTLVertexBufferLayoutDescriptorArray>;
 
         /// Describes the per-attribute format/location mapping.
         #[unsafe(method(attributes))]
         #[unsafe(method_family = none)]
-        pub fn attributes(&self) -> Retained<VertexAttributeDescriptorArray>;
+        pub fn attributes(&self) -> Retained<MTLVertexAttributeDescriptorArray>;
 
         /// Reset to the default (empty) descriptor.
         #[unsafe(method(reset))]
@@ -57,34 +56,33 @@ impl VertexDescriptor {
 extern_class!(
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtlvertexattributedescriptor?language=objc)
     #[unsafe(super(NSObject))]
-    #[name = "MTLVertexAttributeDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct VertexAttributeDescriptor;
+    pub struct MTLVertexAttributeDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for VertexAttributeDescriptor {}
+    unsafe impl NSCopying for MTLVertexAttributeDescriptor {}
 );
 
-unsafe impl CopyingHelper for VertexAttributeDescriptor {
+unsafe impl CopyingHelper for MTLVertexAttributeDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for VertexAttributeDescriptor {}
+    unsafe impl NSObjectProtocol for MTLVertexAttributeDescriptor {}
 );
 
-impl VertexAttributeDescriptor {
+impl MTLVertexAttributeDescriptor {
     extern_methods!(
         /// The attribute data format.
         #[unsafe(method(format))]
         #[unsafe(method_family = none)]
-        pub fn format(&self) -> VertexFormat;
+        pub fn format(&self) -> MTLVertexFormat;
 
         /// Setter for [`format`][Self::format].
         #[unsafe(method(setFormat:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_format(&self, format: VertexFormat);
+        pub unsafe fn set_format(&self, format: MTLVertexFormat);
 
         /// Byte offset of this attribute within the vertex.
         #[unsafe(method(offset))]
@@ -111,36 +109,35 @@ impl VertexAttributeDescriptor {
 extern_class!(
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtlvertexattributedescriptorarray?language=objc)
     #[unsafe(super(NSObject))]
-    #[name = "MTLVertexAttributeDescriptorArray"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct VertexAttributeDescriptorArray;
+    pub struct MTLVertexAttributeDescriptorArray;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for VertexAttributeDescriptorArray {}
+    unsafe impl NSObjectProtocol for MTLVertexAttributeDescriptorArray {}
 );
 
-impl VertexAttributeDescriptorArray {
+impl MTLVertexAttributeDescriptorArray {
     extern_methods!(
         #[unsafe(method(objectAtIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn object_at_indexed_subscript(
             &self,
             index: usize,
-        ) -> Retained<VertexAttributeDescriptor>;
+        ) -> Retained<MTLVertexAttributeDescriptor>;
 
         #[unsafe(method(setObject:atIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_object_at_indexed_subscript(
             &self,
-            attribute_desc: Option<&VertexAttributeDescriptor>,
+            attribute_desc: Option<&MTLVertexAttributeDescriptor>,
             index: usize,
         );
     );
 }
 
 /// Methods declared on superclass `NSObject`.
-impl VertexDescriptor {
+impl MTLVertexDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

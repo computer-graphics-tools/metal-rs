@@ -1,29 +1,28 @@
 use objc2::{extern_protocol, runtime::ProtocolObject};
 use objc2_foundation::NSRange;
 
-use crate::types::{Origin, Region, Size};
+use crate::types::{MTLOrigin, MTLRegion, MTLSize};
 use crate::{
-    Buffer, CommandEncoder, CounterSampleBuffer, Fence, IndirectCommandBuffer, Resource, Tensor,
-    Texture,
+    MTLBuffer, MTLCommandEncoder, MTLCounterSampleBuffer, MTLFence, MTLIndirectCommandBuffer,
+    MTLResource, MTLTensor, MTLTexture,
 };
 
-use super::BlitOption;
+use super::MTLBlitOption;
 
 extern_protocol!(
     /// A command encoder that performs basic copies and blits between buffers and textures.
-    #[name = "MTLBlitCommandEncoder"]
-    pub unsafe trait BlitCommandEncoder: CommandEncoder {
+    pub unsafe trait MTLBlitCommandEncoder: MTLCommandEncoder {
         /// Flush any copy of this resource from the device's caches, and invalidate any CPU caches if needed.
         #[unsafe(method(synchronizeResource:))]
         #[unsafe(method_family = none)]
-        fn synchronize_resource(&self, resource: &ProtocolObject<dyn Resource>);
+        fn synchronize_resource(&self, resource: &ProtocolObject<dyn MTLResource>);
 
         /// Flush any copy of this image from the device's caches, and invalidate CPU caches if needed.
         #[unsafe(method(synchronizeTexture:slice:level:))]
         #[unsafe(method_family = none)]
         unsafe fn synchronize_texture_slice_level(
             &self,
-            texture: &ProtocolObject<dyn Texture>,
+            texture: &ProtocolObject<dyn MTLTexture>,
             slice: usize,
             level: usize,
         );
@@ -33,15 +32,15 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn copy_from_texture_to_texture(
             &self,
-            source_texture: &ProtocolObject<dyn Texture>,
+            source_texture: &ProtocolObject<dyn MTLTexture>,
             source_slice: usize,
             source_level: usize,
-            source_origin: Origin,
-            source_size: Size,
-            destination_texture: &ProtocolObject<dyn Texture>,
+            source_origin: MTLOrigin,
+            source_size: MTLSize,
+            destination_texture: &ProtocolObject<dyn MTLTexture>,
             destination_slice: usize,
             destination_level: usize,
-            destination_origin: Origin,
+            destination_origin: MTLOrigin,
         );
 
         /// Copy an image from a buffer into a texture.
@@ -49,15 +48,15 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn copy_from_buffer_to_texture(
             &self,
-            source_buffer: &ProtocolObject<dyn Buffer>,
+            source_buffer: &ProtocolObject<dyn MTLBuffer>,
             source_offset: usize,
             source_bytes_per_row: usize,
             source_bytes_per_image: usize,
-            source_size: Size,
-            destination_texture: &ProtocolObject<dyn Texture>,
+            source_size: MTLSize,
+            destination_texture: &ProtocolObject<dyn MTLTexture>,
             destination_slice: usize,
             destination_level: usize,
-            destination_origin: Origin,
+            destination_origin: MTLOrigin,
         );
 
         /// Copy an image from a buffer into a texture with options.
@@ -65,16 +64,16 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn copy_from_buffer_to_texture_with_options(
             &self,
-            source_buffer: &ProtocolObject<dyn Buffer>,
+            source_buffer: &ProtocolObject<dyn MTLBuffer>,
             source_offset: usize,
             source_bytes_per_row: usize,
             source_bytes_per_image: usize,
-            source_size: Size,
-            destination_texture: &ProtocolObject<dyn Texture>,
+            source_size: MTLSize,
+            destination_texture: &ProtocolObject<dyn MTLTexture>,
             destination_slice: usize,
             destination_level: usize,
-            destination_origin: Origin,
-            options: BlitOption,
+            destination_origin: MTLOrigin,
+            options: MTLBlitOption,
         );
 
         /// Copy an image from a texture into a buffer.
@@ -82,12 +81,12 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn copy_from_texture_to_buffer(
             &self,
-            source_texture: &ProtocolObject<dyn Texture>,
+            source_texture: &ProtocolObject<dyn MTLTexture>,
             source_slice: usize,
             source_level: usize,
-            source_origin: Origin,
-            source_size: Size,
-            destination_buffer: &ProtocolObject<dyn Buffer>,
+            source_origin: MTLOrigin,
+            source_size: MTLSize,
+            destination_buffer: &ProtocolObject<dyn MTLBuffer>,
             destination_offset: usize,
             destination_bytes_per_row: usize,
             destination_bytes_per_image: usize,
@@ -98,29 +97,29 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn copy_from_texture_to_buffer_with_options(
             &self,
-            source_texture: &ProtocolObject<dyn Texture>,
+            source_texture: &ProtocolObject<dyn MTLTexture>,
             source_slice: usize,
             source_level: usize,
-            source_origin: Origin,
-            source_size: Size,
-            destination_buffer: &ProtocolObject<dyn Buffer>,
+            source_origin: MTLOrigin,
+            source_size: MTLSize,
+            destination_buffer: &ProtocolObject<dyn MTLBuffer>,
             destination_offset: usize,
             destination_bytes_per_row: usize,
             destination_bytes_per_image: usize,
-            options: BlitOption,
+            options: MTLBlitOption,
         );
 
         /// Generate mipmaps for a texture from the base level up to the max level.
         #[unsafe(method(generateMipmapsForTexture:))]
         #[unsafe(method_family = none)]
-        fn generate_mipmaps_for_texture(&self, texture: &ProtocolObject<dyn Texture>);
+        fn generate_mipmaps_for_texture(&self, texture: &ProtocolObject<dyn MTLTexture>);
 
         /// Fill a buffer with a fixed value in each byte.
         #[unsafe(method(fillBuffer:range:value:))]
         #[unsafe(method_family = none)]
         fn fill_buffer_range_value(
             &self,
-            buffer: &ProtocolObject<dyn Buffer>,
+            buffer: &ProtocolObject<dyn MTLBuffer>,
             range: NSRange,
             value: u8,
         );
@@ -130,10 +129,10 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn copy_surfaces_between_textures(
             &self,
-            source_texture: &ProtocolObject<dyn Texture>,
+            source_texture: &ProtocolObject<dyn MTLTexture>,
             source_slice: usize,
             source_level: usize,
-            destination_texture: &ProtocolObject<dyn Texture>,
+            destination_texture: &ProtocolObject<dyn MTLTexture>,
             destination_slice: usize,
             destination_level: usize,
             slice_count: usize,
@@ -145,8 +144,8 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn copy_from_texture_to_texture_simple(
             &self,
-            source_texture: &ProtocolObject<dyn Texture>,
-            destination_texture: &ProtocolObject<dyn Texture>,
+            source_texture: &ProtocolObject<dyn MTLTexture>,
+            destination_texture: &ProtocolObject<dyn MTLTexture>,
         );
 
         /// Basic memory copy between buffers.
@@ -154,9 +153,9 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn copy_buffer_to_buffer(
             &self,
-            source_buffer: &ProtocolObject<dyn Buffer>,
+            source_buffer: &ProtocolObject<dyn MTLBuffer>,
             source_offset: usize,
-            destination_buffer: &ProtocolObject<dyn Buffer>,
+            destination_buffer: &ProtocolObject<dyn MTLBuffer>,
             destination_offset: usize,
             size: usize,
         );
@@ -164,12 +163,12 @@ extern_protocol!(
         /// Update the fence to capture all GPU work so far enqueued by this encoder.
         #[unsafe(method(updateFence:))]
         #[unsafe(method_family = none)]
-        fn update_fence(&self, fence: &ProtocolObject<dyn Fence>);
+        fn update_fence(&self, fence: &ProtocolObject<dyn MTLFence>);
 
         /// Prevent further GPU work until the fence is reached.
         #[unsafe(method(waitForFence:))]
         #[unsafe(method_family = none)]
-        fn wait_for_fence(&self, fence: &ProtocolObject<dyn Fence>);
+        fn wait_for_fence(&self, fence: &ProtocolObject<dyn MTLFence>);
 
         /// Copies tile access counters within specified region into provided buffer.
         #[optional]
@@ -177,12 +176,12 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn get_texture_access_counters(
             &self,
-            texture: &ProtocolObject<dyn Texture>,
-            region: Region,
+            texture: &ProtocolObject<dyn MTLTexture>,
+            region: MTLRegion,
             mip_level: usize,
             slice: usize,
             reset_counters: bool,
-            counters_buffer: &ProtocolObject<dyn Buffer>,
+            counters_buffer: &ProtocolObject<dyn MTLBuffer>,
             counters_buffer_offset: usize,
         );
 
@@ -192,8 +191,8 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn reset_texture_access_counters(
             &self,
-            texture: &ProtocolObject<dyn Texture>,
-            region: Region,
+            texture: &ProtocolObject<dyn MTLTexture>,
+            region: MTLRegion,
             mip_level: usize,
             slice: usize,
         );
@@ -201,14 +200,14 @@ extern_protocol!(
         /// Optimizes the texture data for GPU access.
         #[unsafe(method(optimizeContentsForGPUAccess:))]
         #[unsafe(method_family = none)]
-        fn optimize_contents_for_gpu_access(&self, texture: &ProtocolObject<dyn Texture>);
+        fn optimize_contents_for_gpu_access(&self, texture: &ProtocolObject<dyn MTLTexture>);
 
         /// Optimizes a subset of the texture data for GPU access.
         #[unsafe(method(optimizeContentsForGPUAccess:slice:level:))]
         #[unsafe(method_family = none)]
         unsafe fn optimize_contents_for_gpu_access_slice_level(
             &self,
-            texture: &ProtocolObject<dyn Texture>,
+            texture: &ProtocolObject<dyn MTLTexture>,
             slice: usize,
             level: usize,
         );
@@ -216,14 +215,14 @@ extern_protocol!(
         /// Optimizes the texture data for CPU access.
         #[unsafe(method(optimizeContentsForCPUAccess:))]
         #[unsafe(method_family = none)]
-        unsafe fn optimize_contents_for_cpu_access(&self, texture: &ProtocolObject<dyn Texture>);
+        unsafe fn optimize_contents_for_cpu_access(&self, texture: &ProtocolObject<dyn MTLTexture>);
 
         /// Optimizes a subset of the texture data for CPU access.
         #[unsafe(method(optimizeContentsForCPUAccess:slice:level:))]
         #[unsafe(method_family = none)]
         unsafe fn optimize_contents_for_cpu_access_slice_level(
             &self,
-            texture: &ProtocolObject<dyn Texture>,
+            texture: &ProtocolObject<dyn MTLTexture>,
             slice: usize,
             level: usize,
         );
@@ -233,7 +232,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn reset_commands_in_buffer(
             &self,
-            buffer: &ProtocolObject<dyn IndirectCommandBuffer>,
+            buffer: &ProtocolObject<dyn MTLIndirectCommandBuffer>,
             range: NSRange,
         );
 
@@ -242,9 +241,9 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn copy_indirect_command_buffer(
             &self,
-            source: &ProtocolObject<dyn IndirectCommandBuffer>,
+            source: &ProtocolObject<dyn MTLIndirectCommandBuffer>,
             source_range: NSRange,
-            destination: &ProtocolObject<dyn IndirectCommandBuffer>,
+            destination: &ProtocolObject<dyn MTLIndirectCommandBuffer>,
             destination_index: usize,
         );
 
@@ -253,7 +252,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn optimize_indirect_command_buffer(
             &self,
-            indirect_command_buffer: &ProtocolObject<dyn IndirectCommandBuffer>,
+            indirect_command_buffer: &ProtocolObject<dyn MTLIndirectCommandBuffer>,
             range: NSRange,
         );
 
@@ -262,7 +261,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn sample_counters_in_buffer(
             &self,
-            sample_buffer: &ProtocolObject<dyn CounterSampleBuffer>,
+            sample_buffer: &ProtocolObject<dyn MTLCounterSampleBuffer>,
             sample_index: usize,
             barrier: bool,
         );
@@ -272,9 +271,9 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn resolve_counters(
             &self,
-            sample_buffer: &ProtocolObject<dyn CounterSampleBuffer>,
+            sample_buffer: &ProtocolObject<dyn MTLCounterSampleBuffer>,
             range: NSRange,
-            destination_buffer: &ProtocolObject<dyn Buffer>,
+            destination_buffer: &ProtocolObject<dyn MTLBuffer>,
             destination_offset: usize,
         );
 
@@ -283,12 +282,12 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn copy_between_tensors(
             &self,
-            source_tensor: &ProtocolObject<dyn Tensor>,
-            source_origin: &crate::tensor::TensorExtents,
-            source_dimensions: &crate::tensor::TensorExtents,
-            destination_tensor: &ProtocolObject<dyn Tensor>,
-            destination_origin: &crate::tensor::TensorExtents,
-            destination_dimensions: &crate::tensor::TensorExtents,
+            source_tensor: &ProtocolObject<dyn MTLTensor>,
+            source_origin: &crate::tensor::MTLTensorExtents,
+            source_dimensions: &crate::tensor::MTLTensorExtents,
+            destination_tensor: &ProtocolObject<dyn MTLTensor>,
+            destination_origin: &crate::tensor::MTLTensorExtents,
+            destination_dimensions: &crate::tensor::MTLTensorExtents,
         );
     }
 );

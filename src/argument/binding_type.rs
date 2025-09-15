@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// The type of a resource binding (from `MTLBindingType`).
 #[repr(i64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum BindingType {
+pub enum MTLBindingType {
     Buffer = 0,
     ThreadgroupMemory = 1,
     Texture = 2,
@@ -18,10 +18,10 @@ pub enum BindingType {
     Tensor = 37,
 }
 
-unsafe impl Encode for BindingType {
+unsafe impl Encode for MTLBindingType {
     const ENCODING: Encoding = i64::ENCODING;
 }
 
-unsafe impl RefEncode for BindingType {
+unsafe impl RefEncode for MTLBindingType {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

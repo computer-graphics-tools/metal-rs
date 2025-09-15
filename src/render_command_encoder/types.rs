@@ -2,7 +2,7 @@ use objc2::{Encode, Encoding, RefEncode};
 
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum PrimitiveType {
+pub enum MTLPrimitiveType {
     Point = 0,
     Line = 1,
     LineStrip = 2,
@@ -10,40 +10,40 @@ pub enum PrimitiveType {
     TriangleStrip = 4,
 }
 
-unsafe impl Encode for PrimitiveType {
+unsafe impl Encode for MTLPrimitiveType {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for PrimitiveType {
+unsafe impl RefEncode for MTLPrimitiveType {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum VisibilityResultMode {
+pub enum MTLVisibilityResultMode {
     Disabled = 0,
     Boolean = 1,
     Counting = 2,
 }
 
-unsafe impl Encode for VisibilityResultMode {
+unsafe impl Encode for MTLVisibilityResultMode {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for VisibilityResultMode {
+unsafe impl RefEncode for MTLVisibilityResultMode {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct ScissorRect {
+pub struct MTLScissorRect {
     pub x: usize,
     pub y: usize,
     pub width: usize,
     pub height: usize,
 }
 
-unsafe impl Encode for ScissorRect {
+unsafe impl Encode for MTLScissorRect {
     const ENCODING: Encoding = Encoding::Struct(
         "{MTLScissorRect=QQQQ}",
         &[
@@ -55,13 +55,13 @@ unsafe impl Encode for ScissorRect {
     );
 }
 
-unsafe impl RefEncode for ScissorRect {
+unsafe impl RefEncode for MTLScissorRect {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Viewport {
+pub struct MTLViewport {
     pub origin_x: f64,
     pub origin_y: f64,
     pub width: f64,
@@ -70,7 +70,7 @@ pub struct Viewport {
     pub zfar: f64,
 }
 
-unsafe impl Encode for Viewport {
+unsafe impl Encode for MTLViewport {
     const ENCODING: Encoding = Encoding::Struct(
         "{MTLViewport=dddddd}",
         &[
@@ -84,85 +84,85 @@ unsafe impl Encode for Viewport {
     );
 }
 
-unsafe impl RefEncode for Viewport {
+unsafe impl RefEncode for MTLViewport {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum CullMode {
+pub enum MTLCullMode {
     None = 0,
     Front = 1,
     Back = 2,
 }
 
-unsafe impl Encode for CullMode {
+unsafe impl Encode for MTLCullMode {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for CullMode {
+unsafe impl RefEncode for MTLCullMode {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum Winding {
+pub enum MTLWinding {
     Clockwise = 0,
     CounterClockwise = 1,
 }
 
-unsafe impl Encode for Winding {
+unsafe impl Encode for MTLWinding {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for Winding {
+unsafe impl RefEncode for MTLWinding {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum DepthClipMode {
+pub enum MTLDepthClipMode {
     Clip = 0,
     Clamp = 1,
 }
 
-unsafe impl Encode for DepthClipMode {
+unsafe impl Encode for MTLDepthClipMode {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for DepthClipMode {
+unsafe impl RefEncode for MTLDepthClipMode {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum TriangleFillMode {
+pub enum MTLTriangleFillMode {
     Fill = 0,
     Lines = 1,
 }
 
-unsafe impl Encode for TriangleFillMode {
+unsafe impl Encode for MTLTriangleFillMode {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for TriangleFillMode {
+unsafe impl RefEncode for MTLTriangleFillMode {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct VertexAmplificationViewMapping {
+pub struct MTLVertexAmplificationViewMapping {
     pub viewport_array_index_offset: u32,
     pub render_target_array_index_offset: u32,
 }
 
-unsafe impl Encode for VertexAmplificationViewMapping {
+unsafe impl Encode for MTLVertexAmplificationViewMapping {
     const ENCODING: Encoding = Encoding::Struct(
         "{MTLVertexAmplificationViewMapping=II}",
         &[u32::ENCODING, u32::ENCODING],
     );
 }
 
-unsafe impl RefEncode for VertexAmplificationViewMapping {
+unsafe impl RefEncode for MTLVertexAmplificationViewMapping {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

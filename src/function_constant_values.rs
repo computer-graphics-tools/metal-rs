@@ -8,29 +8,28 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSRange, NSString};
 
-use crate::types::DataType;
+use crate::types::MTLDataType;
 
 extern_class!(
     /// Values for Metal function constants (bridged from `MTLFunctionConstantValues`).
     #[unsafe(super(NSObject))]
-    #[name = "MTLFunctionConstantValues"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct FunctionConstantValues;
+    pub struct MTLFunctionConstantValues;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for FunctionConstantValues {}
+    unsafe impl NSCopying for MTLFunctionConstantValues {}
 );
 
-unsafe impl CopyingHelper for FunctionConstantValues {
+unsafe impl CopyingHelper for MTLFunctionConstantValues {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for FunctionConstantValues {}
+    unsafe impl NSObjectProtocol for MTLFunctionConstantValues {}
 );
 
-impl FunctionConstantValues {
+impl MTLFunctionConstantValues {
     extern_methods!(
         /// Set a single constant value by index.
         #[unsafe(method(setConstantValue:type:atIndex:))]
@@ -38,7 +37,7 @@ impl FunctionConstantValues {
         pub unsafe fn set_constant_value_type_at_index(
             &self,
             value: NonNull<c_void>,
-            r#type: DataType,
+            r#type: MTLDataType,
             index: usize,
         );
 
@@ -48,7 +47,7 @@ impl FunctionConstantValues {
         pub unsafe fn set_constant_values_type_with_range(
             &self,
             values: NonNull<c_void>,
-            r#type: DataType,
+            r#type: MTLDataType,
             range: NSRange,
         );
 
@@ -58,7 +57,7 @@ impl FunctionConstantValues {
         pub unsafe fn set_constant_value_type_with_name(
             &self,
             value: NonNull<c_void>,
-            r#type: DataType,
+            r#type: MTLDataType,
             name: &NSString,
         );
 
@@ -70,7 +69,7 @@ impl FunctionConstantValues {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl FunctionConstantValues {
+impl MTLFunctionConstantValues {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

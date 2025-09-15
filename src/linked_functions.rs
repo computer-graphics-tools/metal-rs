@@ -1,4 +1,4 @@
-use crate::library::Function;
+use crate::library::MTLFunction;
 use objc2::rc::DefaultRetained;
 use objc2::{
     extern_class, extern_conformance, extern_methods,
@@ -12,51 +12,52 @@ use objc2_foundation::{
 extern_class!(
     /// Functions to be linked into a pipeline.
     #[unsafe(super(NSObject))]
-    #[name = "MTLLinkedFunctions"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct LinkedFunctions;
+    pub struct MTLLinkedFunctions;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for LinkedFunctions {}
+    unsafe impl NSCopying for MTLLinkedFunctions {}
 );
 
-unsafe impl CopyingHelper for LinkedFunctions {
+unsafe impl CopyingHelper for MTLLinkedFunctions {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for LinkedFunctions {}
+    unsafe impl NSObjectProtocol for MTLLinkedFunctions {}
 );
 
-impl LinkedFunctions {
+impl MTLLinkedFunctions {
     extern_methods!(
         /// Create an autoreleased LinkedFunctions object.
         #[unsafe(method(linkedFunctions))]
         #[unsafe(method_family = none)]
-        pub fn linked_functions() -> Retained<LinkedFunctions>;
+        pub fn linked_functions() -> Retained<MTLLinkedFunctions>;
 
         /// Array of functions to be AIR linked.
         #[unsafe(method(functions))]
         #[unsafe(method_family = none)]
-        pub fn functions(&self) -> Option<Retained<NSArray<ProtocolObject<dyn Function>>>>;
+        pub fn functions(&self) -> Option<Retained<NSArray<ProtocolObject<dyn MTLFunction>>>>;
 
         /// Setter for [`functions`][Self::functions]. Copied when set.
         #[unsafe(method(setFunctions:))]
         #[unsafe(method_family = none)]
-        pub fn set_functions(&self, functions: Option<&NSArray<ProtocolObject<dyn Function>>>);
+        pub fn set_functions(&self, functions: Option<&NSArray<ProtocolObject<dyn MTLFunction>>>);
 
         /// Array of functions compiled to binary to be linked.
         #[unsafe(method(binaryFunctions))]
         #[unsafe(method_family = none)]
-        pub fn binary_functions(&self) -> Option<Retained<NSArray<ProtocolObject<dyn Function>>>>;
+        pub fn binary_functions(
+            &self,
+        ) -> Option<Retained<NSArray<ProtocolObject<dyn MTLFunction>>>>;
 
         /// Setter for [`binary_functions`][Self::binary_functions]. Copied when set.
         #[unsafe(method(setBinaryFunctions:))]
         #[unsafe(method_family = none)]
         pub fn set_binary_functions(
             &self,
-            binary_functions: Option<&NSArray<ProtocolObject<dyn Function>>>,
+            binary_functions: Option<&NSArray<ProtocolObject<dyn MTLFunction>>>,
         );
 
         /// Groups of functions, keyed by callsite name.
@@ -64,32 +65,34 @@ impl LinkedFunctions {
         #[unsafe(method_family = none)]
         pub fn groups(
             &self,
-        ) -> Option<Retained<NSDictionary<NSString, NSArray<ProtocolObject<dyn Function>>>>>;
+        ) -> Option<Retained<NSDictionary<NSString, NSArray<ProtocolObject<dyn MTLFunction>>>>>;
 
         /// Setter for [`groups`][Self::groups]. Copied when set.
         #[unsafe(method(setGroups:))]
         #[unsafe(method_family = none)]
         pub fn set_groups(
             &self,
-            groups: Option<&NSDictionary<NSString, NSArray<ProtocolObject<dyn Function>>>>,
+            groups: Option<&NSDictionary<NSString, NSArray<ProtocolObject<dyn MTLFunction>>>>,
         );
 
         /// Private functions to be AIR linked but not exported as function handles.
         #[unsafe(method(privateFunctions))]
         #[unsafe(method_family = none)]
-        pub fn private_functions(&self) -> Option<Retained<NSArray<ProtocolObject<dyn Function>>>>;
+        pub fn private_functions(
+            &self,
+        ) -> Option<Retained<NSArray<ProtocolObject<dyn MTLFunction>>>>;
 
         /// Setter for [`private_functions`][Self::private_functions]. Copied when set.
         #[unsafe(method(setPrivateFunctions:))]
         #[unsafe(method_family = none)]
         pub fn set_private_functions(
             &self,
-            private_functions: Option<&NSArray<ProtocolObject<dyn Function>>>,
+            private_functions: Option<&NSArray<ProtocolObject<dyn MTLFunction>>>,
         );
     );
 }
 
-impl LinkedFunctions {
+impl MTLLinkedFunctions {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]
@@ -101,7 +104,7 @@ impl LinkedFunctions {
     );
 }
 
-impl DefaultRetained for LinkedFunctions {
+impl DefaultRetained for MTLLinkedFunctions {
     #[inline]
     fn default_retained() -> Retained<Self> {
         Self::new()

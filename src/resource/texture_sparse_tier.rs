@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Enumerates the different support levels for sparse textures (from `MTLTextureSparseTier`).
 #[repr(i64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum TextureSparseTier {
+pub enum MTLTextureSparseTier {
     /// Indicates that the texture is not sparse.
     None = 0,
     /// Indicates support for sparse textures tier 1.
@@ -28,12 +28,10 @@ pub enum TextureSparseTier {
     Tier2 = 2,
 }
 
-unsafe impl Encode for TextureSparseTier {
+unsafe impl Encode for MTLTextureSparseTier {
     const ENCODING: Encoding = i64::ENCODING;
 }
 
-unsafe impl RefEncode for TextureSparseTier {
+unsafe impl RefEncode for MTLTextureSparseTier {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-

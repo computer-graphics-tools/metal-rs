@@ -2,25 +2,24 @@ use core::ffi::c_void;
 use core::ptr::NonNull;
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 
-use crate::{Buffer, Resource, ResourceID};
+use crate::{MTLBuffer, MTLResource, MTLResourceID};
 
-use super::{TensorDataType, TensorExtents, TensorUsage};
+use super::{MTLTensorDataType, MTLTensorExtents, MTLTensorUsage};
 
 extern_protocol!(
     /// A resource representing a multi-dimensional array that you can use with machine learning workloads.
     ///
     /// See also Apple's documentation: `https://developer.apple.com/documentation/metal/mtltensor?language=objc`
-    #[name = "MTLTensor"]
-    pub unsafe trait Tensor: Resource {
+    pub unsafe trait MTLTensor: MTLResource {
         /// A handle that represents the GPU resource, which you can store in an argument buffer.
         #[unsafe(method(gpuResourceID))]
         #[unsafe(method_family = none)]
-        fn gpu_resource_id(&self) -> ResourceID;
+        fn gpu_resource_id(&self) -> MTLResourceID;
 
         /// A buffer instance this tensor shares its storage with or nil if this tensor does not wrap an underlying buffer.
         #[unsafe(method(buffer))]
         #[unsafe(method_family = none)]
-        fn buffer(&self) -> Option<Retained<ProtocolObject<dyn Buffer>>>;
+        fn buffer(&self) -> Option<Retained<ProtocolObject<dyn MTLBuffer>>>;
 
         /// An offset, in bytes, into the buffer instance this tensor shares its storage with, or zero if this tensor does not wrap an underlying buffer.
         #[unsafe(method(bufferOffset))]
@@ -32,22 +31,22 @@ extern_protocol!(
         /// This property only applies if this tensor shares its storage with a buffer, otherwise it's nil.
         #[unsafe(method(strides))]
         #[unsafe(method_family = none)]
-        fn strides(&self) -> Option<Retained<TensorExtents>>;
+        fn strides(&self) -> Option<Retained<MTLTensorExtents>>;
 
         /// An array of sizes, in elements, one for each dimension of this tensor.
         #[unsafe(method(dimensions))]
         #[unsafe(method_family = none)]
-        fn dimensions(&self) -> Retained<TensorExtents>;
+        fn dimensions(&self) -> Retained<MTLTensorExtents>;
 
         /// An underlying data format of this tensor.
         #[unsafe(method(dataType))]
         #[unsafe(method_family = none)]
-        fn data_type(&self) -> TensorDataType;
+        fn data_type(&self) -> MTLTensorDataType;
 
         /// A set of contexts in which you can use this tensor.
         #[unsafe(method(usage))]
         #[unsafe(method_family = none)]
-        fn usage(&self) -> TensorUsage;
+        fn usage(&self) -> MTLTensorUsage;
 
         /// Replaces the contents of a slice of this tensor with data you provide.
         ///
@@ -62,10 +61,10 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn replace_slice_origin_slice_dimensions_with_bytes_strides(
             &self,
-            slice_origin: &TensorExtents,
-            slice_dimensions: &TensorExtents,
+            slice_origin: &MTLTensorExtents,
+            slice_dimensions: &MTLTensorExtents,
             bytes: NonNull<c_void>,
-            strides: &TensorExtents,
+            strides: &MTLTensorExtents,
         );
 
         /// Copies the data corresponding to a slice of this tensor into a pointer you provide.
@@ -82,9 +81,9 @@ extern_protocol!(
         unsafe fn get_bytes_strides_from_slice_origin_slice_dimensions(
             &self,
             bytes: NonNull<c_void>,
-            strides: &TensorExtents,
-            slice_origin: &TensorExtents,
-            slice_dimensions: &TensorExtents,
+            strides: &MTLTensorExtents,
+            slice_origin: &MTLTensorExtents,
+            slice_dimensions: &MTLTensorExtents,
         );
     }
 );

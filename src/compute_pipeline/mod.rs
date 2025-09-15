@@ -2,6 +2,6 @@ mod descriptor;
 mod reflection;
 mod state;
 
-pub use descriptor::ComputePipelineDescriptor;
-pub use reflection::ComputePipelineReflection;
-pub use state::ComputePipelineState;
+pub use descriptor::MTLComputePipelineDescriptor;
+pub use reflection::MTLComputePipelineReflection;
+pub use state::MTLComputePipelineState;

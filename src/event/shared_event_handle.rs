@@ -8,27 +8,26 @@ use objc2_foundation::{NSCoding, NSObjectProtocol, NSSecureCoding, NSString};
 extern_class!(
     /// Handle that can be sent across processes/devices for a shared event.
     #[unsafe(super(NSObject))]
-    #[name = "MTLSharedEventHandle"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct SharedEventHandle;
+    pub struct MTLSharedEventHandle;
 );
 
-unsafe impl Send for SharedEventHandle {}
-unsafe impl Sync for SharedEventHandle {}
+unsafe impl Send for MTLSharedEventHandle {}
+unsafe impl Sync for MTLSharedEventHandle {}
 
 extern_conformance!(
-    unsafe impl NSCoding for SharedEventHandle {}
-);
-
-extern_conformance!(
-    unsafe impl NSObjectProtocol for SharedEventHandle {}
+    unsafe impl NSCoding for MTLSharedEventHandle {}
 );
 
 extern_conformance!(
-    unsafe impl NSSecureCoding for SharedEventHandle {}
+    unsafe impl NSObjectProtocol for MTLSharedEventHandle {}
 );
 
-impl SharedEventHandle {
+extern_conformance!(
+    unsafe impl NSSecureCoding for MTLSharedEventHandle {}
+);
+
+impl MTLSharedEventHandle {
     extern_methods!(
         #[unsafe(method(label))]
         #[unsafe(method_family = none)]
@@ -37,7 +36,7 @@ impl SharedEventHandle {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl SharedEventHandle {
+impl MTLSharedEventHandle {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

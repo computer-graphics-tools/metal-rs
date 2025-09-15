@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// The level of the log entry (from `MTLLogLevel`).
 #[repr(i64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum LogLevel {
+pub enum MTLLogLevel {
     Undefined = 0,
     Debug = 1,
     Info = 2,
@@ -12,10 +12,10 @@ pub enum LogLevel {
     Fault = 5,
 }
 
-unsafe impl Encode for LogLevel {
+unsafe impl Encode for MTLLogLevel {
     const ENCODING: Encoding = i64::ENCODING;
 }
 
-unsafe impl RefEncode for LogLevel {
+unsafe impl RefEncode for MTLLogLevel {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

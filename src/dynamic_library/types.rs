@@ -6,7 +6,7 @@ use objc2_foundation::NSErrorDomain;
 /// See Apple's documentation for `MTLDynamicLibraryError`.
 #[repr(u64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum DynamicLibraryError {
+pub enum MTLDynamicLibraryError {
     None = 0,
     InvalidFile = 1,
     CompilationFailure = 2,
@@ -15,11 +15,11 @@ pub enum DynamicLibraryError {
     Unsupported = 5,
 }
 
-unsafe impl Encode for DynamicLibraryError {
+unsafe impl Encode for MTLDynamicLibraryError {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for DynamicLibraryError {
+unsafe impl RefEncode for MTLDynamicLibraryError {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
@@ -32,5 +32,3 @@ unsafe extern "C" {
 pub fn dynamic_library_error_domain() -> &'static NSErrorDomain {
     unsafe { MTLDynamicLibraryDomain }
 }
-
-

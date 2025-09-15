@@ -8,24 +8,23 @@ use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSString};
 extern_class!(
     /// Parameters for creating a resource view pool.
     #[unsafe(super(NSObject))]
-    #[name = "MTLResourceViewPoolDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct ResourceViewPoolDescriptor;
+    pub struct MTLResourceViewPoolDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for ResourceViewPoolDescriptor {}
+    unsafe impl NSCopying for MTLResourceViewPoolDescriptor {}
 );
 
-unsafe impl CopyingHelper for ResourceViewPoolDescriptor {
+unsafe impl CopyingHelper for MTLResourceViewPoolDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for ResourceViewPoolDescriptor {}
+    unsafe impl NSObjectProtocol for MTLResourceViewPoolDescriptor {}
 );
 
-impl ResourceViewPoolDescriptor {
+impl MTLResourceViewPoolDescriptor {
     extern_methods!(
         /// Number of resource views with which Metal creates the resource view pool.
         #[unsafe(method(resourceViewCount))]
@@ -50,7 +49,7 @@ impl ResourceViewPoolDescriptor {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl ResourceViewPoolDescriptor {
+impl MTLResourceViewPoolDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

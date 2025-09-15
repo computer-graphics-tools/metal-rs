@@ -4,8 +4,9 @@ use objc2_io_surface::IOSurfaceRef;
 use std::{ops::Range, os::raw::c_void, ptr::NonNull};
 
 use crate::{
-    Buffer, Device, PixelFormat, Region, Resource, ResourceID, SharedTextureHandle,
-    TextureCompressionType, TextureSparseTier, TextureSwizzleChannels, TextureType, TextureUsage,
+    MTLBuffer, MTLDevice, MTLPixelFormat, MTLRegion, MTLResource, MTLResourceID,
+    MTLSharedTextureHandle, MTLTextureCompressionType, MTLTextureSparseTier,
+    MTLTextureSwizzleChannels, MTLTextureType, MTLTextureUsage,
 };
 
 extern_protocol!(
@@ -16,18 +17,17 @@ extern_protocol!(
     /// Most APIs that operate on individual images in a texture address those images via a tuple of a Slice, and Mipmap Level within that slice.
     ///
     /// See also [Apple's documentation](https://developer.apple.com/documentation/metal/mtltexture?language=objc)
-    #[name = "MTLTexture"]
-    pub unsafe trait Texture: Resource {
+    pub unsafe trait MTLTexture: MTLResource {
         /// The resource this texture was created from. It may be a texture or a buffer. If this texture is not reusing storage of another MTLResource, then nil is returned.
         #[deprecated = "Use parentTexture or buffer instead"]
         #[unsafe(method(rootResource))]
         #[unsafe(method_family = none)]
-        fn root_resource(&self) -> Option<Retained<ProtocolObject<dyn Resource>>>;
+        fn root_resource(&self) -> Option<Retained<ProtocolObject<dyn MTLResource>>>;
 
         /// The texture this texture view was created from, or nil if this is not a texture view or it was not created from a texture.
         #[unsafe(method(parentTexture))]
         #[unsafe(method_family = none)]
-        fn parent_texture(&self) -> Option<Retained<ProtocolObject<dyn Texture>>>;
+        fn parent_texture(&self) -> Option<Retained<ProtocolObject<dyn MTLTexture>>>;
 
         /// The base level of the texture this texture view was created from, or 0 if this is not a texture view.
         #[unsafe(method(parentRelativeLevel))]
@@ -42,7 +42,7 @@ extern_protocol!(
         /// The buffer this texture view was created from, or nil if this is not a texture view or it was not created from a buffer.
         #[unsafe(method(buffer))]
         #[unsafe(method_family = none)]
-        fn buffer(&self) -> Option<Retained<ProtocolObject<dyn Buffer>>>;
+        fn buffer(&self) -> Option<Retained<ProtocolObject<dyn MTLBuffer>>>;
 
         /// The offset of the buffer this texture view was created from, or 0 if this is not a texture view.
         #[unsafe(method(bufferOffset))]
@@ -67,12 +67,12 @@ extern_protocol!(
         /// The type of this texture.
         #[unsafe(method(textureType))]
         #[unsafe(method_family = none)]
-        fn texture_type(&self) -> TextureType;
+        fn texture_type(&self) -> MTLTextureType;
 
         /// The MTLPixelFormat that is used to interpret this texture's contents.
         #[unsafe(method(pixelFormat))]
         #[unsafe(method_family = none)]
-        fn pixel_format(&self) -> PixelFormat;
+        fn pixel_format(&self) -> MTLPixelFormat;
 
         /// The width of the MTLTexture instance in pixels.
         #[unsafe(method(width))]
@@ -115,7 +115,7 @@ extern_protocol!(
         /// Description of texture usage.
         #[unsafe(method(usage))]
         #[unsafe(method_family = none)]
-        fn usage(&self) -> TextureUsage;
+        fn usage(&self) -> MTLTextureUsage;
 
         /// If YES, this texture can be shared with other processes.
         ///
@@ -161,12 +161,12 @@ extern_protocol!(
         /// See the compressionType property on MTLTextureDescriptor
         #[unsafe(method(compressionType))]
         #[unsafe(method_family = none)]
-        unsafe fn compression_type(&self) -> TextureCompressionType;
+        unsafe fn compression_type(&self) -> MTLTextureCompressionType;
 
         /// Handle of the GPU resource suitable for storing in an Argument Buffer
         #[unsafe(method(gpuResourceID))]
         #[unsafe(method_family = none)]
-        unsafe fn gpu_resource_id(&self) -> ResourceID;
+        unsafe fn gpu_resource_id(&self) -> MTLResourceID;
 
         /// Convenience for getBytes:bytesPerRow:bytesPerImage:fromRegion:mipmapLevel:slice: that doesn't require slice related arguments
         ///
@@ -179,7 +179,7 @@ extern_protocol!(
             &self,
             pixel_bytes: NonNull<c_void>,
             bytes_per_row: usize,
-            region: Region,
+            region: MTLRegion,
             level: usize,
         );
 
@@ -195,7 +195,7 @@ extern_protocol!(
             pixel_bytes: NonNull<c_void>,
             bytes_per_row: usize,
             bytes_per_image: usize,
-            region: Region,
+            region: MTLRegion,
             level: usize,
             slice: usize,
         );
@@ -209,7 +209,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn replace_region(
             &self,
-            region: Region,
+            region: MTLRegion,
             level: usize,
             pixel_bytes: NonNull<c_void>,
             bytes_per_row: usize,
@@ -224,7 +224,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn replace_region_with_slice_bytes_per_image(
             &self,
-            region: Region,
+            region: MTLRegion,
             level: usize,
             slice: usize,
             pixel_bytes: NonNull<c_void>,
@@ -237,30 +237,30 @@ extern_protocol!(
         #[unsafe(method_family = new)]
         fn new_texture_view_with_pixel_format(
             &self,
-            pixel_format: PixelFormat,
-        ) -> Option<Retained<ProtocolObject<dyn Texture>>>;
+            pixel_format: MTLPixelFormat,
+        ) -> Option<Retained<ProtocolObject<dyn MTLTexture>>>;
 
         /// Create a new texture which shares the same storage as the source texture, but with a different (but compatible) pixel format, texture type, levels, slices and swizzle.
         #[unsafe(method(newTextureViewWithPixelFormat:textureType:levels:slices:swizzle:))]
         #[unsafe(method_family = new)]
         unsafe fn new_texture_view_with_pixel_format_texture_type_levels_slices_swizzle(
             &self,
-            pixel_format: PixelFormat,
-            texture_type: TextureType,
+            pixel_format: MTLPixelFormat,
+            texture_type: MTLTextureType,
             level_range: NSRange,
             slice_range: NSRange,
-            swizzle: TextureSwizzleChannels,
-        ) -> Option<Retained<ProtocolObject<dyn Texture>>>;
+            swizzle: MTLTextureSwizzleChannels,
+        ) -> Option<Retained<ProtocolObject<dyn MTLTexture>>>;
 
         /// Create a new texture handle, that can be shared across process addres space boundaries.
         #[unsafe(method(newSharedTextureHandle))]
         #[unsafe(method_family = new)]
-        fn new_shared_texture_handle(&self) -> Option<Retained<SharedTextureHandle>>;
+        fn new_shared_texture_handle(&self) -> Option<Retained<MTLSharedTextureHandle>>;
 
         /// For Metal texture objects that are remote views, this returns the texture associated with the storage on the originating device.
         #[unsafe(method(remoteStorageTexture))]
         #[unsafe(method_family = none)]
-        fn remote_storage_texture(&self) -> Option<Retained<ProtocolObject<dyn Texture>>>;
+        fn remote_storage_texture(&self) -> Option<Retained<ProtocolObject<dyn MTLTexture>>>;
 
         /// On Metal devices that support peer to peer transfers, this method is used to create a remote texture view on another device
         /// within the peer group.  The receiver must use MTLStorageModePrivate or be backed by an IOSurface.
@@ -268,40 +268,40 @@ extern_protocol!(
         #[unsafe(method_family = new)]
         unsafe fn new_remote_texture_view_for_device(
             &self,
-            device: &ProtocolObject<dyn Device>,
-        ) -> Option<Retained<ProtocolObject<dyn Texture>>>;
+            device: &ProtocolObject<dyn MTLDevice>,
+        ) -> Option<Retained<ProtocolObject<dyn MTLTexture>>>;
 
         /// The channel swizzle used when reading or sampling from this texture
         #[unsafe(method(swizzle))]
         #[unsafe(method_family = none)]
-        fn swizzle(&self) -> TextureSwizzleChannels;
+        fn swizzle(&self) -> MTLTextureSwizzleChannels;
 
         /// Query support tier for sparse textures.
         #[unsafe(method(sparseTextureTier))]
         #[unsafe(method_family = none)]
-        fn sparse_texture_tier(&self) -> TextureSparseTier;
+        fn sparse_texture_tier(&self) -> MTLTextureSparseTier;
     }
 );
 
-pub trait TextureExt: Texture + Message {
+pub trait TextureExt: MTLTexture + Message {
     /// Create a new texture which shares the same storage as the source texture, but with a different (but compatible) pixel format, texture type, levels and slices.
     unsafe fn new_texture_view_with_pixel_format_texture_type_levels_slices(
         &self,
-        pixel_format: PixelFormat,
-        texture_type: TextureType,
+        pixel_format: MTLPixelFormat,
+        texture_type: MTLTextureType,
         level_range: Range<usize>,
         slice_range: Range<usize>,
-    ) -> Option<Retained<ProtocolObject<dyn Texture>>>;
+    ) -> Option<Retained<ProtocolObject<dyn MTLTexture>>>;
 }
 
-impl TextureExt for ProtocolObject<dyn Texture> {
+impl TextureExt for ProtocolObject<dyn MTLTexture> {
     unsafe fn new_texture_view_with_pixel_format_texture_type_levels_slices(
         &self,
-        pixel_format: PixelFormat,
-        texture_type: TextureType,
+        pixel_format: MTLPixelFormat,
+        texture_type: MTLTextureType,
         level_range: Range<usize>,
         slice_range: Range<usize>,
-    ) -> Option<Retained<ProtocolObject<dyn Texture>>> {
+    ) -> Option<Retained<ProtocolObject<dyn MTLTexture>>> {
         unsafe {
             msg_send![
                 self,

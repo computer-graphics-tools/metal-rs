@@ -8,19 +8,18 @@ use objc2_foundation::NSObjectProtocol;
 extern_class!(
     /// Listener for SharedEvent notifications from Metal.
     #[unsafe(super(NSObject))]
-    #[name = "MTLSharedEventListener"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct SharedEventListener;
+    pub struct MTLSharedEventListener;
 );
 
-unsafe impl Send for SharedEventListener {}
-unsafe impl Sync for SharedEventListener {}
+unsafe impl Send for MTLSharedEventListener {}
+unsafe impl Sync for MTLSharedEventListener {}
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for SharedEventListener {}
+    unsafe impl NSObjectProtocol for MTLSharedEventListener {}
 );
 
-impl SharedEventListener {
+impl MTLSharedEventListener {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]
@@ -30,12 +29,12 @@ impl SharedEventListener {
 
         #[unsafe(method(sharedListener))]
         #[unsafe(method_family = none)]
-        pub unsafe fn shared_listener() -> Retained<SharedEventListener>;
+        pub unsafe fn shared_listener() -> Retained<MTLSharedEventListener>;
     );
 }
 
 /// Methods declared on superclass `NSObject`.
-impl SharedEventListener {
+impl MTLSharedEventListener {
     extern_methods!(
         #[unsafe(method(new))]
         #[unsafe(method_family = new)]

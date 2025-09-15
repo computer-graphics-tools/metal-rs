@@ -1,12 +1,11 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSArray, NSObjectProtocol, NSString};
 
-use super::Counter;
+use super::MTLCounter;
 
 extern_protocol!(
     /// A collection of counters that the device can capture in a single pass.
-    #[name = "MTLCounterSet"]
-    pub unsafe trait CounterSet: NSObjectProtocol + Send + Sync {
+    pub unsafe trait MTLCounterSet: NSObjectProtocol + Send + Sync {
         #[unsafe(method(name))]
         #[unsafe(method_family = none)]
         unsafe fn name(&self) -> Retained<NSString>;
@@ -16,6 +15,6 @@ extern_protocol!(
         /// will not be written to the resolved buffer when the samples are resolved.
         #[unsafe(method(counters))]
         #[unsafe(method_family = none)]
-        unsafe fn counters(&self) -> Retained<NSArray<ProtocolObject<dyn Counter>>>;
+        unsafe fn counters(&self) -> Retained<NSArray<ProtocolObject<dyn MTLCounter>>>;
     }
 );

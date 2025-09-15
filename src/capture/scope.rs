@@ -1,12 +1,11 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSString};
 
-use crate::{CommandQueue, Device};
+use crate::{MTLCommandQueue, MTLDevice};
 
 extern_protocol!(
     /// Capture scope to bracket GPU work for debugging captures.
-    #[name = "MTLCaptureScope"]
-    pub unsafe trait CaptureScope: NSObjectProtocol {
+    pub unsafe trait MTLCaptureScope: NSObjectProtocol {
         #[unsafe(method(beginScope))]
         #[unsafe(method_family = none)]
         fn begin_scope(&self);
@@ -28,11 +27,11 @@ extern_protocol!(
         /// Associated device.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
-        unsafe fn device(&self) -> Retained<ProtocolObject<dyn Device>>;
+        unsafe fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
 
         /// If set, only capture commands from the associated command queue.
         #[unsafe(method(commandQueue))]
         #[unsafe(method_family = none)]
-        unsafe fn command_queue(&self) -> Option<Retained<ProtocolObject<dyn CommandQueue>>>;
+        unsafe fn command_queue(&self) -> Option<Retained<ProtocolObject<dyn MTLCommandQueue>>>;
     }
 );

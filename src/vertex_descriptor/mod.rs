@@ -6,10 +6,10 @@ mod vertex_format;
 mod vertex_step_function;
 
 pub use constants::BUFFER_LAYOUT_STRIDE_DYNAMIC;
-pub use vertex_buffer_layout_descriptor::VertexBufferLayoutDescriptor;
-pub use vertex_buffer_layout_descriptor_array::VertexBufferLayoutDescriptorArray;
-pub use vertex_descriptor::VertexAttributeDescriptor;
-pub use vertex_descriptor::VertexAttributeDescriptorArray;
-pub use vertex_descriptor::VertexDescriptor;
-pub use vertex_format::VertexFormat;
-pub use vertex_step_function::VertexStepFunction;
+pub use vertex_buffer_layout_descriptor::MTLVertexBufferLayoutDescriptor;
+pub use vertex_buffer_layout_descriptor_array::MTLVertexBufferLayoutDescriptorArray;
+pub use vertex_descriptor::MTLVertexAttributeDescriptor;
+pub use vertex_descriptor::MTLVertexAttributeDescriptorArray;
+pub use vertex_descriptor::MTLVertexDescriptor;
+pub use vertex_format::MTLVertexFormat;
+pub use vertex_step_function::MTLVertexStepFunction;

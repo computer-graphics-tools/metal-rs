@@ -2,6 +2,6 @@ mod compute_pass_descriptor;
 mod sample_buffer_attachment_descriptor;
 mod sample_buffer_attachment_descriptor_array;
 
-pub use compute_pass_descriptor::ComputePassDescriptor;
-pub use sample_buffer_attachment_descriptor::ComputePassSampleBufferAttachmentDescriptor;
-pub use sample_buffer_attachment_descriptor_array::ComputePassSampleBufferAttachmentDescriptorArray;
+pub use compute_pass_descriptor::MTLComputePassDescriptor;
+pub use sample_buffer_attachment_descriptor::MTLComputePassSampleBufferAttachmentDescriptor;
+pub use sample_buffer_attachment_descriptor_array::MTLComputePassSampleBufferAttachmentDescriptorArray;

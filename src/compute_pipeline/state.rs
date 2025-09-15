@@ -1,16 +1,15 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSString};
 
-use crate::intersection_function_table::IntersectionFunctionTableDescriptor;
+use crate::intersection_function_table::MTLIntersectionFunctionTableDescriptor;
 use crate::{
-    Device, ResourceID,
-    visible_function_table::{VisibleFunctionTable, VisibleFunctionTableDescriptor},
+    MTLDevice, MTLResourceID,
+    visible_function_table::{MTLVisibleFunctionTable, MTLVisibleFunctionTableDescriptor},
 };
 
 extern_protocol!(
     /// A handle to compiled code for a compute function.
-    #[name = "MTLComputePipelineState"]
-    pub unsafe trait ComputePipelineState: NSObjectProtocol + Send + Sync {
+    pub unsafe trait MTLComputePipelineState: NSObjectProtocol + Send + Sync {
         /// A string to help identify this object.
         #[unsafe(method(label))]
         #[unsafe(method_family = none)]
@@ -19,7 +18,7 @@ extern_protocol!(
         /// The device this resource was created against.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
-        fn device(&self) -> Retained<ProtocolObject<dyn Device>>;
+        fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
 
         /// The maximum total number of threads that can be in a single compute threadgroup.
         #[unsafe(method(maxTotalThreadsPerThreadgroup))]
@@ -39,22 +38,22 @@ extern_protocol!(
         /// Handle of the GPU resource suitable for storing in an Argument Buffer
         #[unsafe(method(gpuResourceID))]
         #[unsafe(method_family = none)]
-        unsafe fn gpu_resource_id(&self) -> ResourceID;
+        unsafe fn gpu_resource_id(&self) -> MTLResourceID;
 
         /// Allocate a visible function table for the pipeline with the provided descriptor.
         #[unsafe(method(newVisibleFunctionTableWithDescriptor:))]
         #[unsafe(method_family = new)]
         fn new_visible_function_table_with_descriptor(
             &self,
-            descriptor: &VisibleFunctionTableDescriptor,
-        ) -> Option<Retained<ProtocolObject<dyn VisibleFunctionTable>>>;
+            descriptor: &MTLVisibleFunctionTableDescriptor,
+        ) -> Option<Retained<ProtocolObject<dyn MTLVisibleFunctionTable>>>;
 
         /// Allocate an intersection function table for the pipeline with the provided descriptor.
         #[unsafe(method(newIntersectionFunctionTableWithDescriptor:))]
         #[unsafe(method_family = new)]
         fn new_intersection_function_table_with_descriptor(
             &self,
-            descriptor: &IntersectionFunctionTableDescriptor,
-        ) -> Option<Retained<ProtocolObject<dyn crate::IntersectionFunctionTable>>>;
+            descriptor: &MTLIntersectionFunctionTableDescriptor,
+        ) -> Option<Retained<ProtocolObject<dyn crate::MTLIntersectionFunctionTable>>>;
     }
 );

@@ -3,8 +3,7 @@ use objc2_foundation::{NSObjectProtocol, NSString, NSUInteger, NSURL};
 
 extern_protocol!(
     /// Location information for a function log (from `MTLFunctionLogDebugLocation`).
-    #[name = "MTLFunctionLogDebugLocation"]
-    pub unsafe trait FunctionLogDebugLocation: NSObjectProtocol {
+    pub unsafe trait MTLFunctionLogDebugLocation: NSObjectProtocol {
         #[unsafe(method(functionName))]
         #[unsafe(method_family = none)]
         unsafe fn function_name(&self) -> Option<Retained<NSString>>;

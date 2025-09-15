@@ -5,7 +5,7 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use super::RenderPassAttachmentDescriptor;
+use super::MTLRenderPassAttachmentDescriptor;
 
 /// Controls the MSAA depth resolve operation.
 #[repr(u64)]
@@ -26,25 +26,24 @@ unsafe impl RefEncode for MultisampleDepthResolveFilter {
 
 extern_class!(
     /// Depth attachment descriptor for a render pass.
-    #[unsafe(super(RenderPassAttachmentDescriptor, NSObject))]
-    #[name = "MTLRenderPassDepthAttachmentDescriptor"]
+    #[unsafe(super(MTLRenderPassAttachmentDescriptor, NSObject))]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct RenderPassDepthAttachmentDescriptor;
+    pub struct MTLRenderPassDepthAttachmentDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for RenderPassDepthAttachmentDescriptor {}
+    unsafe impl NSCopying for MTLRenderPassDepthAttachmentDescriptor {}
 );
 
-unsafe impl CopyingHelper for RenderPassDepthAttachmentDescriptor {
+unsafe impl CopyingHelper for MTLRenderPassDepthAttachmentDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for RenderPassDepthAttachmentDescriptor {}
+    unsafe impl NSObjectProtocol for MTLRenderPassDepthAttachmentDescriptor {}
 );
 
-impl RenderPassDepthAttachmentDescriptor {
+impl MTLRenderPassDepthAttachmentDescriptor {
     extern_methods!(
         /// The clear depth value to be used if the load action is Clear.
         #[unsafe(method(clearDepth))]

@@ -5,40 +5,39 @@ use objc2::{
 };
 use objc2_foundation::NSObjectProtocol;
 
-use super::ComputePassSampleBufferAttachmentDescriptor;
+use super::MTLComputePassSampleBufferAttachmentDescriptor;
 
 extern_class!(
     /// Array of `ComputePassSampleBufferAttachmentDescriptor` objects.
     #[unsafe(super(NSObject))]
-    #[name = "MTLComputePassSampleBufferAttachmentDescriptorArray"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct ComputePassSampleBufferAttachmentDescriptorArray;
+    pub struct MTLComputePassSampleBufferAttachmentDescriptorArray;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for ComputePassSampleBufferAttachmentDescriptorArray {}
+    unsafe impl NSObjectProtocol for MTLComputePassSampleBufferAttachmentDescriptorArray {}
 );
 
-impl ComputePassSampleBufferAttachmentDescriptorArray {
+impl MTLComputePassSampleBufferAttachmentDescriptorArray {
     extern_methods!(
         #[unsafe(method(objectAtIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn object_at_indexed_subscript(
             &self,
             attachment_index: usize,
-        ) -> Retained<ComputePassSampleBufferAttachmentDescriptor>;
+        ) -> Retained<MTLComputePassSampleBufferAttachmentDescriptor>;
 
         #[unsafe(method(setObject:atIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_object_at_indexed_subscript(
             &self,
-            attachment: Option<&ComputePassSampleBufferAttachmentDescriptor>,
+            attachment: Option<&MTLComputePassSampleBufferAttachmentDescriptor>,
             attachment_index: usize,
         );
     );
 }
 
-impl ComputePassSampleBufferAttachmentDescriptorArray {
+impl MTLComputePassSampleBufferAttachmentDescriptorArray {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

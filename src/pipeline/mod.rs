@@ -4,8 +4,8 @@ mod pipeline_buffer_descriptor_array;
 mod pipeline_option;
 mod shader_validation;
 
-pub use mutability::Mutability;
-pub use pipeline_buffer_descriptor::PipelineBufferDescriptor;
-pub use pipeline_buffer_descriptor_array::PipelineBufferDescriptorArray;
-pub use pipeline_option::PipelineOption;
-pub use shader_validation::ShaderValidation;
+pub use mutability::MTLMutability;
+pub use pipeline_buffer_descriptor::MTLPipelineBufferDescriptor;
+pub use pipeline_buffer_descriptor_array::MTLPipelineBufferDescriptorArray;
+pub use pipeline_option::MTLPipelineOption;
+pub use shader_validation::MTLShaderValidation;

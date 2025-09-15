@@ -5,41 +5,40 @@ use objc2::{
 };
 use objc2_foundation::NSObjectProtocol;
 
-use super::BufferLayoutDescriptor;
+use super::MTLBufferLayoutDescriptor;
 
 extern_class!(
     /// Array of buffer layout descriptors
     #[unsafe(super(NSObject))]
-    #[name = "MTLBufferLayoutDescriptorArray"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct BufferLayoutDescriptorArray;
+    pub struct MTLBufferLayoutDescriptorArray;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for BufferLayoutDescriptorArray {}
+    unsafe impl NSObjectProtocol for MTLBufferLayoutDescriptorArray {}
 );
 
-impl BufferLayoutDescriptorArray {
+impl MTLBufferLayoutDescriptorArray {
     extern_methods!(
         #[unsafe(method(objectAtIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn object_at_indexed_subscript(
             &self,
             index: usize,
-        ) -> Retained<BufferLayoutDescriptor>;
+        ) -> Retained<MTLBufferLayoutDescriptor>;
 
         #[unsafe(method(setObject:atIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_object_at_indexed_subscript(
             &self,
-            buffer_desc: Option<&BufferLayoutDescriptor>,
+            buffer_desc: Option<&MTLBufferLayoutDescriptor>,
             index: usize,
         );
     );
 }
 
 /// Methods declared on superclass `NSObject`.
-impl BufferLayoutDescriptorArray {
+impl MTLBufferLayoutDescriptorArray {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

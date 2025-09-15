@@ -2,6 +2,6 @@ mod buffer;
 mod descriptor;
 mod types;
 
-pub use buffer::IndirectCommandBuffer;
-pub use descriptor::IndirectCommandBufferDescriptor;
-pub use types::{IndirectCommandBufferExecutionRange, IndirectCommandType};
+pub use buffer::MTLIndirectCommandBuffer;
+pub use descriptor::MTLIndirectCommandBufferDescriptor;
+pub use types::{MTLIndirectCommandBufferExecutionRange, MTLIndirectCommandType};

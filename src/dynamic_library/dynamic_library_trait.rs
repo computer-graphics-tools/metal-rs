@@ -1,14 +1,13 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSError, NSObjectProtocol, NSString, NSURL};
 
-use crate::device::Device;
+use crate::device::MTLDevice;
 
 extern_protocol!(
     /// A container for the binary representation of code compiled for a Device.
     ///
     /// Mirrors `MTLDynamicLibrary`.
-    #[name = "MTLDynamicLibrary"]
-    pub unsafe trait DynamicLibrary: NSObjectProtocol + Send + Sync {
+    pub unsafe trait MTLDynamicLibrary: NSObjectProtocol + Send + Sync {
         /// A string to help identify this object.
         #[unsafe(method(label))]
         #[unsafe(method_family = none)]
@@ -22,7 +21,7 @@ extern_protocol!(
         /// The device this resource was created against.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
-        fn device(&self) -> Retained<ProtocolObject<dyn Device>>;
+        fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
 
         /// The install name of this dynamic library. Cannot be nil.
         #[unsafe(method(installName))]
@@ -35,5 +34,3 @@ extern_protocol!(
         fn serialize_to_url(&self, url: &NSURL) -> Result<(), Retained<NSError>>;
     }
 );
-
-

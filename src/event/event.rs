@@ -3,12 +3,11 @@ use objc2_foundation::{NSObjectProtocol, NSString};
 
 extern_protocol!(
     /// Bridged protocol for `MTLEvent`.
-    #[name = "MTLEvent"]
-    pub unsafe trait Event: NSObjectProtocol + Send + Sync {
+    pub unsafe trait MTLEvent: NSObjectProtocol + Send + Sync {
         /// The device this event can be used with. Will be nil when the event is shared across devices.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
-        fn device(&self) -> Option<Retained<ProtocolObject<dyn crate::Device>>>;
+        fn device(&self) -> Option<Retained<ProtocolObject<dyn crate::MTLDevice>>>;
 
         /// Optional label.
         #[unsafe(method(label))]

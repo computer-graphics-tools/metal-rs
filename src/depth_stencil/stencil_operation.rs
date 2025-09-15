@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Stencil buffer update operation for various test outcomes.
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum StencilOperation {
+pub enum MTLStencilOperation {
     Keep = 0,
     Zero = 1,
     Replace = 2,
@@ -14,12 +14,10 @@ pub enum StencilOperation {
     DecrementWrap = 7,
 }
 
-unsafe impl Encode for StencilOperation {
+unsafe impl Encode for MTLStencilOperation {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for StencilOperation {
+unsafe impl RefEncode for MTLStencilOperation {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-

@@ -1,37 +1,32 @@
-use objc2::{msg_send, extern_protocol, rc::Retained, Message, runtime::ProtocolObject};
+use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::NSString;
 
-use crate::device::Device;
-use crate::allocation::Allocation;
+use crate::allocation::MTLAllocation;
+use crate::device::MTLDevice;
 
 use super::{
-    CpuCacheMode,
-    StorageMode,
-    HazardTrackingMode,
-    ResourceOptions,
-    PurgeableState,
+    MTLCPUCacheMode, MTLHazardTrackingMode, MTLPurgeableState, MTLResourceOptions, MTLStorageMode,
 };
 
 extern_protocol!(
     /// Common APIs available for MTLBuffer and MTLTexture instances
     ///
     /// See also Apple's documentation: `https://developer.apple.com/documentation/metal/mtlresource?language=objc`
-    #[name = "MTLResource"]
-    pub unsafe trait Resource: Allocation {
+    pub unsafe trait MTLResource: MTLAllocation {
         /// The device this resource was created against.  This resource can only be used with this device.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
-        fn device(&self) -> Retained<ProtocolObject<dyn Device>>;
+        fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
 
         /// The cache mode used for the CPU mapping for this resource
         #[unsafe(method(cpuCacheMode))]
         #[unsafe(method_family = none)]
-        fn cpu_cache_mode(&self) -> CpuCacheMode;
+        fn cpu_cache_mode(&self) -> MTLCPUCacheMode;
 
         /// The resource storage mode used for the CPU mapping for this resource
         #[unsafe(method(storageMode))]
         #[unsafe(method_family = none)]
-        fn storage_mode(&self) -> StorageMode;
+        fn storage_mode(&self) -> MTLStorageMode;
 
         /// Whether or not the resource is hazard tracked.
         ///
@@ -39,12 +34,12 @@ extern_protocol!(
         /// Resources created from heaps are by default untracked, whereas resources created from the device are by default tracked.
         #[unsafe(method(hazardTrackingMode))]
         #[unsafe(method_family = none)]
-        fn hazard_tracking_mode(&self) -> HazardTrackingMode;
+        fn hazard_tracking_mode(&self) -> MTLHazardTrackingMode;
 
         /// A packed tuple of the `storageMode`, `cpuCacheMode` and `hazardTrackingMode` properties.
         #[unsafe(method(resourceOptions))]
         #[unsafe(method_family = none)]
-        fn resource_options(&self) -> ResourceOptions;
+        fn resource_options(&self) -> MTLResourceOptions;
 
         /// Set (or query) the purgeability state of a resource
         ///
@@ -52,7 +47,7 @@ extern_protocol!(
         /// FIXME: If the device is keeping a cached copy of the resource, both the shared copy and cached copy are made purgeable.  Any access to the resource by either the CPU or device will be undefined.
         #[unsafe(method(setPurgeableState:))]
         #[unsafe(method_family = none)]
-        fn set_purgeable_state(&self, state: PurgeableState) -> PurgeableState;
+        fn set_purgeable_state(&self, state: MTLPurgeableState) -> MTLPurgeableState;
 
         /// The offset inside the heap at which this resource was created.
         ///
@@ -96,22 +91,20 @@ extern_protocol!(
     }
 );
 
-pub trait ResourceExt: Resource + Message {
+pub trait MTLResourceExt: MTLResource + Message {
     fn label(&self) -> Option<String>;
     fn set_label(&self, label: Option<&str>);
 }
 
-impl ResourceExt for ProtocolObject<dyn Resource> {
+impl MTLResourceExt for ProtocolObject<dyn MTLResource> {
     fn label(&self) -> Option<String> {
-        let label: Option<Retained<NSString>> = unsafe {
-            msg_send![self, label]
-        };
+        let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
         label.map(|label| label.to_string())
     }
     fn set_label(&self, label: Option<&str>) {
         unsafe {
             let _: () = msg_send![
-                self, 
+                self,
                 setLabel: label.map(NSString::from_str).as_deref()
             ];
         }

@@ -1,17 +1,16 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSData, NSObjectProtocol, NSRange, NSString};
 
-use crate::Device;
+use crate::MTLDevice;
 
 extern_protocol!(
     /// The Counter Sample Buffer contains opaque counter samples as well
     /// as state needed to request a sample from the API.
-    #[name = "MTLCounterSampleBuffer"]
-    pub unsafe trait CounterSampleBuffer: NSObjectProtocol {
+    pub unsafe trait MTLCounterSampleBuffer: NSObjectProtocol {
         /// The device this sample buffer was created against.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
-        unsafe fn device(&self) -> Retained<ProtocolObject<dyn Device>>;
+        unsafe fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
 
         /// The label set on the descriptor used to create this sample buffer.
         #[unsafe(method(label))]

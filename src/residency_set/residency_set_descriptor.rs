@@ -10,24 +10,23 @@ extern_class!(
     ///
     /// Apple's documentation: `https://developer.apple.com/documentation/metal/mtlresidencysetdescriptor?language=objc`
     #[unsafe(super(NSObject))]
-    #[name = "MTLResidencySetDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct ResidencySetDescriptor;
+    pub struct MTLResidencySetDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for ResidencySetDescriptor {}
+    unsafe impl NSCopying for MTLResidencySetDescriptor {}
 );
 
-unsafe impl CopyingHelper for ResidencySetDescriptor {
+unsafe impl CopyingHelper for MTLResidencySetDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for ResidencySetDescriptor {}
+    unsafe impl NSObjectProtocol for MTLResidencySetDescriptor {}
 );
 
-impl ResidencySetDescriptor {
+impl MTLResidencySetDescriptor {
     extern_methods!(
         /// Optional label for the residency set.
         #[unsafe(method(label))]
@@ -52,7 +51,7 @@ impl ResidencySetDescriptor {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl ResidencySetDescriptor {
+impl MTLResidencySetDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

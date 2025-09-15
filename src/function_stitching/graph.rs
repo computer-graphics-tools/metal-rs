@@ -5,34 +5,32 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSArray, NSCopying, NSObjectProtocol, NSString};
 
-use super::FunctionStitchingFunctionNode;
+use super::MTLFunctionStitchingFunctionNode;
 
 extern_class!(
     /// Function graph describing a DAG used to produce a stitched function.
     #[unsafe(super(NSObject))]
-    #[name = "MTLFunctionStitchingGraph"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct FunctionStitchingGraph;
+    pub struct MTLFunctionStitchingGraph;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for FunctionStitchingGraph {}
+    unsafe impl NSCopying for MTLFunctionStitchingGraph {}
 );
 
-unsafe impl CopyingHelper for FunctionStitchingGraph {
+unsafe impl CopyingHelper for MTLFunctionStitchingGraph {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for FunctionStitchingGraph {}
+    unsafe impl NSObjectProtocol for MTLFunctionStitchingGraph {}
 );
 
 extern_protocol!(
-    #[name = "MTLFunctionStitchingAttribute"]
-    pub unsafe trait __HiddenAttrProtocol: NSObjectProtocol {}
+    pub unsafe trait MTLFunctionStitchingAttribute: NSObjectProtocol {}
 );
 
-impl FunctionStitchingGraph {
+impl MTLFunctionStitchingGraph {
     extern_methods!(
         #[unsafe(method(functionName))]
         #[unsafe(method_family = none)]
@@ -45,34 +43,37 @@ impl FunctionStitchingGraph {
 
         #[unsafe(method(nodes))]
         #[unsafe(method_family = none)]
-        pub unsafe fn nodes(&self) -> Retained<NSArray<FunctionStitchingFunctionNode>>;
+        pub unsafe fn nodes(&self) -> Retained<NSArray<MTLFunctionStitchingFunctionNode>>;
 
         /// Setter for [`nodes`][Self::nodes].
         #[unsafe(method(setNodes:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_nodes(&self, nodes: &NSArray<FunctionStitchingFunctionNode>);
+        pub unsafe fn set_nodes(&self, nodes: &NSArray<MTLFunctionStitchingFunctionNode>);
 
         #[unsafe(method(outputNode))]
         #[unsafe(method_family = none)]
-        pub unsafe fn output_node(&self) -> Option<Retained<FunctionStitchingFunctionNode>>;
+        pub unsafe fn output_node(&self) -> Option<Retained<MTLFunctionStitchingFunctionNode>>;
 
         /// Setter for [`output_node`][Self::output_node].
         #[unsafe(method(setOutputNode:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_output_node(&self, output_node: Option<&FunctionStitchingFunctionNode>);
+        pub unsafe fn set_output_node(
+            &self,
+            output_node: Option<&MTLFunctionStitchingFunctionNode>,
+        );
 
         #[unsafe(method(attributes))]
         #[unsafe(method_family = none)]
         pub unsafe fn attributes(
             &self,
-        ) -> Retained<NSArray<ProtocolObject<dyn super::FunctionStitchingAttribute>>>;
+        ) -> Retained<NSArray<ProtocolObject<dyn super::MTLFunctionStitchingAttribute>>>;
 
         /// Setter for [`attributes`][Self::attributes].
         #[unsafe(method(setAttributes:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_attributes(
             &self,
-            attributes: &NSArray<ProtocolObject<dyn super::FunctionStitchingAttribute>>,
+            attributes: &NSArray<ProtocolObject<dyn super::MTLFunctionStitchingAttribute>>,
         );
 
         #[unsafe(method(initWithFunctionName:nodes:outputNode:attributes:))]
@@ -80,9 +81,9 @@ impl FunctionStitchingGraph {
         pub unsafe fn init_with_function_name_nodes_output_node_attributes(
             this: Allocated<Self>,
             function_name: &NSString,
-            nodes: &NSArray<FunctionStitchingFunctionNode>,
-            output_node: Option<&FunctionStitchingFunctionNode>,
-            attributes: &NSArray<ProtocolObject<dyn super::FunctionStitchingAttribute>>,
+            nodes: &NSArray<MTLFunctionStitchingFunctionNode>,
+            output_node: Option<&MTLFunctionStitchingFunctionNode>,
+            attributes: &NSArray<ProtocolObject<dyn super::MTLFunctionStitchingAttribute>>,
         ) -> Retained<Self>;
     );
 }

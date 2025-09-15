@@ -6,71 +6,70 @@ use objc2::{
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
 use super::{
-    RenderPassColorAttachmentDescriptorArray, RenderPassDepthAttachmentDescriptor,
-    RenderPassSampleBufferAttachmentDescriptorArray, RenderPassStencilAttachmentDescriptor,
-    VisibilityResultType,
+    MTLRenderPassColorAttachmentDescriptorArray, MTLRenderPassDepthAttachmentDescriptor,
+    MTLRenderPassSampleBufferAttachmentDescriptorArray, MTLRenderPassStencilAttachmentDescriptor,
+    MTLVisibilityResultType,
 };
-use crate::{Buffer, RasterizationRateMap, SamplePosition};
+use crate::{MTLBuffer, MTLSamplePosition, MTLRasterizationRateMap};
 
 extern_class!(
     /// A collection of attachments used to create a render command encoder.
     #[unsafe(super(NSObject))]
-    #[name = "MTLRenderPassDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct RenderPassDescriptor;
+    pub struct MTLRenderPassDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for RenderPassDescriptor {}
+    unsafe impl NSCopying for MTLRenderPassDescriptor {}
 );
 
-unsafe impl CopyingHelper for RenderPassDescriptor {
+unsafe impl CopyingHelper for MTLRenderPassDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for RenderPassDescriptor {}
+    unsafe impl NSObjectProtocol for MTLRenderPassDescriptor {}
 );
 
-impl RenderPassDescriptor {
+impl MTLRenderPassDescriptor {
     extern_methods!(
         /// Create a default frame buffer descriptor.
         #[unsafe(method(renderPassDescriptor))]
         #[unsafe(method_family = none)]
-        pub fn render_pass_descriptor() -> Retained<RenderPassDescriptor>;
+        pub fn render_pass_descriptor() -> Retained<MTLRenderPassDescriptor>;
 
         #[unsafe(method(colorAttachments))]
         #[unsafe(method_family = none)]
-        pub fn color_attachments(&self) -> Retained<RenderPassColorAttachmentDescriptorArray>;
+        pub fn color_attachments(&self) -> Retained<MTLRenderPassColorAttachmentDescriptorArray>;
 
         #[unsafe(method(depthAttachment))]
         #[unsafe(method_family = none)]
-        pub fn depth_attachment(&self) -> Retained<RenderPassDepthAttachmentDescriptor>;
+        pub fn depth_attachment(&self) -> Retained<MTLRenderPassDepthAttachmentDescriptor>;
 
         #[unsafe(method(setDepthAttachment:))]
         #[unsafe(method_family = none)]
-        pub fn set_depth_attachment(&self, depth: Option<&RenderPassDepthAttachmentDescriptor>);
+        pub fn set_depth_attachment(&self, depth: Option<&MTLRenderPassDepthAttachmentDescriptor>);
 
         #[unsafe(method(stencilAttachment))]
         #[unsafe(method_family = none)]
-        pub fn stencil_attachment(&self) -> Retained<RenderPassStencilAttachmentDescriptor>;
+        pub fn stencil_attachment(&self) -> Retained<MTLRenderPassStencilAttachmentDescriptor>;
 
         #[unsafe(method(setStencilAttachment:))]
         #[unsafe(method_family = none)]
         pub fn set_stencil_attachment(
             &self,
-            stencil: Option<&RenderPassStencilAttachmentDescriptor>,
+            stencil: Option<&MTLRenderPassStencilAttachmentDescriptor>,
         );
 
         /// Buffer into which samples passing the depth and stencil tests are counted.
         #[unsafe(method(visibilityResultBuffer))]
         #[unsafe(method_family = none)]
-        pub fn visibility_result_buffer(&self) -> Option<Retained<ProtocolObject<dyn Buffer>>>;
+        pub fn visibility_result_buffer(&self) -> Option<Retained<ProtocolObject<dyn MTLBuffer>>>;
 
         /// Setter for [`visibility_result_buffer`][Self::visibility_result_buffer].
         #[unsafe(method(setVisibilityResultBuffer:))]
         #[unsafe(method_family = none)]
-        pub fn set_visibility_result_buffer(&self, buffer: Option<&ProtocolObject<dyn Buffer>>);
+        pub fn set_visibility_result_buffer(&self, buffer: Option<&ProtocolObject<dyn MTLBuffer>>);
 
         /// The number of active layers.
         #[unsafe(method(renderTargetArrayLength))]
@@ -148,7 +147,11 @@ impl RenderPassDescriptor {
         /// Safety: `positions` must be a valid pointer or null.
         #[unsafe(method(setSamplePositions:count:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_sample_positions(&self, positions: *const SamplePosition, count: usize);
+        pub unsafe fn set_sample_positions(
+            &self,
+            positions: *const MTLSamplePosition,
+            count: usize,
+        );
 
         /// Retrieve previously configured custom sample positions.
         /// Safety: `positions` must be a valid pointer or null.
@@ -156,7 +159,7 @@ impl RenderPassDescriptor {
         #[unsafe(method_family = none)]
         pub unsafe fn get_sample_positions(
             &self,
-            positions: *mut SamplePosition,
+            positions: *mut MTLSamplePosition,
             count: usize,
         ) -> usize;
 
@@ -165,14 +168,14 @@ impl RenderPassDescriptor {
         #[unsafe(method_family = none)]
         pub fn rasterization_rate_map(
             &self,
-        ) -> Option<Retained<ProtocolObject<dyn RasterizationRateMap>>>;
+        ) -> Option<Retained<ProtocolObject<dyn MTLRasterizationRateMap>>>;
 
         /// Setter for [`rasterization_rate_map`][Self::rasterization_rate_map].
         #[unsafe(method(setRasterizationRateMap:))]
         #[unsafe(method_family = none)]
         pub fn set_rasterization_rate_map(
             &self,
-            map: Option<&ProtocolObject<dyn RasterizationRateMap>>,
+            map: Option<&ProtocolObject<dyn MTLRasterizationRateMap>>,
         );
 
         /// An array of sample buffers and associated sample indices.
@@ -180,21 +183,21 @@ impl RenderPassDescriptor {
         #[unsafe(method_family = none)]
         pub fn sample_buffer_attachments(
             &self,
-        ) -> Retained<RenderPassSampleBufferAttachmentDescriptorArray>;
+        ) -> Retained<MTLRenderPassSampleBufferAttachmentDescriptorArray>;
 
         /// Specifies if Metal accumulates visibility results between render encoders or resets them.
         #[unsafe(method(visibilityResultType))]
         #[unsafe(method_family = none)]
-        pub unsafe fn visibility_result_type(&self) -> VisibilityResultType;
+        pub unsafe fn visibility_result_type(&self) -> MTLVisibilityResultType;
 
         /// Setter for [`visibility_result_type`][Self::visibility_result_type].
         #[unsafe(method(setVisibilityResultType:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_visibility_result_type(&self, v: VisibilityResultType);
+        pub unsafe fn set_visibility_result_type(&self, v: MTLVisibilityResultType);
     );
 }
 
-impl RenderPassDescriptor {
+impl MTLRenderPassDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

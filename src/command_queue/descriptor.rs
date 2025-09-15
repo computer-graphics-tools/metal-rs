@@ -5,29 +5,28 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSUInteger};
 
-use crate::log_state::LogState;
+use crate::log_state::MTLLogState;
 
 extern_class!(
     /// Descriptor for creating a `CommandQueue`.
     #[unsafe(super(NSObject))]
-    #[name = "MTLCommandQueueDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct CommandQueueDescriptor;
+    pub struct MTLCommandQueueDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for CommandQueueDescriptor {}
+    unsafe impl NSCopying for MTLCommandQueueDescriptor {}
 );
 
-unsafe impl CopyingHelper for CommandQueueDescriptor {
+unsafe impl CopyingHelper for MTLCommandQueueDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for CommandQueueDescriptor {}
+    unsafe impl NSObjectProtocol for MTLCommandQueueDescriptor {}
 );
 
-impl CommandQueueDescriptor {
+impl MTLCommandQueueDescriptor {
     extern_methods!(
         /// Specify upper bound on uncompleted command buffers that may be enqueued on this queue.
         #[unsafe(method(maxCommandBufferCount))]
@@ -41,15 +40,15 @@ impl CommandQueueDescriptor {
         /// Specify the `LogState` to enable shader logging.
         #[unsafe(method(logState))]
         #[unsafe(method_family = none)]
-        pub fn log_state(&self) -> Option<Retained<ProtocolObject<dyn LogState>>>;
+        pub fn log_state(&self) -> Option<Retained<ProtocolObject<dyn MTLLogState>>>;
 
         #[unsafe(method(setLogState:))]
         #[unsafe(method_family = none)]
-        pub fn set_log_state(&self, log_state: Option<&ProtocolObject<dyn LogState>>);
+        pub fn set_log_state(&self, log_state: Option<&ProtocolObject<dyn MTLLogState>>);
     );
 }
 
-impl CommandQueueDescriptor {
+impl MTLCommandQueueDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

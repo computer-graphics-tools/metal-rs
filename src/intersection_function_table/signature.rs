@@ -3,9 +3,9 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Signature defining what data is provided to an intersection function (from `MTLIntersectionFunctionSignature`).
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct IntersectionFunctionSignature(pub u64);
+pub struct MTLIntersectionFunctionSignature(pub u64);
 bitflags::bitflags! {
-    impl IntersectionFunctionSignature: u64 {
+    impl MTLIntersectionFunctionSignature: u64 {
         const None = 0;
         const Instancing = 1<<0;
         const TriangleData = 1<<1;
@@ -20,10 +20,10 @@ bitflags::bitflags! {
     }
 }
 
-unsafe impl Encode for IntersectionFunctionSignature {
+unsafe impl Encode for MTLIntersectionFunctionSignature {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for IntersectionFunctionSignature {
+unsafe impl RefEncode for MTLIntersectionFunctionSignature {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

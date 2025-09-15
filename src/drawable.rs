@@ -12,14 +12,13 @@ use objc2_foundation::NSObjectProtocol;
 /// the first command buffer of your frame rendering and GPUEndTime of your last
 /// frame rendering to calculate the frame interval.
 pub type DrawablePresentedHandler =
-    *mut block2::DynBlock<dyn Fn(NonNull<ProtocolObject<dyn Drawable>>) >;
+    *mut block2::DynBlock<dyn Fn(NonNull<ProtocolObject<dyn MTLDrawable>>)>;
 
 extern_protocol!(
     /// All "drawable" objects (such as those coming from CAMetalLayer) are expected to conform to this protocol.
     ///
     /// Mirrors `MTLDrawable`.
-    #[name = "MTLDrawable"]
-    pub unsafe trait Drawable: NSObjectProtocol {
+    pub unsafe trait MTLDrawable: NSObjectProtocol {
         /// Present this drawable immediately.
         #[unsafe(method(present))]
         #[unsafe(method_family = none)]
@@ -66,5 +65,3 @@ extern_protocol!(
         fn drawable_id(&self) -> usize;
     }
 );
-
-

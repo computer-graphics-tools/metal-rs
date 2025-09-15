@@ -1,39 +1,38 @@
 use objc2::{extern_class, extern_conformance, extern_methods, runtime::NSObject};
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use super::AttributeFormat;
+use super::MTLAttributeFormat;
 
 extern_class!(
     /// Attribute descriptor
     #[unsafe(super(NSObject))]
-    #[name = "MTLAttributeDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct AttributeDescriptor;
+    pub struct MTLAttributeDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for AttributeDescriptor {}
+    unsafe impl NSCopying for MTLAttributeDescriptor {}
 );
 
-unsafe impl CopyingHelper for AttributeDescriptor {
+unsafe impl CopyingHelper for MTLAttributeDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for AttributeDescriptor {}
+    unsafe impl NSObjectProtocol for MTLAttributeDescriptor {}
 );
 
-impl AttributeDescriptor {
+impl MTLAttributeDescriptor {
     extern_methods!(
         /// The attribute data format.
         #[unsafe(method(format))]
         #[unsafe(method_family = none)]
-        pub fn format(&self) -> AttributeFormat;
+        pub fn format(&self) -> MTLAttributeFormat;
 
         /// Setter for [`format`][Self::format].
         #[unsafe(method(setFormat:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_format(&self, format: AttributeFormat);
+        pub unsafe fn set_format(&self, format: MTLAttributeFormat);
 
         /// Byte offset of this attribute within the vertex.
         #[unsafe(method(offset))]

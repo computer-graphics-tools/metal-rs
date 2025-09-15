@@ -4,18 +4,17 @@ use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSRange, NSString};
 
 use crate::{
-    AccelerationStructure, Buffer, ComputePipelineState, DepthStencilState, Device,
-    IndirectCommandBuffer, RenderPipelineState, SamplerState, Texture,
+    MTLAccelerationStructure, MTLBuffer, MTLComputePipelineState, MTLDepthStencilState, MTLDevice,
+    MTLIndirectCommandBuffer, MTLRenderPipelineState, MTLSamplerState, MTLTexture,
 };
 
 extern_protocol!(
     /// Encodes buffer, texture, sampler, pipeline, and constant data into a buffer.
-    #[name = "MTLArgumentEncoder"]
-    pub unsafe trait ArgumentEncoder: NSObjectProtocol {
+    pub unsafe trait MTLArgumentEncoder: NSObjectProtocol {
         /// The device this argument encoder was created against.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
-        unsafe fn device(&self) -> Retained<ProtocolObject<dyn Device>>;
+        unsafe fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
 
         /// A string to help identify this object.
         #[unsafe(method(label))]
@@ -42,7 +41,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_argument_buffer(
             &self,
-            argument_buffer: Option<&ProtocolObject<dyn Buffer>>,
+            argument_buffer: Option<&ProtocolObject<dyn MTLBuffer>>,
             offset: usize,
         );
 
@@ -51,7 +50,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_argument_buffer_with_array_element(
             &self,
-            argument_buffer: Option<&ProtocolObject<dyn Buffer>>,
+            argument_buffer: Option<&ProtocolObject<dyn MTLBuffer>>,
             start_offset: usize,
             array_element: usize,
         );
@@ -61,7 +60,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_buffer(
             &self,
-            buffer: Option<&ProtocolObject<dyn Buffer>>,
+            buffer: Option<&ProtocolObject<dyn MTLBuffer>>,
             offset: usize,
             index: usize,
         );
@@ -72,7 +71,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_buffers(
             &self,
-            buffers: NonNull<*const ProtocolObject<dyn Buffer>>,
+            buffers: NonNull<*const ProtocolObject<dyn MTLBuffer>>,
             offsets: NonNull<usize>,
             range: NSRange,
         );
@@ -80,7 +79,11 @@ extern_protocol!(
         /// Set a texture at the given bind point index.
         #[unsafe(method(setTexture:atIndex:))]
         #[unsafe(method_family = none)]
-        unsafe fn set_texture(&self, texture: Option<&ProtocolObject<dyn Texture>>, index: usize);
+        unsafe fn set_texture(
+            &self,
+            texture: Option<&ProtocolObject<dyn MTLTexture>>,
+            index: usize,
+        );
 
         /// Set an array of textures at the given bind point index range.
         /// Safety: `textures` must be a valid pointer.
@@ -88,7 +91,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_textures(
             &self,
-            textures: NonNull<*const ProtocolObject<dyn Texture>>,
+            textures: NonNull<*const ProtocolObject<dyn MTLTexture>>,
             range: NSRange,
         );
 
@@ -97,7 +100,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_sampler_state(
             &self,
-            sampler: Option<&ProtocolObject<dyn SamplerState>>,
+            sampler: Option<&ProtocolObject<dyn MTLSamplerState>>,
             index: usize,
         );
 
@@ -107,7 +110,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_sampler_states(
             &self,
-            samplers: NonNull<*const ProtocolObject<dyn SamplerState>>,
+            samplers: NonNull<*const ProtocolObject<dyn MTLSamplerState>>,
             range: NSRange,
         );
 
@@ -122,7 +125,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_render_pipeline_state(
             &self,
-            pipeline: Option<&ProtocolObject<dyn RenderPipelineState>>,
+            pipeline: Option<&ProtocolObject<dyn MTLRenderPipelineState>>,
             index: usize,
         );
 
@@ -132,7 +135,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_render_pipeline_states(
             &self,
-            pipelines: NonNull<*const ProtocolObject<dyn RenderPipelineState>>,
+            pipelines: NonNull<*const ProtocolObject<dyn MTLRenderPipelineState>>,
             range: NSRange,
         );
 
@@ -141,7 +144,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_compute_pipeline_state(
             &self,
-            pipeline: Option<&ProtocolObject<dyn ComputePipelineState>>,
+            pipeline: Option<&ProtocolObject<dyn MTLComputePipelineState>>,
             index: usize,
         );
 
@@ -151,7 +154,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_compute_pipeline_states(
             &self,
-            pipelines: NonNull<*const ProtocolObject<dyn ComputePipelineState>>,
+            pipelines: NonNull<*const ProtocolObject<dyn MTLComputePipelineState>>,
             range: NSRange,
         );
 
@@ -160,7 +163,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_indirect_command_buffer(
             &self,
-            indirect_command_buffer: Option<&ProtocolObject<dyn IndirectCommandBuffer>>,
+            indirect_command_buffer: Option<&ProtocolObject<dyn MTLIndirectCommandBuffer>>,
             index: usize,
         );
 
@@ -170,7 +173,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_indirect_command_buffers(
             &self,
-            buffers: NonNull<*const ProtocolObject<dyn IndirectCommandBuffer>>,
+            buffers: NonNull<*const ProtocolObject<dyn MTLIndirectCommandBuffer>>,
             range: NSRange,
         );
 
@@ -179,7 +182,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_acceleration_structure(
             &self,
-            acceleration_structure: Option<&ProtocolObject<dyn AccelerationStructure>>,
+            acceleration_structure: Option<&ProtocolObject<dyn MTLAccelerationStructure>>,
             index: usize,
         );
 
@@ -189,14 +192,14 @@ extern_protocol!(
         unsafe fn new_argument_encoder_for_buffer_at_index(
             &self,
             index: usize,
-        ) -> Option<Retained<ProtocolObject<dyn super::ArgumentEncoder>>>;
+        ) -> Option<Retained<ProtocolObject<dyn super::MTLArgumentEncoder>>>;
 
         /// Set a visible function table at the given buffer index.
         #[unsafe(method(setVisibleFunctionTable:atIndex:))]
         #[unsafe(method_family = none)]
         unsafe fn set_visible_function_table(
             &self,
-            visible_function_table: Option<&ProtocolObject<dyn crate::VisibleFunctionTable>>,
+            visible_function_table: Option<&ProtocolObject<dyn crate::MTLVisibleFunctionTable>>,
             index: usize,
         );
 
@@ -207,7 +210,7 @@ extern_protocol!(
         unsafe fn set_visible_function_tables(
             &self,
             visible_function_tables: NonNull<
-                *const ProtocolObject<dyn crate::VisibleFunctionTable>,
+                *const ProtocolObject<dyn crate::MTLVisibleFunctionTable>,
             >,
             range: NSRange,
         );
@@ -218,7 +221,7 @@ extern_protocol!(
         unsafe fn set_intersection_function_table(
             &self,
             intersection_function_table: Option<
-                &ProtocolObject<dyn crate::IntersectionFunctionTable>,
+                &ProtocolObject<dyn crate::MTLIntersectionFunctionTable>,
             >,
             index: usize,
         );
@@ -230,7 +233,7 @@ extern_protocol!(
         unsafe fn set_intersection_function_tables(
             &self,
             intersection_function_tables: NonNull<
-                *const ProtocolObject<dyn crate::IntersectionFunctionTable>,
+                *const ProtocolObject<dyn crate::MTLIntersectionFunctionTable>,
             >,
             range: NSRange,
         );
@@ -240,7 +243,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_depth_stencil_state(
             &self,
-            depth_stencil_state: Option<&ProtocolObject<dyn DepthStencilState>>,
+            depth_stencil_state: Option<&ProtocolObject<dyn MTLDepthStencilState>>,
             index: usize,
         );
 
@@ -250,7 +253,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_depth_stencil_states(
             &self,
-            depth_stencil_states: NonNull<*const ProtocolObject<dyn DepthStencilState>>,
+            depth_stencil_states: NonNull<*const ProtocolObject<dyn MTLDepthStencilState>>,
             range: NSRange,
         );
     }

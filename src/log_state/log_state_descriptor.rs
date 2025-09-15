@@ -5,38 +5,37 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSInteger, NSObjectProtocol};
 
-use super::LogLevel;
+use super::MTLLogLevel;
 
 extern_class!(
     /// Descriptor for creating a `LogState`.
     #[unsafe(super(NSObject))]
-    #[name = "MTLLogStateDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct LogStateDescriptor;
+    pub struct MTLLogStateDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for LogStateDescriptor {}
+    unsafe impl NSCopying for MTLLogStateDescriptor {}
 );
 
-unsafe impl CopyingHelper for LogStateDescriptor {
+unsafe impl CopyingHelper for MTLLogStateDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for LogStateDescriptor {}
+    unsafe impl NSObjectProtocol for MTLLogStateDescriptor {}
 );
 
-impl LogStateDescriptor {
+impl MTLLogStateDescriptor {
     extern_methods!(
         /// Minimum level of logs that will be printed.
         #[unsafe(method(level))]
         #[unsafe(method_family = none)]
-        pub fn level(&self) -> LogLevel;
+        pub fn level(&self) -> MTLLogLevel;
 
         #[unsafe(method(setLevel:))]
         #[unsafe(method_family = none)]
-        pub fn set_level(&self, level: LogLevel);
+        pub fn set_level(&self, level: MTLLogLevel);
 
         /// Size of the GPU buffer for shader logging (minimum 1KB).
         #[unsafe(method(bufferSize))]
@@ -49,7 +48,7 @@ impl LogStateDescriptor {
     );
 }
 
-impl LogStateDescriptor {
+impl MTLLogStateDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

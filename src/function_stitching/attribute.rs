@@ -3,22 +3,20 @@ use objc2_foundation::NSObjectProtocol;
 
 extern_protocol!(
     /// Attribute applied to the produced stitched function.
-    #[name = "MTLFunctionStitchingAttribute"]
-    pub unsafe trait FunctionStitchingAttribute: NSObjectProtocol {}
+    pub unsafe trait MTLFunctionStitchingAttribute: NSObjectProtocol {}
 );
 
 extern_class!(
     /// Applies the `__attribute__((always_inline))` attribute to the produced stitched function.
     #[unsafe(super(NSObject))]
-    #[name = "MTLFunctionStitchingAttributeAlwaysInline"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct FunctionStitchingAttributeAlwaysInline;
+    pub struct MTLFunctionStitchingAttributeAlwaysInline;
 );
 
 extern_conformance!(
-    unsafe impl FunctionStitchingAttribute for FunctionStitchingAttributeAlwaysInline {}
+    unsafe impl MTLFunctionStitchingAttribute for MTLFunctionStitchingAttributeAlwaysInline {}
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for FunctionStitchingAttributeAlwaysInline {}
+    unsafe impl NSObjectProtocol for MTLFunctionStitchingAttributeAlwaysInline {}
 );

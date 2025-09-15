@@ -5,40 +5,39 @@ use objc2::{
 };
 use objc2_foundation::NSObjectProtocol;
 
-use super::BlitPassSampleBufferAttachmentDescriptor;
+use super::MTLBlitPassSampleBufferAttachmentDescriptor;
 
 extern_class!(
     /// Array of `BlitPassSampleBufferAttachmentDescriptor` objects.
     #[unsafe(super(NSObject))]
-    #[name = "MTLBlitPassSampleBufferAttachmentDescriptorArray"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct BlitPassSampleBufferAttachmentDescriptorArray;
+    pub struct MTLBlitPassSampleBufferAttachmentDescriptorArray;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for BlitPassSampleBufferAttachmentDescriptorArray {}
+    unsafe impl NSObjectProtocol for MTLBlitPassSampleBufferAttachmentDescriptorArray {}
 );
 
-impl BlitPassSampleBufferAttachmentDescriptorArray {
+impl MTLBlitPassSampleBufferAttachmentDescriptorArray {
     extern_methods!(
         #[unsafe(method(objectAtIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn object_at_indexed_subscript(
             &self,
             attachment_index: usize,
-        ) -> Retained<BlitPassSampleBufferAttachmentDescriptor>;
+        ) -> Retained<MTLBlitPassSampleBufferAttachmentDescriptor>;
 
         #[unsafe(method(setObject:atIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_object_at_indexed_subscript(
             &self,
-            attachment: Option<&BlitPassSampleBufferAttachmentDescriptor>,
+            attachment: Option<&MTLBlitPassSampleBufferAttachmentDescriptor>,
             attachment_index: usize,
         );
     );
 }
 
-impl BlitPassSampleBufferAttachmentDescriptorArray {
+impl MTLBlitPassSampleBufferAttachmentDescriptorArray {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

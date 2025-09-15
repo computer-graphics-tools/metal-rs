@@ -5,41 +5,40 @@ use objc2::{
 };
 use objc2_foundation::NSObjectProtocol;
 
-use super::sample_buffer_attachment_descriptor::ResourceStatePassSampleBufferAttachmentDescriptor;
+use super::sample_buffer_attachment_descriptor::MTLResourceStatePassSampleBufferAttachmentDescriptor;
 
 extern_class!(
     /// Array of sample buffer attachment descriptors
     #[unsafe(super(NSObject))]
-    #[name = "MTLResourceStatePassSampleBufferAttachmentDescriptorArray"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct ResourceStatePassSampleBufferAttachmentDescriptorArray;
+    pub struct MTLResourceStatePassSampleBufferAttachmentDescriptorArray;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for ResourceStatePassSampleBufferAttachmentDescriptorArray {}
+    unsafe impl NSObjectProtocol for MTLResourceStatePassSampleBufferAttachmentDescriptorArray {}
 );
 
-impl ResourceStatePassSampleBufferAttachmentDescriptorArray {
+impl MTLResourceStatePassSampleBufferAttachmentDescriptorArray {
     extern_methods!(
         #[unsafe(method(objectAtIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn object_at_indexed_subscript(
             &self,
             attachment_index: usize,
-        ) -> Retained<ResourceStatePassSampleBufferAttachmentDescriptor>;
+        ) -> Retained<MTLResourceStatePassSampleBufferAttachmentDescriptor>;
 
         #[unsafe(method(setObject:atIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_object_at_indexed_subscript(
             &self,
-            attachment: Option<&ResourceStatePassSampleBufferAttachmentDescriptor>,
+            attachment: Option<&MTLResourceStatePassSampleBufferAttachmentDescriptor>,
             attachment_index: usize,
         );
     );
 }
 
 /// Methods declared on superclass `NSObject`.
-impl ResourceStatePassSampleBufferAttachmentDescriptorArray {
+impl MTLResourceStatePassSampleBufferAttachmentDescriptorArray {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

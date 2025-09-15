@@ -5,30 +5,31 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSArray, NSCopying, NSObjectProtocol, NSString};
 
-use super::{PrimitiveTopologyClass, RenderPipelineColorAttachmentDescriptorArray};
-use crate::{PipelineBufferDescriptorArray, PixelFormat, ShaderValidation, VertexDescriptor};
+use super::{MTLPrimitiveTopologyClass, MTLRenderPipelineColorAttachmentDescriptorArray};
+use crate::{
+    MTLPipelineBufferDescriptorArray, MTLPixelFormat, MTLShaderValidation, MTLVertexDescriptor,
+};
 
 extern_class!(
     /// Descriptor for creating a `RenderPipelineState`.
     #[unsafe(super(NSObject))]
-    #[name = "MTLRenderPipelineDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct RenderPipelineDescriptor;
+    pub struct MTLRenderPipelineDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for RenderPipelineDescriptor {}
+    unsafe impl NSCopying for MTLRenderPipelineDescriptor {}
 );
 
-unsafe impl CopyingHelper for RenderPipelineDescriptor {
+unsafe impl CopyingHelper for MTLRenderPipelineDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for RenderPipelineDescriptor {}
+    unsafe impl NSObjectProtocol for MTLRenderPipelineDescriptor {}
 );
 
-impl RenderPipelineDescriptor {
+impl MTLRenderPipelineDescriptor {
     extern_methods!(
         #[unsafe(method(label))]
         #[unsafe(method_family = none)]
@@ -80,39 +81,41 @@ impl RenderPipelineDescriptor {
 
         #[unsafe(method(colorAttachments))]
         #[unsafe(method_family = none)]
-        pub fn color_attachments(&self) -> Retained<RenderPipelineColorAttachmentDescriptorArray>;
+        pub fn color_attachments(
+            &self,
+        ) -> Retained<MTLRenderPipelineColorAttachmentDescriptorArray>;
 
         #[unsafe(method(depthAttachmentPixelFormat))]
         #[unsafe(method_family = none)]
-        pub fn depth_attachment_pixel_format(&self) -> PixelFormat;
+        pub fn depth_attachment_pixel_format(&self) -> MTLPixelFormat;
 
         #[unsafe(method(setDepthAttachmentPixelFormat:))]
         #[unsafe(method_family = none)]
-        pub fn set_depth_attachment_pixel_format(&self, fmt: PixelFormat);
+        pub fn set_depth_attachment_pixel_format(&self, fmt: MTLPixelFormat);
 
         #[unsafe(method(stencilAttachmentPixelFormat))]
         #[unsafe(method_family = none)]
-        pub fn stencil_attachment_pixel_format(&self) -> PixelFormat;
+        pub fn stencil_attachment_pixel_format(&self) -> MTLPixelFormat;
 
         #[unsafe(method(setStencilAttachmentPixelFormat:))]
         #[unsafe(method_family = none)]
-        pub fn set_stencil_attachment_pixel_format(&self, fmt: PixelFormat);
+        pub fn set_stencil_attachment_pixel_format(&self, fmt: MTLPixelFormat);
 
         #[unsafe(method(inputPrimitiveTopology))]
         #[unsafe(method_family = none)]
-        pub fn input_primitive_topology(&self) -> PrimitiveTopologyClass;
+        pub fn input_primitive_topology(&self) -> MTLPrimitiveTopologyClass;
 
         #[unsafe(method(setInputPrimitiveTopology:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_input_primitive_topology(&self, topo: PrimitiveTopologyClass);
+        pub unsafe fn set_input_primitive_topology(&self, topo: MTLPrimitiveTopologyClass);
 
         #[unsafe(method(vertexDescriptor))]
         #[unsafe(method_family = none)]
-        pub fn vertex_descriptor(&self) -> Option<Retained<VertexDescriptor>>;
+        pub fn vertex_descriptor(&self) -> Option<Retained<MTLVertexDescriptor>>;
 
         #[unsafe(method(setVertexDescriptor:))]
         #[unsafe(method_family = none)]
-        pub fn set_vertex_descriptor(&self, vertex_descriptor: Option<&VertexDescriptor>);
+        pub fn set_vertex_descriptor(&self, vertex_descriptor: Option<&MTLVertexDescriptor>);
 
         #[unsafe(method(supportIndirectCommandBuffers))]
         #[unsafe(method_family = none)]
@@ -128,15 +131,15 @@ impl RenderPipelineDescriptor {
 
         #[unsafe(method(shaderValidation))]
         #[unsafe(method_family = none)]
-        pub unsafe fn shader_validation(&self) -> ShaderValidation;
+        pub unsafe fn shader_validation(&self) -> MTLShaderValidation;
 
         #[unsafe(method(setShaderValidation:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_shader_validation(&self, v: ShaderValidation);
+        pub unsafe fn set_shader_validation(&self, v: MTLShaderValidation);
     );
 }
 
-impl RenderPipelineDescriptor {
+impl MTLRenderPipelineDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

@@ -5,45 +5,44 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSString};
 
-use super::{RasterizationRateLayerArray, RasterizationRateLayerDescriptor};
-use crate::types::Size;
+use super::{MTLRasterizationRateLayerArray, MTLRasterizationRateLayerDescriptor};
+use crate::types::MTLSize;
 
 extern_class!(
     /// Describes a rasterization rate map containing layer descriptors.
     #[unsafe(super(NSObject))]
-    #[name = "MTLRasterizationRateMapDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct RasterizationRateMapDescriptor;
+    pub struct MTLRasterizationRateMapDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for RasterizationRateMapDescriptor {}
+    unsafe impl NSCopying for MTLRasterizationRateMapDescriptor {}
 );
 
-unsafe impl CopyingHelper for RasterizationRateMapDescriptor {
+unsafe impl CopyingHelper for MTLRasterizationRateMapDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for RasterizationRateMapDescriptor {}
+    unsafe impl NSObjectProtocol for MTLRasterizationRateMapDescriptor {}
 );
 
-impl RasterizationRateMapDescriptor {
+impl MTLRasterizationRateMapDescriptor {
     extern_methods!(
         /// Convenience descriptor creation without layers.
         #[unsafe(method(rasterizationRateMapDescriptorWithScreenSize:))]
         #[unsafe(method_family = none)]
         pub unsafe fn rasterization_rate_map_descriptor_with_screen_size(
-            screen_size: Size,
-        ) -> Retained<RasterizationRateMapDescriptor>;
+            screen_size: MTLSize,
+        ) -> Retained<MTLRasterizationRateMapDescriptor>;
 
         /// Convenience descriptor creation for a single layer.
         #[unsafe(method(rasterizationRateMapDescriptorWithScreenSize:layer:))]
         #[unsafe(method_family = none)]
         pub unsafe fn rasterization_rate_map_descriptor_with_screen_size_layer(
-            screen_size: Size,
-            layer: &RasterizationRateLayerDescriptor,
-        ) -> Retained<RasterizationRateMapDescriptor>;
+            screen_size: MTLSize,
+            layer: &MTLRasterizationRateLayerDescriptor,
+        ) -> Retained<MTLRasterizationRateMapDescriptor>;
 
         /// Returns the layer descriptor for the given index, if any.
         #[unsafe(method(layerAtIndex:))]
@@ -51,31 +50,31 @@ impl RasterizationRateMapDescriptor {
         pub unsafe fn layer_at_index(
             &self,
             layer_index: usize,
-        ) -> Option<Retained<RasterizationRateLayerDescriptor>>;
+        ) -> Option<Retained<MTLRasterizationRateLayerDescriptor>>;
 
         /// Sets the layer descriptor for the given index.
         #[unsafe(method(setLayer:atIndex:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_layer_at_index(
             &self,
-            layer: Option<&RasterizationRateLayerDescriptor>,
+            layer: Option<&MTLRasterizationRateLayerDescriptor>,
             layer_index: usize,
         );
 
         /// Access the modifiable array of layers.
         #[unsafe(method(layers))]
         #[unsafe(method_family = none)]
-        pub unsafe fn layers(&self) -> Retained<RasterizationRateLayerArray>;
+        pub unsafe fn layers(&self) -> Retained<MTLRasterizationRateLayerArray>;
 
         /// The screen size in pixels of the region where variable rasterization is applied.
         #[unsafe(method(screenSize))]
         #[unsafe(method_family = none)]
-        pub unsafe fn screen_size(&self) -> Size;
+        pub unsafe fn screen_size(&self) -> MTLSize;
 
         /// Setter for [`screen_size`][Self::screen_size].
         #[unsafe(method(setScreenSize:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_screen_size(&self, screen_size: Size);
+        pub unsafe fn set_screen_size(&self, screen_size: MTLSize);
 
         /// Optional label for the descriptor.
         #[unsafe(method(label))]
@@ -95,7 +94,7 @@ impl RasterizationRateMapDescriptor {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl RasterizationRateMapDescriptor {
+impl MTLRasterizationRateMapDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

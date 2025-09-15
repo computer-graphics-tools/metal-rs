@@ -1,2 +1,2 @@
 /// 64-bit GPU virtual address.
-pub type GpuAddress = u64;
+pub type MTLGpuAddress = u64;

@@ -5,39 +5,38 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use super::types::IndirectCommandType;
+use super::types::MTLIndirectCommandType;
 
 extern_class!(
     /// Descriptor specifying limits and features for an indirect command buffer.
     #[unsafe(super(NSObject))]
-    #[name = "MTLIndirectCommandBufferDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct IndirectCommandBufferDescriptor;
+    pub struct MTLIndirectCommandBufferDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for IndirectCommandBufferDescriptor {}
+    unsafe impl NSCopying for MTLIndirectCommandBufferDescriptor {}
 );
 
-unsafe impl CopyingHelper for IndirectCommandBufferDescriptor {
+unsafe impl CopyingHelper for MTLIndirectCommandBufferDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for IndirectCommandBufferDescriptor {}
+    unsafe impl NSObjectProtocol for MTLIndirectCommandBufferDescriptor {}
 );
 
-impl IndirectCommandBufferDescriptor {
+impl MTLIndirectCommandBufferDescriptor {
     extern_methods!(
         /// Command types that may be encoded.
         #[unsafe(method(commandTypes))]
         #[unsafe(method_family = none)]
-        pub fn command_types(&self) -> IndirectCommandType;
+        pub fn command_types(&self) -> MTLIndirectCommandType;
 
         /// Setter for [`command_types`][Self::command_types].
         #[unsafe(method(setCommandTypes:))]
         #[unsafe(method_family = none)]
-        pub fn set_command_types(&self, command_types: IndirectCommandType);
+        pub fn set_command_types(&self, command_types: MTLIndirectCommandType);
 
         /// Whether pipelines are inherited from the encoder.
         #[unsafe(method(inheritPipelineState))]
@@ -222,7 +221,7 @@ impl IndirectCommandBufferDescriptor {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl IndirectCommandBufferDescriptor {
+impl MTLIndirectCommandBufferDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Attribute data formats (ported from `MTLAttributeFormat`).
 #[repr(u64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum AttributeFormat {
+pub enum MTLAttributeFormat {
     Invalid = 0,
     UChar2 = 1,
     UChar3 = 2,
@@ -60,10 +60,10 @@ pub enum AttributeFormat {
     FloatRGB9E5 = 55,
 }
 
-unsafe impl Encode for AttributeFormat {
+unsafe impl Encode for MTLAttributeFormat {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for AttributeFormat {
+unsafe impl RefEncode for MTLAttributeFormat {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

@@ -6,53 +6,55 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSString};
 
-use super::{AddressMode, BorderColor, MinMagFilter, MipFilter, ReductionMode};
+use super::{
+    MTLSamplerAddressMode, MTLSamplerBorderColor, MTLSamplerMinMagFilter, MTLSamplerMipFilter,
+    MTLSamplerReductionMode,
+};
 
 extern_class!(
     /// A mutable descriptor used to configure a sampler.
     #[unsafe(super(NSObject))]
-    #[name = "MTLSamplerDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct SamplerDescriptor;
+    pub struct MTLSamplerDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for SamplerDescriptor {}
+    unsafe impl NSCopying for MTLSamplerDescriptor {}
 );
 
-unsafe impl CopyingHelper for SamplerDescriptor {
+unsafe impl CopyingHelper for MTLSamplerDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for SamplerDescriptor {}
+    unsafe impl NSObjectProtocol for MTLSamplerDescriptor {}
 );
 
-impl SamplerDescriptor {
+impl MTLSamplerDescriptor {
     extern_methods!(
         #[unsafe(method(minFilter))]
         #[unsafe(method_family = none)]
-        pub fn min_filter(&self) -> MinMagFilter;
+        pub fn min_filter(&self) -> MTLSamplerMinMagFilter;
 
         #[unsafe(method(setMinFilter:))]
         #[unsafe(method_family = none)]
-        pub fn set_min_filter(&self, min_filter: MinMagFilter);
+        pub fn set_min_filter(&self, min_filter: MTLSamplerMinMagFilter);
 
         #[unsafe(method(magFilter))]
         #[unsafe(method_family = none)]
-        pub fn mag_filter(&self) -> MinMagFilter;
+        pub fn mag_filter(&self) -> MTLSamplerMinMagFilter;
 
         #[unsafe(method(setMagFilter:))]
         #[unsafe(method_family = none)]
-        pub fn set_mag_filter(&self, mag_filter: MinMagFilter);
+        pub fn set_mag_filter(&self, mag_filter: MTLSamplerMinMagFilter);
 
         #[unsafe(method(mipFilter))]
         #[unsafe(method_family = none)]
-        pub fn mip_filter(&self) -> MipFilter;
+        pub fn mip_filter(&self) -> MTLSamplerMipFilter;
 
         #[unsafe(method(setMipFilter:))]
         #[unsafe(method_family = none)]
-        pub fn set_mip_filter(&self, mip_filter: MipFilter);
+        pub fn set_mip_filter(&self, mip_filter: MTLSamplerMipFilter);
 
         #[unsafe(method(maxAnisotropy))]
         #[unsafe(method_family = none)]
@@ -64,43 +66,43 @@ impl SamplerDescriptor {
 
         #[unsafe(method(sAddressMode))]
         #[unsafe(method_family = none)]
-        pub fn s_address_mode(&self) -> AddressMode;
+        pub fn s_address_mode(&self) -> MTLSamplerAddressMode;
 
         #[unsafe(method(setSAddressMode:))]
         #[unsafe(method_family = none)]
-        pub fn set_s_address_mode(&self, mode: AddressMode);
+        pub fn set_s_address_mode(&self, mode: MTLSamplerAddressMode);
 
         #[unsafe(method(tAddressMode))]
         #[unsafe(method_family = none)]
-        pub fn t_address_mode(&self) -> AddressMode;
+        pub fn t_address_mode(&self) -> MTLSamplerAddressMode;
 
         #[unsafe(method(setTAddressMode:))]
         #[unsafe(method_family = none)]
-        pub fn set_t_address_mode(&self, mode: AddressMode);
+        pub fn set_t_address_mode(&self, mode: MTLSamplerAddressMode);
 
         #[unsafe(method(rAddressMode))]
         #[unsafe(method_family = none)]
-        pub fn r_address_mode(&self) -> AddressMode;
+        pub fn r_address_mode(&self) -> MTLSamplerAddressMode;
 
         #[unsafe(method(setRAddressMode:))]
         #[unsafe(method_family = none)]
-        pub fn set_r_address_mode(&self, mode: AddressMode);
+        pub fn set_r_address_mode(&self, mode: MTLSamplerAddressMode);
 
         #[unsafe(method(borderColor))]
         #[unsafe(method_family = none)]
-        pub fn border_color(&self) -> BorderColor;
+        pub fn border_color(&self) -> MTLSamplerBorderColor;
 
         #[unsafe(method(setBorderColor:))]
         #[unsafe(method_family = none)]
-        pub fn set_border_color(&self, color: BorderColor);
+        pub fn set_border_color(&self, color: MTLSamplerBorderColor);
 
         #[unsafe(method(reductionMode))]
         #[unsafe(method_family = none)]
-        pub unsafe fn reduction_mode(&self) -> ReductionMode;
+        pub unsafe fn reduction_mode(&self) -> MTLSamplerReductionMode;
 
         #[unsafe(method(setReductionMode:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_reduction_mode(&self, mode: ReductionMode);
+        pub unsafe fn set_reduction_mode(&self, mode: MTLSamplerReductionMode);
 
         #[unsafe(method(normalizedCoordinates))]
         #[unsafe(method_family = none)]
@@ -161,7 +163,7 @@ impl SamplerDescriptor {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl SamplerDescriptor {
+impl MTLSamplerDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

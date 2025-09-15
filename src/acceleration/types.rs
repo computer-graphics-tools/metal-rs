@@ -4,30 +4,30 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Controls the acceleration structure refit operation (from `MTLAccelerationStructureRefitOptions`).
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct AccelerationStructureRefitOptions(pub u64);
+pub struct MTLAccelerationStructureRefitOptions(pub u64);
 
 bitflags::bitflags! {
-    impl AccelerationStructureRefitOptions: u64 {
+    impl MTLAccelerationStructureRefitOptions: u64 {
         const VertexData = 1<<0;
         const PerPrimitiveData = 1<<1;
     }
 }
 
-unsafe impl Encode for AccelerationStructureRefitOptions {
+unsafe impl Encode for MTLAccelerationStructureRefitOptions {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for AccelerationStructureRefitOptions {
+unsafe impl RefEncode for MTLAccelerationStructureRefitOptions {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 /// Usage flags for an acceleration structure (from `MTLAccelerationStructureUsage`).
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct AccelerationStructureUsage(pub u64);
+pub struct MTLAccelerationStructureUsage(pub u64);
 
 bitflags::bitflags! {
-    impl AccelerationStructureUsage: u64 {
+    impl MTLAccelerationStructureUsage: u64 {
         const None = 0;
         const Refit = 1<<0;
         const PreferFastBuild = 1<<1;
@@ -37,21 +37,21 @@ bitflags::bitflags! {
     }
 }
 
-unsafe impl Encode for AccelerationStructureUsage {
+unsafe impl Encode for MTLAccelerationStructureUsage {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for AccelerationStructureUsage {
+unsafe impl RefEncode for MTLAccelerationStructureUsage {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 /// Per-instance options (from `MTLAccelerationStructureInstanceOptions`).
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct AccelerationStructureInstanceOptions(pub u32);
+pub struct MTLAccelerationStructureInstanceOptions(pub u32);
 
 bitflags::bitflags! {
-    impl AccelerationStructureInstanceOptions: u32 {
+    impl MTLAccelerationStructureInstanceOptions: u32 {
         const None = 0;
         const DisableTriangleCulling = 1<<0;
         const TriangleFrontFacingWindingCounterClockwise = 1<<1;
@@ -60,106 +60,106 @@ bitflags::bitflags! {
     }
 }
 
-unsafe impl Encode for AccelerationStructureInstanceOptions {
+unsafe impl Encode for MTLAccelerationStructureInstanceOptions {
     const ENCODING: Encoding = u32::ENCODING;
 }
 
-unsafe impl RefEncode for AccelerationStructureInstanceOptions {
+unsafe impl RefEncode for MTLAccelerationStructureInstanceOptions {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 /// Matrix layout (from `MTLMatrixLayout`).
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum MatrixLayout {
+pub enum MTLMatrixLayout {
     ColumnMajor = 0,
     RowMajor = 1,
 }
 
-unsafe impl Encode for MatrixLayout {
+unsafe impl Encode for MTLMatrixLayout {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for MatrixLayout {
+unsafe impl RefEncode for MTLMatrixLayout {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 /// Motion border mode (from `MTLMotionBorderMode`).
 #[repr(u32)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum MotionBorderMode {
+pub enum MTLMotionBorderMode {
     Clamp = 0,
     Vanish = 1,
 }
 
-unsafe impl Encode for MotionBorderMode {
+unsafe impl Encode for MTLMotionBorderMode {
     const ENCODING: Encoding = u32::ENCODING;
 }
 
-unsafe impl RefEncode for MotionBorderMode {
+unsafe impl RefEncode for MTLMotionBorderMode {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 /// Transform type (from `MTLTransformType`).
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum TransformType {
+pub enum MTLTransformType {
     PackedFloat4x3 = 0,
     Component = 1,
 }
 
-unsafe impl Encode for TransformType {
+unsafe impl Encode for MTLTransformType {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for TransformType {
+unsafe impl RefEncode for MTLTransformType {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 /// Curve type (from `MTLCurveType`).
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum CurveType {
+pub enum MTLCurveType {
     Round = 0,
     Flat = 1,
 }
 
-unsafe impl Encode for CurveType {
+unsafe impl Encode for MTLCurveType {
     const ENCODING: Encoding = u64::ENCODING;
 }
-unsafe impl RefEncode for CurveType {
+unsafe impl RefEncode for MTLCurveType {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 /// Curve basis (from `MTLCurveBasis`).
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum CurveBasis {
+pub enum MTLCurveBasis {
     BSpline = 0,
     CatmullRom = 1,
     Linear = 2,
     Bezier = 3,
 }
 
-unsafe impl Encode for CurveBasis {
+unsafe impl Encode for MTLCurveBasis {
     const ENCODING: Encoding = u64::ENCODING;
 }
-unsafe impl RefEncode for CurveBasis {
+unsafe impl RefEncode for MTLCurveBasis {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 /// Curve end caps (from `MTLCurveEndCaps`).
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum CurveEndCaps {
+pub enum MTLCurveEndCaps {
     None = 0,
     Disk = 1,
     Sphere = 2,
 }
 
-unsafe impl Encode for CurveEndCaps {
+unsafe impl Encode for MTLCurveEndCaps {
     const ENCODING: Encoding = u64::ENCODING;
 }
-unsafe impl RefEncode for CurveEndCaps {
+unsafe impl RefEncode for MTLCurveEndCaps {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

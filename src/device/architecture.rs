@@ -10,24 +10,23 @@ extern_class!(
     ///
     /// Apple's docs: `https://developer.apple.com/documentation/metal/mtlarchitecture?language=objc`
     #[unsafe(super(NSObject))]
-    #[name = "MTLArchitecture"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct Architecture;
+    pub struct MTLArchitecture;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for Architecture {}
+    unsafe impl NSCopying for MTLArchitecture {}
 );
 
-unsafe impl CopyingHelper for Architecture {
+unsafe impl CopyingHelper for MTLArchitecture {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for Architecture {}
+    unsafe impl NSObjectProtocol for MTLArchitecture {}
 );
 
-impl Architecture {
+impl MTLArchitecture {
     extern_methods!(
         /// The device's architecture name.
         #[unsafe(method(name))]
@@ -37,7 +36,7 @@ impl Architecture {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl Architecture {
+impl MTLArchitecture {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

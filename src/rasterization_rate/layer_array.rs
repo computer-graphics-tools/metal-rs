@@ -5,21 +5,20 @@ use objc2::{
 };
 use objc2_foundation::NSObjectProtocol;
 
-use super::RasterizationRateLayerDescriptor;
+use super::MTLRasterizationRateLayerDescriptor;
 
 extern_class!(
     /// Mutable array of rasterization rate layer descriptors
     #[unsafe(super(NSObject))]
-    #[name = "MTLRasterizationRateLayerArray"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct RasterizationRateLayerArray;
+    pub struct MTLRasterizationRateLayerArray;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for RasterizationRateLayerArray {}
+    unsafe impl NSObjectProtocol for MTLRasterizationRateLayerArray {}
 );
 
-impl RasterizationRateLayerArray {
+impl MTLRasterizationRateLayerArray {
     extern_methods!(
         /// Returns the layer descriptor for the given index, if any.
         #[unsafe(method(objectAtIndexedSubscript:))]
@@ -27,21 +26,21 @@ impl RasterizationRateLayerArray {
         pub unsafe fn object_at_indexed_subscript(
             &self,
             layer_index: usize,
-        ) -> Option<Retained<RasterizationRateLayerDescriptor>>;
+        ) -> Option<Retained<MTLRasterizationRateLayerDescriptor>>;
 
         /// Sets the layer descriptor at the given index.
         #[unsafe(method(setObject:atIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_object_at_indexed_subscript(
             &self,
-            layer: Option<&RasterizationRateLayerDescriptor>,
+            layer: Option<&MTLRasterizationRateLayerDescriptor>,
             layer_index: usize,
         );
     );
 }
 
 /// Methods declared on superclass `NSObject`.
-impl RasterizationRateLayerArray {
+impl MTLRasterizationRateLayerArray {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

@@ -1,5 +1,5 @@
 mod command_encoder;
 mod types;
 
-pub use command_encoder::CommandEncoder;
-pub use types::{BarrierScope, ResourceUsage, Stages};
+pub use command_encoder::MTLCommandEncoder;
+pub use types::{MTLBarrierScope, MTLResourceUsage, MTLStages};

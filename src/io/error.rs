@@ -4,16 +4,16 @@ use objc2_foundation::NSErrorDomain;
 /// IO error codes (ported from `MTLIOError`).
 #[repr(i64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum IoError {
+pub enum MTLIOError {
     UrlInvalid = 1,
     Internal = 2,
 }
 
-unsafe impl Encode for IoError {
+unsafe impl Encode for MTLIOError {
     const ENCODING: Encoding = i64::ENCODING;
 }
 
-unsafe impl RefEncode for IoError {
+unsafe impl RefEncode for MTLIOError {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 

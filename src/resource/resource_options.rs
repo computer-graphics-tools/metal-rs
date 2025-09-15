@@ -9,7 +9,7 @@ bitflags! {
     /// they are also passed directly into MTLBuffer creation methods.
     #[repr(transparent)]
     #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-    pub struct ResourceOptions: usize {
+    pub struct MTLResourceOptions: usize {
         /// The default CPU cache mode for the resource.
         /// Applications should only investigate changing the cache mode if writing to normally cached buffers is known to
         /// cause performance issues due to cache pollution, as write combined memory can have surprising performance pitfalls.
@@ -55,12 +55,10 @@ bitflags! {
     }
 }
 
-unsafe impl Encode for ResourceOptions {
+unsafe impl Encode for MTLResourceOptions {
     const ENCODING: Encoding = usize::ENCODING;
 }
 
-unsafe impl RefEncode for ResourceOptions {
+unsafe impl RefEncode for MTLResourceOptions {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-

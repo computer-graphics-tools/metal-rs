@@ -5,37 +5,39 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSString};
 
-use super::CounterSet;
+use super::MTLCounterSet;
 
 extern_class!(
     /// Object to represent the counter state.
     #[unsafe(super(NSObject))]
-    #[name = "MTLCounterSampleBufferDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct CounterSampleBufferDescriptor;
+    pub struct MTLCounterSampleBufferDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for CounterSampleBufferDescriptor {}
+    unsafe impl NSCopying for MTLCounterSampleBufferDescriptor {}
 );
 
-unsafe impl CopyingHelper for CounterSampleBufferDescriptor {
+unsafe impl CopyingHelper for MTLCounterSampleBufferDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for CounterSampleBufferDescriptor {}
+    unsafe impl NSObjectProtocol for MTLCounterSampleBufferDescriptor {}
 );
 
-impl CounterSampleBufferDescriptor {
+impl MTLCounterSampleBufferDescriptor {
     extern_methods!(
         #[unsafe(method(counterSet))]
         #[unsafe(method_family = none)]
-        pub unsafe fn counter_set(&self) -> Option<Retained<ProtocolObject<dyn CounterSet>>>;
+        pub unsafe fn counter_set(&self) -> Option<Retained<ProtocolObject<dyn MTLCounterSet>>>;
 
         #[unsafe(method(setCounterSet:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_counter_set(&self, counter_set: Option<&ProtocolObject<dyn CounterSet>>);
+        pub unsafe fn set_counter_set(
+            &self,
+            counter_set: Option<&ProtocolObject<dyn MTLCounterSet>>,
+        );
 
         #[unsafe(method(label))]
         #[unsafe(method_family = none)]
@@ -55,7 +57,7 @@ impl CounterSampleBufferDescriptor {
     );
 }
 
-impl CounterSampleBufferDescriptor {
+impl MTLCounterSampleBufferDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

@@ -4,14 +4,13 @@ use objc2_foundation::NSObjectProtocol;
 extern_class!(
     /// Reflection info for a function in a Metal library.
     #[unsafe(super(NSObject))]
-    #[name = "MTLFunctionReflection"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct FunctionReflection;
+    pub struct MTLFunctionReflection;
 );
 
-unsafe impl Send for FunctionReflection {}
-unsafe impl Sync for FunctionReflection {}
+unsafe impl Send for MTLFunctionReflection {}
+unsafe impl Sync for MTLFunctionReflection {}
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for FunctionReflection {}
+    unsafe impl NSObjectProtocol for MTLFunctionReflection {}
 );

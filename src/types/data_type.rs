@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// An enumeration of the different data types in Metal (from `MTLDataType`).
 #[repr(u64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum DataType {
+pub enum MTLDataType {
     /// Represents no data type.
     None = 0,
 
@@ -222,12 +222,10 @@ pub enum DataType {
     Tensor = 140,
 }
 
-unsafe impl Encode for DataType {
+unsafe impl Encode for MTLDataType {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for DataType {
+unsafe impl RefEncode for MTLDataType {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-

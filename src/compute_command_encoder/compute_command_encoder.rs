@@ -3,25 +3,25 @@ use core::ptr::NonNull;
 use objc2::{extern_protocol, runtime::ProtocolObject};
 use objc2_foundation::NSRange;
 
-use crate::compute_pipeline::ComputePipelineState;
-use crate::intersection_function_table::IntersectionFunctionTable;
-use crate::types::{Region, Size};
-use crate::visible_function_table::VisibleFunctionTable;
+use crate::compute_pipeline::MTLComputePipelineState;
+use crate::intersection_function_table::MTLIntersectionFunctionTable;
+use crate::types::{MTLRegion, MTLSize};
+use crate::visible_function_table::MTLVisibleFunctionTable;
 use crate::{
-    AccelerationStructure, Buffer, CommandEncoder, Fence, Resource, SamplerState, Texture,
+    MTLAccelerationStructure, MTLBuffer, MTLCommandEncoder, MTLFence, MTLResource, MTLSamplerState,
+    MTLTexture,
 };
 
 extern_protocol!(
     /// A command encoder that writes data parallel compute commands.
-    #[name = "MTLComputeCommandEncoder"]
-    pub unsafe trait ComputeCommandEncoder: CommandEncoder {
+    pub unsafe trait MTLComputeCommandEncoder: MTLCommandEncoder {
         #[unsafe(method(dispatchType))]
         #[unsafe(method_family = none)]
-        unsafe fn dispatch_type(&self) -> super::DispatchType;
+        unsafe fn dispatch_type(&self) -> super::MTLDispatchType;
 
         #[unsafe(method(setComputePipelineState:))]
         #[unsafe(method_family = none)]
-        fn set_compute_pipeline_state(&self, state: &ProtocolObject<dyn ComputePipelineState>);
+        fn set_compute_pipeline_state(&self, state: &ProtocolObject<dyn MTLComputePipelineState>);
 
         /// Set data for a buffer binding point, by copy.
         /// Safety: `bytes` must be valid.
@@ -33,7 +33,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_buffer(
             &self,
-            buffer: Option<&ProtocolObject<dyn Buffer>>,
+            buffer: Option<&ProtocolObject<dyn MTLBuffer>>,
             offset: usize,
             index: usize,
         );
@@ -47,7 +47,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_buffers(
             &self,
-            buffers: NonNull<*const ProtocolObject<dyn Buffer>>,
+            buffers: NonNull<*const ProtocolObject<dyn MTLBuffer>>,
             offsets: NonNull<usize>,
             range: NSRange,
         );
@@ -56,7 +56,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_buffer_with_attribute_stride(
             &self,
-            buffer: &ProtocolObject<dyn Buffer>,
+            buffer: &ProtocolObject<dyn MTLBuffer>,
             offset: usize,
             stride: usize,
             index: usize,
@@ -67,7 +67,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_buffers_with_attribute_strides(
             &self,
-            buffers: NonNull<*const ProtocolObject<dyn Buffer>>,
+            buffers: NonNull<*const ProtocolObject<dyn MTLBuffer>>,
             offsets: NonNull<usize>,
             strides: NonNull<usize>,
             range: NSRange,
@@ -97,7 +97,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_visible_function_table(
             &self,
-            table: Option<&ProtocolObject<dyn VisibleFunctionTable>>,
+            table: Option<&ProtocolObject<dyn MTLVisibleFunctionTable>>,
             buffer_index: usize,
         );
 
@@ -106,7 +106,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_visible_function_tables(
             &self,
-            tables: NonNull<*const ProtocolObject<dyn VisibleFunctionTable>>,
+            tables: NonNull<*const ProtocolObject<dyn MTLVisibleFunctionTable>>,
             range: NSRange,
         );
 
@@ -114,7 +114,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_intersection_function_table(
             &self,
-            table: Option<&ProtocolObject<dyn IntersectionFunctionTable>>,
+            table: Option<&ProtocolObject<dyn MTLIntersectionFunctionTable>>,
             buffer_index: usize,
         );
 
@@ -123,7 +123,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_intersection_function_tables(
             &self,
-            tables: NonNull<*const ProtocolObject<dyn IntersectionFunctionTable>>,
+            tables: NonNull<*const ProtocolObject<dyn MTLIntersectionFunctionTable>>,
             range: NSRange,
         );
 
@@ -131,20 +131,24 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_acceleration_structure(
             &self,
-            structure: Option<&ProtocolObject<dyn AccelerationStructure>>,
+            structure: Option<&ProtocolObject<dyn MTLAccelerationStructure>>,
             buffer_index: usize,
         );
 
         #[unsafe(method(setTexture:atIndex:))]
         #[unsafe(method_family = none)]
-        unsafe fn set_texture(&self, texture: Option<&ProtocolObject<dyn Texture>>, index: usize);
+        unsafe fn set_texture(
+            &self,
+            texture: Option<&ProtocolObject<dyn MTLTexture>>,
+            index: usize,
+        );
 
         /// Safety: `textures` must be valid.
         #[unsafe(method(setTextures:withRange:))]
         #[unsafe(method_family = none)]
         unsafe fn set_textures(
             &self,
-            textures: NonNull<*const ProtocolObject<dyn Texture>>,
+            textures: NonNull<*const ProtocolObject<dyn MTLTexture>>,
             range: NSRange,
         );
 
@@ -152,7 +156,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_sampler_state(
             &self,
-            sampler: Option<&ProtocolObject<dyn SamplerState>>,
+            sampler: Option<&ProtocolObject<dyn MTLSamplerState>>,
             index: usize,
         );
 
@@ -161,7 +165,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_sampler_states(
             &self,
-            samplers: NonNull<*const ProtocolObject<dyn SamplerState>>,
+            samplers: NonNull<*const ProtocolObject<dyn MTLSamplerState>>,
             range: NSRange,
         );
 
@@ -169,7 +173,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_sampler_state_with_lod(
             &self,
-            sampler: Option<&ProtocolObject<dyn SamplerState>>,
+            sampler: Option<&ProtocolObject<dyn MTLSamplerState>>,
             lod_min_clamp: f32,
             lod_max_clamp: f32,
             index: usize,
@@ -180,7 +184,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_sampler_states_with_lods(
             &self,
-            samplers: NonNull<*const ProtocolObject<dyn SamplerState>>,
+            samplers: NonNull<*const ProtocolObject<dyn MTLSamplerState>>,
             lod_min_clamps: NonNull<f32>,
             lod_max_clamps: NonNull<f32>,
             range: NSRange,
@@ -196,47 +200,51 @@ extern_protocol!(
 
         #[unsafe(method(setStageInRegion:))]
         #[unsafe(method_family = none)]
-        unsafe fn set_stage_in_region(&self, region: Region);
+        unsafe fn set_stage_in_region(&self, region: MTLRegion);
 
         #[unsafe(method(setStageInRegionWithIndirectBuffer:indirectBufferOffset:))]
         #[unsafe(method_family = none)]
         unsafe fn set_stage_in_region_indirect(
             &self,
-            indirect_buffer: &ProtocolObject<dyn Buffer>,
+            indirect_buffer: &ProtocolObject<dyn MTLBuffer>,
             indirect_buffer_offset: usize,
         );
 
         #[unsafe(method(dispatchThreadgroups:threadsPerThreadgroup:))]
         #[unsafe(method_family = none)]
-        fn dispatch_threadgroups(&self, threadgroups_per_grid: Size, threads_per_threadgroup: Size);
+        fn dispatch_threadgroups(
+            &self,
+            threadgroups_per_grid: MTLSize,
+            threads_per_threadgroup: MTLSize,
+        );
 
         #[unsafe(method(dispatchThreadgroupsWithIndirectBuffer:indirectBufferOffset:threadsPerThreadgroup:))]
         #[unsafe(method_family = none)]
         unsafe fn dispatch_threadgroups_indirect(
             &self,
-            indirect_buffer: &ProtocolObject<dyn Buffer>,
+            indirect_buffer: &ProtocolObject<dyn MTLBuffer>,
             indirect_buffer_offset: usize,
-            threads_per_threadgroup: Size,
+            threads_per_threadgroup: MTLSize,
         );
 
         #[unsafe(method(dispatchThreads:threadsPerThreadgroup:))]
         #[unsafe(method_family = none)]
-        fn dispatch_threads(&self, threads_per_grid: Size, threads_per_threadgroup: Size);
+        fn dispatch_threads(&self, threads_per_grid: MTLSize, threads_per_threadgroup: MTLSize);
 
         #[unsafe(method(updateFence:))]
         #[unsafe(method_family = none)]
-        fn update_fence(&self, fence: &ProtocolObject<dyn Fence>);
+        fn update_fence(&self, fence: &ProtocolObject<dyn MTLFence>);
 
         #[unsafe(method(waitForFence:))]
         #[unsafe(method_family = none)]
-        fn wait_for_fence(&self, fence: &ProtocolObject<dyn Fence>);
+        fn wait_for_fence(&self, fence: &ProtocolObject<dyn MTLFence>);
 
         #[unsafe(method(useResource:usage:))]
         #[unsafe(method_family = none)]
         fn use_resource(
             &self,
-            resource: &ProtocolObject<dyn Resource>,
-            usage: crate::ResourceUsage,
+            resource: &ProtocolObject<dyn MTLResource>,
+            usage: crate::MTLResourceUsage,
         );
 
         /// Safety: `resources` must be valid.
@@ -244,21 +252,21 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn use_resources(
             &self,
-            resources: NonNull<NonNull<ProtocolObject<dyn Resource>>>,
+            resources: NonNull<NonNull<ProtocolObject<dyn MTLResource>>>,
             count: usize,
-            usage: crate::ResourceUsage,
+            usage: crate::MTLResourceUsage,
         );
 
         #[unsafe(method(useHeap:))]
         #[unsafe(method_family = none)]
-        fn use_heap(&self, heap: &ProtocolObject<dyn crate::Heap>);
+        fn use_heap(&self, heap: &ProtocolObject<dyn crate::MTLHeap>);
 
         /// Safety: `heaps` must be valid.
         #[unsafe(method(useHeaps:count:))]
         #[unsafe(method_family = none)]
         unsafe fn use_heaps(
             &self,
-            heaps: NonNull<NonNull<ProtocolObject<dyn crate::Heap>>>,
+            heaps: NonNull<NonNull<ProtocolObject<dyn crate::MTLHeap>>>,
             count: usize,
         );
 
@@ -266,7 +274,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn execute_commands_in_buffer(
             &self,
-            icb: &ProtocolObject<dyn crate::IndirectCommandBuffer>,
+            icb: &ProtocolObject<dyn crate::MTLIndirectCommandBuffer>,
             execution_range: NSRange,
         );
 
@@ -274,21 +282,21 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn execute_commands_in_buffer_indirect(
             &self,
-            icb: &ProtocolObject<dyn crate::IndirectCommandBuffer>,
-            indirect_range_buffer: &ProtocolObject<dyn Buffer>,
+            icb: &ProtocolObject<dyn crate::MTLIndirectCommandBuffer>,
+            indirect_range_buffer: &ProtocolObject<dyn MTLBuffer>,
             indirect_buffer_offset: usize,
         );
 
         #[unsafe(method(memoryBarrierWithScope:))]
         #[unsafe(method_family = none)]
-        unsafe fn memory_barrier_with_scope(&self, scope: crate::BarrierScope);
+        unsafe fn memory_barrier_with_scope(&self, scope: crate::MTLBarrierScope);
 
         /// Safety: `resources` must be valid.
         #[unsafe(method(memoryBarrierWithResources:count:))]
         #[unsafe(method_family = none)]
         unsafe fn memory_barrier_with_resources(
             &self,
-            resources: NonNull<NonNull<ProtocolObject<dyn Resource>>>,
+            resources: NonNull<NonNull<ProtocolObject<dyn MTLResource>>>,
             count: usize,
         );
 
@@ -296,7 +304,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn sample_counters_in_buffer(
             &self,
-            sample_buffer: &ProtocolObject<dyn crate::CounterSampleBuffer>,
+            sample_buffer: &ProtocolObject<dyn crate::MTLCounterSampleBuffer>,
             sample_index: usize,
             barrier: bool,
         );

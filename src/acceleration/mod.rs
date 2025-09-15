@@ -4,14 +4,15 @@ mod acceleration_structure_sizes;
 mod packed;
 mod types;
 
-pub use acceleration_structure::AccelerationStructure;
-pub use acceleration_structure_descriptor::AccelerationStructureDescriptor;
-pub use acceleration_structure_sizes::AccelerationStructureSizes;
+pub use acceleration_structure::MTLAccelerationStructure;
+pub use acceleration_structure_descriptor::MTLAccelerationStructureDescriptor;
+pub use acceleration_structure_sizes::MTLAccelerationStructureSizes;
 pub use packed::{
-    AxisAlignedBoundingBox, ComponentTransform, PackedFloat3, PackedFloat4x3, PackedFloatQuaternion,
+    MTLAxisAlignedBoundingBox, MTLComponentTransform, MTLPackedFloat3, MTLPackedFloat4x3,
+    MTLPackedFloatQuaternion,
 };
 pub use types::{
-    AccelerationStructureInstanceOptions, AccelerationStructureRefitOptions,
-    AccelerationStructureUsage, CurveBasis, CurveEndCaps, CurveType, MatrixLayout,
-    MotionBorderMode, TransformType,
+    MTLAccelerationStructureInstanceOptions, MTLAccelerationStructureRefitOptions,
+    MTLAccelerationStructureUsage, MTLCurveBasis, MTLCurveEndCaps, MTLCurveType, MTLMatrixLayout,
+    MTLMotionBorderMode, MTLTransformType,
 };

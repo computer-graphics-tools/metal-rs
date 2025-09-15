@@ -5,40 +5,39 @@ use objc2::{
 };
 use objc2_foundation::{NSCoding, NSObjectProtocol, NSSecureCoding, NSString};
 
-use crate::Device;
+use crate::MTLDevice;
 
 extern_class!(
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtlsharedtexturehandle?language=objc)
     #[unsafe(super(NSObject))]
-    #[name = "MTLSharedTextureHandle"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct SharedTextureHandle;
+    pub struct MTLSharedTextureHandle;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for SharedTextureHandle {}
+    unsafe impl NSObjectProtocol for MTLSharedTextureHandle {}
 );
 
 extern_conformance!(
-    unsafe impl NSCoding for SharedTextureHandle {}
+    unsafe impl NSCoding for MTLSharedTextureHandle {}
 );
 
 extern_conformance!(
-    unsafe impl NSSecureCoding for SharedTextureHandle {}
+    unsafe impl NSSecureCoding for MTLSharedTextureHandle {}
 );
 
-impl SharedTextureHandle {
+impl MTLSharedTextureHandle {
     extern_methods!(
         /// The device this texture was created against.
         ///
         /// This shared texture handle can only be used with this device.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
-        pub fn device(&self) -> Retained<ProtocolObject<dyn Device>>;
+        pub fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
     );
 }
 
-impl SharedTextureHandle {
+impl MTLSharedTextureHandle {
     fn label(&self) -> Option<String> {
         let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
         label.map(|label| label.to_string())

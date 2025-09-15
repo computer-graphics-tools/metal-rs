@@ -3,9 +3,9 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Options for creating a `Function` (from `MTLFunctionOptions`).
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct FunctionOptions(pub usize);
+pub struct MTLFunctionOptions(pub usize);
 bitflags::bitflags! {
-    impl FunctionOptions: usize {
+    impl MTLFunctionOptions: usize {
         const None = 0;
         /// Compiles the found function. This enables dynamic linking of this Function.
         /// Only supported for visible functions.
@@ -20,10 +20,10 @@ bitflags::bitflags! {
     }
 }
 
-unsafe impl Encode for FunctionOptions {
+unsafe impl Encode for MTLFunctionOptions {
     const ENCODING: Encoding = usize::ENCODING;
 }
 
-unsafe impl RefEncode for FunctionOptions {
+unsafe impl RefEncode for MTLFunctionOptions {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

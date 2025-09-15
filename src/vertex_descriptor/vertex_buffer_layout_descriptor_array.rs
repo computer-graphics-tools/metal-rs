@@ -5,41 +5,40 @@ use objc2::{
 };
 use objc2_foundation::NSObjectProtocol;
 
-use super::vertex_buffer_layout_descriptor::VertexBufferLayoutDescriptor;
+use super::vertex_buffer_layout_descriptor::MTLVertexBufferLayoutDescriptor;
 
 extern_class!(
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtlvertexbufferlayoutdescriptorarray?language=objc)
     #[unsafe(super(NSObject))]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    #[name = "MTLVertexBufferLayoutDescriptorArray"]
-    pub struct VertexBufferLayoutDescriptorArray;
+    pub struct MTLVertexBufferLayoutDescriptorArray;
 );
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for VertexBufferLayoutDescriptorArray {}
+    unsafe impl NSObjectProtocol for MTLVertexBufferLayoutDescriptorArray {}
 );
 
-impl VertexBufferLayoutDescriptorArray {
+impl MTLVertexBufferLayoutDescriptorArray {
     extern_methods!(
         #[unsafe(method(objectAtIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn object_at_indexed_subscript(
             &self,
             index: usize,
-        ) -> Retained<VertexBufferLayoutDescriptor>;
+        ) -> Retained<MTLVertexBufferLayoutDescriptor>;
 
         #[unsafe(method(setObject:atIndexedSubscript:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_object_at_indexed_subscript(
             &self,
-            buffer_desc: Option<&VertexBufferLayoutDescriptor>,
+            buffer_desc: Option<&MTLVertexBufferLayoutDescriptor>,
             index: usize,
         );
     );
 }
 
 /// Methods declared on superclass `NSObject`.
-impl VertexBufferLayoutDescriptorArray {
+impl MTLVertexBufferLayoutDescriptorArray {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

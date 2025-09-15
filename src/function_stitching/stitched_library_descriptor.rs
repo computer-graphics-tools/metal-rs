@@ -5,64 +5,66 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSArray, NSCopying, NSObjectProtocol};
 
-use super::{FunctionStitchingGraph, StitchedLibraryOptions};
-use crate::library::Function;
+use super::{MTLFunctionStitchingGraph, MTLStitchedLibraryOptions};
+use crate::library::MTLFunction;
 
 extern_class!(
     /// Container for the graphs and functions needed to create stitched functions.
     #[unsafe(super(NSObject))]
-    #[name = "MTLStitchedLibraryDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct StitchedLibraryDescriptor;
+    pub struct MTLStitchedLibraryDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for StitchedLibraryDescriptor {}
+    unsafe impl NSCopying for MTLStitchedLibraryDescriptor {}
 );
 
-unsafe impl CopyingHelper for StitchedLibraryDescriptor {
+unsafe impl CopyingHelper for MTLStitchedLibraryDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for StitchedLibraryDescriptor {}
+    unsafe impl NSObjectProtocol for MTLStitchedLibraryDescriptor {}
 );
 
-impl StitchedLibraryDescriptor {
+impl MTLStitchedLibraryDescriptor {
     extern_methods!(
         #[unsafe(method(functionGraphs))]
         #[unsafe(method_family = none)]
-        pub unsafe fn function_graphs(&self) -> Retained<NSArray<FunctionStitchingGraph>>;
+        pub unsafe fn function_graphs(&self) -> Retained<NSArray<MTLFunctionStitchingGraph>>;
 
         /// Setter for [`function_graphs`][Self::function_graphs].
         #[unsafe(method(setFunctionGraphs:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_function_graphs(&self, function_graphs: &NSArray<FunctionStitchingGraph>);
+        pub unsafe fn set_function_graphs(
+            &self,
+            function_graphs: &NSArray<MTLFunctionStitchingGraph>,
+        );
 
         /// Functions referenced by the graphs.
         #[unsafe(method(functions))]
         #[unsafe(method_family = none)]
-        pub unsafe fn functions(&self) -> Retained<NSArray<ProtocolObject<dyn Function>>>;
+        pub unsafe fn functions(&self) -> Retained<NSArray<ProtocolObject<dyn MTLFunction>>>;
 
         /// Setter for [`functions`][Self::functions].
         #[unsafe(method(setFunctions:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_functions(&self, functions: &NSArray<ProtocolObject<dyn Function>>);
+        pub unsafe fn set_functions(&self, functions: &NSArray<ProtocolObject<dyn MTLFunction>>);
 
         /// Options for creating the stitched library.
         #[unsafe(method(options))]
         #[unsafe(method_family = none)]
-        pub unsafe fn options(&self) -> StitchedLibraryOptions;
+        pub unsafe fn options(&self) -> MTLStitchedLibraryOptions;
 
         /// Setter for [`options`][Self::options].
         #[unsafe(method(setOptions:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_options(&self, options: StitchedLibraryOptions);
+        pub unsafe fn set_options(&self, options: MTLStitchedLibraryOptions);
     );
 }
 
 /// Methods declared on superclass `NSObject`.
-impl StitchedLibraryDescriptor {
+impl MTLStitchedLibraryDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

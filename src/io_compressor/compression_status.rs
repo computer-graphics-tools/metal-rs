@@ -4,19 +4,17 @@ use objc2::{Encode, Encoding, RefEncode};
 /// (ported from `MTLIOCompressionStatus`).
 #[repr(i64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum CompressionStatus {
+pub enum MTLCompressionStatus {
     /// Compression completed successfully.
     Complete = 0,
     /// Compression encountered an error.
     Error = 1,
 }
 
-unsafe impl Encode for CompressionStatus {
+unsafe impl Encode for MTLCompressionStatus {
     const ENCODING: Encoding = i64::ENCODING;
 }
 
-unsafe impl RefEncode for CompressionStatus {
+unsafe impl RefEncode for MTLCompressionStatus {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-

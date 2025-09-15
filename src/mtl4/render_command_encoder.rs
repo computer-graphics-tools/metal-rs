@@ -5,7 +5,14 @@ use core::ptr::NonNull;
 use objc2::__framework_prelude::*;
 use objc2_foundation::*;
 
-use crate::*;
+use crate::{
+    MTL4CommandBuffer, MTL4CommandBuffer, MTL4CommandBuffer, MTL4CommandBuffer, MTL4CommandBuffer,
+    MTL4CommandBuffer, MTL4CommandBuffer, MTL4CommandEncoder, MTL4CommandQueue, MTL4CommandQueue,
+    MTL4CommandQueue, MTL4CommandQueue, MTL4CommandQueue, MTL4CommandQueue, MTL4CommandQueue,
+    MTL4CullMode, MTL4DepthClipMode, MTL4DepthStencilState, MTL4RenderEncoderOptions,
+    MTL4RenderPassDescriptor, MTL4RenderPipelineState, MTL4ScissorRect, MTL4TriangleFillMode,
+    MTL4VertexAmplificationViewMapping, MTL4Viewport, MTL4VisibilityResultMode,
+};
 
 /// Custom render pass options you specify at encoder creation time.
 ///
@@ -60,7 +67,6 @@ extern_protocol!(
     /// Encodes a render pass into a command buffer, including all its draw calls and configuration.
     ///
     /// See also [Apple's documentation](https://developer.apple.com/documentation/metal/mtl4rendercommandencoder?language=objc)
-    #[cfg(feature = "MTL4CommandEncoder")]
     pub unsafe trait MTL4RenderCommandEncoder: MTL4CommandEncoder {
         /// Sets the width of a tile for this render pass.
         #[unsafe(method(tileWidth))]
@@ -72,7 +78,6 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn tileHeight(&self) -> NSUInteger;
 
-        #[cfg(feature = "MTLRenderPipeline")]
         /// Sets the mapping from logical shader color output to physical render pass color attachments.
         ///
         /// Use this method to define how the physical color attachments you specify via ``MTL4RenderPassDescriptor/colorAttachments``
@@ -90,7 +95,6 @@ extern_protocol!(
             mapping: Option<&MTLLogicalToPhysicalColorAttachmentMap>,
         );
 
-        #[cfg(all(feature = "MTLAllocation", feature = "MTLRenderPipeline"))]
         /// Configures this encoder with a render pipeline state that applies to your subsequent draw commands.
         ///
         /// - Parameter pipelineState: a non-`nil` ``MTLRenderPipelineState`` instance.
@@ -101,7 +105,6 @@ extern_protocol!(
             pipeline_state: &ProtocolObject<dyn MTLRenderPipelineState>,
         );
 
-        #[cfg(feature = "MTLRenderCommandEncoder")]
         /// Sets the viewport which that transforms vertices from normalized device coordinates to window coordinates.
         ///
         /// Metal clips fragments that lie outside this viewport, and optionally clamps fragments outside of z-near/z-far range
@@ -112,7 +115,6 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn setViewport(&self, viewport: MTLViewport);
 
-        #[cfg(feature = "MTLRenderCommandEncoder")]
         /// Sets an array of viewports to transform vertices from normalized device coordinates to window coordinates.
         ///
         /// Metal clips fragments that lie outside of the viewport, and optionally clamps fragments outside of z-near/z-far range,
@@ -132,7 +134,6 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn setViewports_count(&self, viewports: NonNull<MTLViewport>, count: NSUInteger);
 
-        #[cfg(feature = "MTLRenderCommandEncoder")]
         /// Sets the vertex amplification count and its view mapping for each amplification ID.
         ///
         /// Each view mapping element describes how to route the corresponding amplification ID to a specific viewport and
@@ -157,7 +158,6 @@ extern_protocol!(
             view_mappings: *const MTLVertexAmplificationViewMapping,
         );
 
-        #[cfg(feature = "MTLRenderCommandEncoder")]
         /// Controls whether Metal culls front facing primitives, back facing primitives, or culls no primitives at all.
         ///
         /// - Parameter cullMode: ``MTLCullMode`` to set.
@@ -165,7 +165,6 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn setCullMode(&self, cull_mode: MTLCullMode);
 
-        #[cfg(feature = "MTLRenderCommandEncoder")]
         /// Controls the behavior for fragments outside of the near or far planes.
         ///
         /// - Parameter depthClipMode: ``MTLDepthClipMode`` to set.
@@ -205,7 +204,6 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn setDepthTestMinBound_maxBound(&self, min_bound: c_float, max_bound: c_float);
 
-        #[cfg(feature = "MTLRenderCommandEncoder")]
         /// Sets a scissor rectangle to discard fragments outside a specific area.
         ///
         /// Metal performs a scissor test and discards all fragments outside of the scissor rect.
@@ -216,7 +214,6 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn setScissorRect(&self, rect: MTLScissorRect);
 
-        #[cfg(feature = "MTLRenderCommandEncoder")]
         /// Sets an array of scissor rectangles for a fragment scissor test.
         ///
         /// Metal uses the specific scissor rectangle corresponding to the index you specify via the `[[ viewport_array_index ]]`
@@ -238,7 +235,6 @@ extern_protocol!(
             count: NSUInteger,
         );
 
-        #[cfg(feature = "MTLRenderCommandEncoder")]
         /// Configures how subsequent draw commands rasterize triangle and triangle strip primitives.
         ///
         /// - Parameter fillMode:``MTLTriangleFillMode`` the render pass applies to draw commands that
@@ -264,7 +260,6 @@ extern_protocol!(
             alpha: c_float,
         );
 
-        #[cfg(feature = "MTLDepthStencil")]
         /// Configures this encoder with a depth stencil state that applies to your subsequent draw commands.
         ///
         /// - Parameter depthStencilState: the ``MTLDepthStencilState`` instance to set.
@@ -302,7 +297,6 @@ extern_protocol!(
             back_reference_value: u32,
         );
 
-        #[cfg(feature = "MTLRenderCommandEncoder")]
         /// Configures a visibility test for Metal to run, and the destination for any results it generates.
         ///
         /// You use the `mode` parameter to enable or disable the visibility test, and determine if it produces a boolean
@@ -322,7 +316,6 @@ extern_protocol!(
             offset: NSUInteger,
         );
 
-        #[cfg(feature = "MTLRenderPass")]
         /// Configures the store action for a color attachment.
         ///
         /// - Parameters:
@@ -337,7 +330,6 @@ extern_protocol!(
             color_attachment_index: NSUInteger,
         );
 
-        #[cfg(feature = "MTLRenderPass")]
         /// Configures the store action for the depth attachment.
         ///
         /// - Parameter storeAction: A store action for the depth attachment that
@@ -346,7 +338,6 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn setDepthStoreAction(&self, store_action: MTLStoreAction);
 
-        #[cfg(feature = "MTLRenderPass")]
         /// Configures the store action for the stencil attachment.
         ///
         /// - Parameter storeAction: A store action for the stencil attachment that
@@ -355,7 +346,6 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn setStencilStoreAction(&self, store_action: MTLStoreAction);
 
-        #[cfg(feature = "MTLRenderCommandEncoder")]
         /// Encodes a draw command that renders an instance of a geometric primitive.
         ///
         /// This command assigns each vertex a unique `vertex_id` value that increases from `vertexStart` through
@@ -377,7 +367,6 @@ extern_protocol!(
             vertex_count: NSUInteger,
         );
 
-        #[cfg(feature = "MTLRenderCommandEncoder")]
         /// Encodes a draw command that renders multiple instances of a geometric primitive.
         ///
         /// The command assigns each vertex a unique `vertex_id` value within its drawing instance
@@ -439,11 +428,6 @@ extern_protocol!(
             base_instance: NSUInteger,
         );
 
-        #[cfg(all(
-            feature = "MTLArgument",
-            feature = "MTLGPUAddress",
-            feature = "MTLRenderCommandEncoder"
-        ))]
         /// Encodes a draw command that renders an instance of a geometric primitive with indexed vertices.
         ///
         /// Use this method to perform indexed drawing, where an index buffer determines how Metal assembles primitives.
@@ -478,11 +462,6 @@ extern_protocol!(
             index_buffer_length: NSUInteger,
         );
 
-        #[cfg(all(
-            feature = "MTLArgument",
-            feature = "MTLGPUAddress",
-            feature = "MTLRenderCommandEncoder"
-        ))]
         /// Encodes a draw command that renders multiple instances of a geometric primitive with indexed vertices.
         ///
         /// Use this method to perform instanced indexed drawing, where an index buffer determines how Metal assembles primitives.
@@ -524,11 +503,6 @@ extern_protocol!(
             instance_count: NSUInteger,
         );
 
-        #[cfg(all(
-            feature = "MTLArgument",
-            feature = "MTLGPUAddress",
-            feature = "MTLRenderCommandEncoder"
-        ))]
         /// Encodes a draw command that renders multiple instances of a geometric primitive with indexed vertices,
         /// starting with a custom vertex and instance.
         ///
@@ -578,7 +552,6 @@ extern_protocol!(
             base_instance: NSUInteger,
         );
 
-        #[cfg(all(feature = "MTLGPUAddress", feature = "MTLRenderCommandEncoder"))]
         /// Encodes a draw command that renders multiple instances of a geometric primitive with indirect arguments.
         ///
         /// When you use this function, Metal reads the parameters to the draw command from an ``MTLBuffer`` instance,
@@ -606,11 +579,6 @@ extern_protocol!(
             indirect_buffer: MTLGPUAddress,
         );
 
-        #[cfg(all(
-            feature = "MTLArgument",
-            feature = "MTLGPUAddress",
-            feature = "MTLRenderCommandEncoder"
-        ))]
         /// Encodes a draw command that renders multiple instances of a geometric primitive with indexed vertices
         /// and indirect arguments.
         ///
@@ -675,12 +643,6 @@ extern_protocol!(
             execution_range: NSRange,
         );
 
-        #[cfg(all(
-            feature = "MTLAllocation",
-            feature = "MTLGPUAddress",
-            feature = "MTLIndirectCommandBuffer",
-            feature = "MTLResource"
-        ))]
         /// Encodes a command that runs an indirect range of commands from an indirect command buffer.
         ///
         /// Use this method to indicate to Metal the span of indices in the command buffer to execute indirectly via an
@@ -721,7 +683,6 @@ extern_protocol!(
             index: NSUInteger,
         );
 
-        #[cfg(feature = "MTLTypes")]
         /// Encodes a draw command that invokes a mesh shader and, optionally, an object shader with a grid of threadgroups.
         ///
         /// - Parameters:
@@ -739,7 +700,6 @@ extern_protocol!(
             threads_per_mesh_threadgroup: MTLSize,
         );
 
-        #[cfg(feature = "MTLTypes")]
         /// Encodes a draw command that invokes a mesh shader and, optionally, an object shader with a grid of threads.
         ///
         /// - Parameters:
@@ -760,7 +720,6 @@ extern_protocol!(
             threads_per_mesh_threadgroup: MTLSize,
         );
 
-        #[cfg(all(feature = "MTLGPUAddress", feature = "MTLTypes"))]
         /// Encodes a draw command that invokes a mesh shader and, optionally, an object shader with indirect arguments.
         ///
         /// This method enables you to determine the number of threadgroups per grid indirectly, in the GPU timeline.
@@ -786,7 +745,6 @@ extern_protocol!(
             threads_per_mesh_threadgroup: MTLSize,
         );
 
-        #[cfg(feature = "MTLTypes")]
         /// Encodes a command that invokes a tile shader function from the encoder’s current tile render pipeline state.
         ///
         /// - Parameter threadsPerTile: A ``MTLSize`` instance that represents the number of threads the render pass uses per tile.
@@ -815,7 +773,6 @@ extern_protocol!(
             index: NSUInteger,
         );
 
-        #[cfg(all(feature = "MTL4ArgumentTable", feature = "MTLRenderCommandEncoder"))]
         /// Associates an argument table with a set of render stages.
         ///
         /// Metal takes a snapshot of the resources in the argument table when you encode a draw, dispatch, or execute command.
@@ -832,7 +789,6 @@ extern_protocol!(
             stages: MTLRenderStages,
         );
 
-        #[cfg(feature = "MTLRenderCommandEncoder")]
         /// Configures the vertex winding order that determines which face of a geometric primitive is the front one.
         ///
         /// - Parameter frontFacingWinding: A ``MTLWinding`` value that determines which side of a primitive the render pipeline
@@ -841,7 +797,6 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn setFrontFacingWinding(&self, front_facing_winding: MTLWinding);
 
-        #[cfg(all(feature = "MTL4Counters", feature = "MTLRenderCommandEncoder"))]
         /// Writes a GPU timestamp into the given ``MTL4CounterHeap`` at `index` after `stage` completes.
         ///
         /// This command only guarantees all draws prior to this command are complete when Metal writes the timestamp into

@@ -5,7 +5,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Available since macOS 10.11, iOS 8.0.
 #[repr(u64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum VertexStepFunction {
+pub enum MTLVertexStepFunction {
     /// The vertex data is shared among all vertices in a primitive.
     ///
     /// Available since macOS 10.11, iOS 8.0.
@@ -32,10 +32,10 @@ pub enum VertexStepFunction {
     PerPatchControlPoint = 4,
 }
 
-unsafe impl Encode for VertexStepFunction {
+unsafe impl Encode for MTLVertexStepFunction {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for VertexStepFunction {
+unsafe impl RefEncode for MTLVertexStepFunction {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

@@ -6,80 +6,80 @@ use objc2::{
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
 use crate::{
-    CpuCacheMode, HazardTrackingMode, PixelFormat, ResourceOptions, SparsePageSize, StorageMode,
-    TextureCompressionType, TextureSwizzleChannels, TextureType, TextureUsage,
+    MTLCPUCacheMode, MTLHazardTrackingMode, MTLPixelFormat, MTLResourceOptions, MTLSparsePageSize,
+    MTLStorageMode, MTLTextureCompressionType, MTLTextureSwizzleChannels, MTLTextureType,
+    MTLTextureUsage,
 };
 
 extern_class!(
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtltexturedescriptor?language=objc)
     #[unsafe(super(NSObject))]
-    #[name = "MTLTextureDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct TextureDescriptor;
+    pub struct MTLTextureDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for TextureDescriptor {}
+    unsafe impl NSCopying for MTLTextureDescriptor {}
 );
 
-unsafe impl CopyingHelper for TextureDescriptor {
+unsafe impl CopyingHelper for MTLTextureDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for TextureDescriptor {}
+    unsafe impl NSObjectProtocol for MTLTextureDescriptor {}
 );
 
-impl TextureDescriptor {
+impl MTLTextureDescriptor {
     extern_methods!(
         /// Create a TextureDescriptor for a common 2D texture.
         #[unsafe(method(texture2DDescriptorWithPixelFormat:width:height:mipmapped:))]
         #[unsafe(method_family = none)]
         pub unsafe fn texture_2d_descriptor_with_pixel_format_width_height_mipmapped(
-            pixel_format: PixelFormat,
+            pixel_format: MTLPixelFormat,
             width: usize,
             height: usize,
             mipmapped: bool,
-        ) -> Retained<TextureDescriptor>;
+        ) -> Retained<MTLTextureDescriptor>;
 
         /// Create a TextureDescriptor for a common Cube texture.
         #[unsafe(method(textureCubeDescriptorWithPixelFormat:size:mipmapped:))]
         #[unsafe(method_family = none)]
         pub unsafe fn texture_cube_descriptor_with_pixel_format_size_mipmapped(
-            pixel_format: PixelFormat,
+            pixel_format: MTLPixelFormat,
             size: usize,
             mipmapped: bool,
-        ) -> Retained<TextureDescriptor>;
+        ) -> Retained<MTLTextureDescriptor>;
 
         /// Create a TextureDescriptor for a common texture buffer.
         #[unsafe(method(textureBufferDescriptorWithPixelFormat:width:resourceOptions:usage:))]
         #[unsafe(method_family = none)]
         pub unsafe fn texture_buffer_descriptor_with_pixel_format_width_resource_options_usage(
-            pixel_format: PixelFormat,
+            pixel_format: MTLPixelFormat,
             width: usize,
-            resource_options: ResourceOptions,
-            usage: TextureUsage,
-        ) -> Retained<TextureDescriptor>;
+            resource_options: MTLResourceOptions,
+            usage: MTLTextureUsage,
+        ) -> Retained<MTLTextureDescriptor>;
 
         /// The overall type of the texture to be created. The default value is MTLTextureType2D.
         #[unsafe(method(textureType))]
         #[unsafe(method_family = none)]
-        pub fn texture_type(&self) -> TextureType;
+        pub fn texture_type(&self) -> MTLTextureType;
 
         /// Setter for [`textureType`][Self::textureType].
         #[unsafe(method(setTextureType:))]
         #[unsafe(method_family = none)]
-        pub fn set_texture_type(&self, texture_type: TextureType);
+        pub fn set_texture_type(&self, texture_type: MTLTextureType);
 
         /// The pixel format to use when allocating this texture. This is also the pixel format that will be used to when the caller writes or reads pixels from this texture. The default value is MTLPixelFormatRGBA8Unorm.
         #[unsafe(method(pixelFormat))]
         #[unsafe(method_family = none)]
-        pub fn pixel_format(&self) -> PixelFormat;
+        pub fn pixel_format(&self) -> MTLPixelFormat;
 
         /// Setter for [`pixelFormat`][Self::pixelFormat].
         #[unsafe(method(setPixelFormat:))]
         #[unsafe(method_family = none)]
-        pub fn set_pixel_format(&self, pixel_format: PixelFormat);
+        pub fn set_pixel_format(&self, pixel_format: MTLPixelFormat);
 
         /// The width of the texture to create. The default value is 1.
         #[unsafe(method(width))]
@@ -156,32 +156,32 @@ impl TextureDescriptor {
         /// Contains a packed set of the storageMode, cpuCacheMode and hazardTrackingMode properties.
         #[unsafe(method(resourceOptions))]
         #[unsafe(method_family = none)]
-        pub fn resource_options(&self) -> ResourceOptions;
+        pub fn resource_options(&self) -> MTLResourceOptions;
 
         /// Setter for [`resourceOptions`][Self::resourceOptions].
         #[unsafe(method(setResourceOptions:))]
         #[unsafe(method_family = none)]
-        pub fn set_resource_options(&self, resource_options: ResourceOptions);
+        pub fn set_resource_options(&self, resource_options: MTLResourceOptions);
 
         /// Options to specify CPU cache mode of texture resource.
         #[unsafe(method(cpuCacheMode))]
         #[unsafe(method_family = none)]
-        pub fn cpu_cache_mode(&self) -> CpuCacheMode;
+        pub fn cpu_cache_mode(&self) -> MTLCPUCacheMode;
 
         /// Setter for [`cpuCacheMode`][Self::cpuCacheMode].
         #[unsafe(method(setCpuCacheMode:))]
         #[unsafe(method_family = none)]
-        pub fn set_cpu_cache_mode(&self, cpu_cache_mode: CpuCacheMode);
+        pub fn set_cpu_cache_mode(&self, cpu_cache_mode: MTLCPUCacheMode);
 
         /// To specify storage mode of texture resource.
         #[unsafe(method(storageMode))]
         #[unsafe(method_family = none)]
-        pub fn storage_mode(&self) -> StorageMode;
+        pub fn storage_mode(&self) -> MTLStorageMode;
 
         /// Setter for [`storageMode`][Self::storageMode].
         #[unsafe(method(setStorageMode:))]
         #[unsafe(method_family = none)]
-        pub fn set_storage_mode(&self, storage_mode: StorageMode);
+        pub fn set_storage_mode(&self, storage_mode: MTLStorageMode);
 
         /// Set hazard tracking mode for the texture. The default value is `HazardTrackingMode::Default`.
         ///
@@ -192,22 +192,22 @@ impl TextureDescriptor {
         /// For optimal performance, perform hazard tracking manually through `Fence` or `Event` instead.
         #[unsafe(method(hazardTrackingMode))]
         #[unsafe(method_family = none)]
-        pub fn hazard_tracking_mode(&self) -> HazardTrackingMode;
+        pub fn hazard_tracking_mode(&self) -> MTLHazardTrackingMode;
 
         /// Setter for [`hazardTrackingMode`][Self::hazardTrackingMode].
         #[unsafe(method(setHazardTrackingMode:))]
         #[unsafe(method_family = none)]
-        pub fn set_hazard_tracking_mode(&self, hazard_tracking_mode: HazardTrackingMode);
+        pub fn set_hazard_tracking_mode(&self, hazard_tracking_mode: MTLHazardTrackingMode);
 
         /// Description of texture usage
         #[unsafe(method(usage))]
         #[unsafe(method_family = none)]
-        pub fn usage(&self) -> TextureUsage;
+        pub fn usage(&self) -> MTLTextureUsage;
 
         /// Setter for [`usage`][Self::usage].
         #[unsafe(method(setUsage:))]
         #[unsafe(method_family = none)]
-        pub fn set_usage(&self, usage: TextureUsage);
+        pub fn set_usage(&self, usage: MTLTextureUsage);
 
         /// Allow GPU-optimization for the contents of this texture. The default value is true.
         ///
@@ -232,22 +232,22 @@ impl TextureDescriptor {
         /// Set allowGPUOptimizedContents to `NO` to opt out of both lossless and lossy compression; such textures do not benefit from either reduced bandwidth usage or reduced storage requirements, but have predictable CPU readback performance.
         #[unsafe(method(compressionType))]
         #[unsafe(method_family = none)]
-        pub unsafe fn compression_type(&self) -> TextureCompressionType;
+        pub unsafe fn compression_type(&self) -> MTLTextureCompressionType;
 
         /// Setter for [`compressionType`][Self::compressionType].
         #[unsafe(method(setCompressionType:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn set_compression_type(&self, compression_type: TextureCompressionType);
+        pub unsafe fn set_compression_type(&self, compression_type: MTLTextureCompressionType);
 
         /// Channel swizzle to use when reading or sampling from the texture, the default value is MTLTextureSwizzleChannelsDefault.
         #[unsafe(method(swizzle))]
         #[unsafe(method_family = none)]
-        pub fn swizzle(&self) -> TextureSwizzleChannels;
+        pub fn swizzle(&self) -> MTLTextureSwizzleChannels;
 
         /// Setter for [`swizzle`][Self::swizzle].
         #[unsafe(method(setSwizzle:))]
         #[unsafe(method_family = none)]
-        pub fn set_swizzle(&self, swizzle: TextureSwizzleChannels);
+        pub fn set_swizzle(&self, swizzle: MTLTextureSwizzleChannels);
 
         /// Determines the page size for a placement sparse texture.
         ///
@@ -258,20 +258,20 @@ impl TextureDescriptor {
         /// This value is 0 by default.
         #[unsafe(method(placementSparsePageSize))]
         #[unsafe(method_family = none)]
-        pub unsafe fn placement_sparse_page_size(&self) -> SparsePageSize;
+        pub unsafe fn placement_sparse_page_size(&self) -> MTLSparsePageSize;
 
         /// Setter for [`placementSparsePageSize`][Self::placementSparsePageSize].
         #[unsafe(method(setPlacementSparsePageSize:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_placement_sparse_page_size(
             &self,
-            placement_sparse_page_size: SparsePageSize,
+            placement_sparse_page_size: MTLSparsePageSize,
         );
     );
 }
 
 /// Methods declared on superclass `NSObject`.
-impl TextureDescriptor {
+impl MTLTextureDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

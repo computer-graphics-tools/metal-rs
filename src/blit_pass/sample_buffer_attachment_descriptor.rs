@@ -5,43 +5,42 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use crate::counters::CounterSampleBuffer;
+use crate::counters::MTLCounterSampleBuffer;
 
 extern_class!(
     /// The sample buffer attachment descriptor for blit passes.
     #[unsafe(super(NSObject))]
-    #[name = "MTLBlitPassSampleBufferAttachmentDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct BlitPassSampleBufferAttachmentDescriptor;
+    pub struct MTLBlitPassSampleBufferAttachmentDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for BlitPassSampleBufferAttachmentDescriptor {}
+    unsafe impl NSCopying for MTLBlitPassSampleBufferAttachmentDescriptor {}
 );
 
-unsafe impl CopyingHelper for BlitPassSampleBufferAttachmentDescriptor {
+unsafe impl CopyingHelper for MTLBlitPassSampleBufferAttachmentDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for BlitPassSampleBufferAttachmentDescriptor {}
+    unsafe impl NSObjectProtocol for MTLBlitPassSampleBufferAttachmentDescriptor {}
 );
 
-impl BlitPassSampleBufferAttachmentDescriptor {
+impl MTLBlitPassSampleBufferAttachmentDescriptor {
     extern_methods!(
         /// The sample buffer to store samples for the blit-pass defined samples.
         #[unsafe(method(sampleBuffer))]
         #[unsafe(method_family = none)]
         pub unsafe fn sample_buffer(
             &self,
-        ) -> Option<Retained<ProtocolObject<dyn CounterSampleBuffer>>>;
+        ) -> Option<Retained<ProtocolObject<dyn MTLCounterSampleBuffer>>>;
 
         /// Setter for `sample_buffer`.
         #[unsafe(method(setSampleBuffer:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_sample_buffer(
             &self,
-            sample_buffer: Option<&ProtocolObject<dyn CounterSampleBuffer>>,
+            sample_buffer: Option<&ProtocolObject<dyn MTLCounterSampleBuffer>>,
         );
 
         /// Sample index for start-of-encoder sample.
@@ -64,7 +63,7 @@ impl BlitPassSampleBufferAttachmentDescriptor {
     );
 }
 
-impl BlitPassSampleBufferAttachmentDescriptor {
+impl MTLBlitPassSampleBufferAttachmentDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

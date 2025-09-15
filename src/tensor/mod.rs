@@ -7,9 +7,9 @@ mod tensor_extents;
 mod tensor_usage;
 
 pub use constants::TENSOR_MAX_RANK;
-pub use tensor::Tensor;
-pub use tensor_data_type::TensorDataType;
-pub use tensor_descriptor::TensorDescriptor;
-pub use tensor_error::TensorError;
-pub use tensor_extents::TensorExtents;
-pub use tensor_usage::TensorUsage;
+pub use tensor::MTLTensor;
+pub use tensor_data_type::MTLTensorDataType;
+pub use tensor_descriptor::MTLTensorDescriptor;
+pub use tensor_error::MTLTensorError;
+pub use tensor_extents::MTLTensorExtents;
+pub use tensor_usage::MTLTensorUsage;

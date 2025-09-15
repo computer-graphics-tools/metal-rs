@@ -1,6 +1,11 @@
-use crate::*;
+use crate::{
+    MTL4FunctionDescriptor, MTL4PipelineDescriptor, MTL4StaticLinkingDescriptor, Size,
+    TileRenderPipelineColorAttachmentDescriptorArray,
+};
 use objc2::{
-    extern_class, extern_conformance, extern_methods, rc::Retained, runtime::ProtocolObject,
+    extern_class, extern_conformance, extern_methods,
+    rc::{Allocated, Retained},
+    runtime::NSObject,
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSUInteger};
 
@@ -58,7 +63,7 @@ impl MTL4TileRenderPipelineDescriptor {
         #[unsafe(method_family = none)]
         pub unsafe fn colorAttachments(
             &self,
-        ) -> Retained<MTLTileRenderPipelineColorAttachmentDescriptorArray>;
+        ) -> Retained<TileRenderPipelineColorAttachmentDescriptorArray>;
 
         /// Indicating whether the size of the threadgroup matches the size of a tile in the render pipeline.
         #[unsafe(method(threadgroupSizeMatchesTileSize))]
@@ -97,14 +102,14 @@ impl MTL4TileRenderPipelineDescriptor {
         /// Setting this value to a size of 0 in every dimension disables this property.
         #[unsafe(method(requiredThreadsPerThreadgroup))]
         #[unsafe(method_family = none)]
-        pub unsafe fn requiredThreadsPerThreadgroup(&self) -> MTLSize;
+        pub unsafe fn requiredThreadsPerThreadgroup(&self) -> Size;
 
         /// Setter for [`requiredThreadsPerThreadgroup`][Self::requiredThreadsPerThreadgroup].
         #[unsafe(method(setRequiredThreadsPerThreadgroup:))]
         #[unsafe(method_family = none)]
         pub unsafe fn setRequiredThreadsPerThreadgroup(
             &self,
-            required_threads_per_threadgroup: MTLSize,
+            required_threads_per_threadgroup: Size,
         );
 
         /// Configures an object that contains information about functions to link to the tile render pipeline

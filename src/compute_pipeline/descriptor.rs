@@ -5,30 +5,29 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSString};
 
-use crate::library::Function;
-use crate::{PipelineBufferDescriptorArray, StageInputOutputDescriptor};
+use crate::library::MTLFunction;
+use crate::{MTLPipelineBufferDescriptorArray, MTLStageInputOutputDescriptor};
 
 extern_class!(
     /// Descriptor for creating a `ComputePipelineState`.
     #[unsafe(super(NSObject))]
-    #[name = "MTLComputePipelineDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct ComputePipelineDescriptor;
+    pub struct MTLComputePipelineDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for ComputePipelineDescriptor {}
+    unsafe impl NSCopying for MTLComputePipelineDescriptor {}
 );
 
-unsafe impl CopyingHelper for ComputePipelineDescriptor {
+unsafe impl CopyingHelper for MTLComputePipelineDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for ComputePipelineDescriptor {}
+    unsafe impl NSObjectProtocol for MTLComputePipelineDescriptor {}
 );
 
-impl ComputePipelineDescriptor {
+impl MTLComputePipelineDescriptor {
     extern_methods!(
         #[unsafe(method(label))]
         #[unsafe(method_family = none)]
@@ -41,11 +40,14 @@ impl ComputePipelineDescriptor {
         /// The function to use with the `ComputePipelineState`.
         #[unsafe(method(computeFunction))]
         #[unsafe(method_family = none)]
-        pub fn compute_function(&self) -> Option<Retained<ProtocolObject<dyn Function>>>;
+        pub fn compute_function(&self) -> Option<Retained<ProtocolObject<dyn MTLFunction>>>;
 
         #[unsafe(method(setComputeFunction:))]
         #[unsafe(method_family = none)]
-        pub fn set_compute_function(&self, compute_function: Option<&ProtocolObject<dyn Function>>);
+        pub fn set_compute_function(
+            &self,
+            compute_function: Option<&ProtocolObject<dyn MTLFunction>>,
+        );
 
         /// Optional property. If not set, returns zero.
         #[unsafe(method(maxTotalThreadsPerThreadgroup))]
@@ -59,17 +61,20 @@ impl ComputePipelineDescriptor {
         /// An `StageInputOutputDescriptor` to fetch data from buffers.
         #[unsafe(method(stageInputDescriptor))]
         #[unsafe(method_family = none)]
-        pub fn stage_input_descriptor(&self) -> Option<Retained<StageInputOutputDescriptor>>;
+        pub fn stage_input_descriptor(&self) -> Option<Retained<MTLStageInputOutputDescriptor>>;
 
         /// This is copied when set.
         #[unsafe(method(setStageInputDescriptor:))]
         #[unsafe(method_family = none)]
-        pub fn set_stage_input_descriptor(&self, descriptor: Option<&StageInputOutputDescriptor>);
+        pub fn set_stage_input_descriptor(
+            &self,
+            descriptor: Option<&MTLStageInputOutputDescriptor>,
+        );
 
         /// Optional properties for each buffer binding used by the compute function.
         #[unsafe(method(buffers))]
         #[unsafe(method_family = none)]
-        pub fn buffers(&self) -> Retained<PipelineBufferDescriptorArray>;
+        pub fn buffers(&self) -> Retained<MTLPipelineBufferDescriptorArray>;
 
         /// This flag makes this pipeline usable with indirect command buffers.
         #[unsafe(method(supportIndirectCommandBuffers))]
@@ -87,7 +92,7 @@ impl ComputePipelineDescriptor {
     );
 }
 
-impl ComputePipelineDescriptor {
+impl MTLComputePipelineDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

@@ -8,29 +8,29 @@ use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 extern_class!(
     /// Apple's documentation: `https://developer.apple.com/documentation/metal/mtlvisiblefunctiontabledescriptor?language=objc`
     #[unsafe(super(NSObject))]
-    #[name = "MTLVisibleFunctionTableDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct VisibleFunctionTableDescriptor;
+    pub struct MTLVisibleFunctionTableDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for VisibleFunctionTableDescriptor {}
+    unsafe impl NSCopying for MTLVisibleFunctionTableDescriptor {}
 );
 
-unsafe impl CopyingHelper for VisibleFunctionTableDescriptor {
+unsafe impl CopyingHelper for MTLVisibleFunctionTableDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for VisibleFunctionTableDescriptor {}
+    unsafe impl NSObjectProtocol for MTLVisibleFunctionTableDescriptor {}
 );
 
-impl VisibleFunctionTableDescriptor {
+impl MTLVisibleFunctionTableDescriptor {
     extern_methods!(
         /// Create an autoreleased visible function table descriptor
         #[unsafe(method(visibleFunctionTableDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn visible_function_table_descriptor() -> Retained<VisibleFunctionTableDescriptor>;
+        pub unsafe fn visible_function_table_descriptor()
+        -> Retained<MTLVisibleFunctionTableDescriptor>;
 
         /// The number of functions in the table.
         #[unsafe(method(functionCount))]
@@ -45,7 +45,7 @@ impl VisibleFunctionTableDescriptor {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl VisibleFunctionTableDescriptor {
+impl MTLVisibleFunctionTableDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

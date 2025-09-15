@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Blend factor (from `MTLBlendFactor`).
 #[repr(u64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum BlendFactor {
+pub enum MTLBlendFactor {
     Zero = 0,
     One = 1,
     SourceColor = 2,
@@ -27,10 +27,10 @@ pub enum BlendFactor {
     Unspecialized = 19,
 }
 
-unsafe impl Encode for BlendFactor {
+unsafe impl Encode for MTLBlendFactor {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for BlendFactor {
+unsafe impl RefEncode for MTLBlendFactor {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

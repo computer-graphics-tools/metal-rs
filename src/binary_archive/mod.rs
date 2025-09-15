@@ -1,7 +1,7 @@
-mod archive_trait;
-mod descriptor;
+mod binary_archive;
+mod binary_archive_descriptor;
 mod types;
 
-pub use archive_trait::BinaryArchive;
-pub use descriptor::BinaryArchiveDescriptor;
-pub use types::{BinaryArchiveError, binary_archive_domain};
+pub use binary_archive::MTLBinaryArchive;
+pub use binary_archive_descriptor::MTLBinaryArchiveDescriptor;
+pub use types::{MTLBinaryArchiveError, binary_archive_domain};

@@ -1,11 +1,11 @@
-use crate::drawable::Drawable;
-use crate::function_log::LogContainer;
+use crate::drawable::MTLDrawable;
+use crate::function_log::MTLLogContainer;
 use objc2::{Encode, Encoding, RefEncode, extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSError, NSErrorDomain, NSObjectProtocol, NSString};
 
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum CommandBufferStatus {
+pub enum MTLCommandBufferStatus {
     NotEnqueued = 0,
     Enqueued = 1,
     Committed = 2,
@@ -14,10 +14,10 @@ pub enum CommandBufferStatus {
     Error = 5,
 }
 
-unsafe impl Encode for CommandBufferStatus {
+unsafe impl Encode for MTLCommandBufferStatus {
     const ENCODING: Encoding = u64::ENCODING;
 }
-unsafe impl RefEncode for CommandBufferStatus {
+unsafe impl RefEncode for MTLCommandBufferStatus {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
@@ -31,7 +31,7 @@ pub fn command_buffer_error_domain() -> &'static NSErrorDomain {
 
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum CommandBufferError {
+pub enum MTLCommandBufferError {
     None = 0,
     Internal = 1,
     Timeout = 2,
@@ -45,28 +45,27 @@ pub enum CommandBufferError {
     StackOverflow = 12,
 }
 
-unsafe impl Encode for CommandBufferError {
+unsafe impl Encode for MTLCommandBufferError {
     const ENCODING: Encoding = u64::ENCODING;
 }
-unsafe impl RefEncode for CommandBufferError {
+unsafe impl RefEncode for MTLCommandBufferError {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 bitflags::bitflags! {
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-    pub struct CommandBufferErrorOption: u64 { const None = 0; const EncoderExecutionStatus = 1<<0; }
+    pub struct MTLCommandBufferErrorOption: u64 { const None = 0; const EncoderExecutionStatus = 1<<0; }
 }
-unsafe impl Encode for CommandBufferErrorOption {
+unsafe impl Encode for MTLCommandBufferErrorOption {
     const ENCODING: Encoding = u64::ENCODING;
 }
-unsafe impl RefEncode for CommandBufferErrorOption {
+unsafe impl RefEncode for MTLCommandBufferErrorOption {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 extern_protocol!(
     /// Opaque command buffer type for primary Metal command queues.
-    #[name = "MTLCommandBuffer"]
-    pub unsafe trait CommandBuffer: NSObjectProtocol {
+    pub unsafe trait MTLCommandBuffer: NSObjectProtocol {
         #[unsafe(method(commit))]
         #[unsafe(method_family = none)]
         fn commit(&self);
@@ -89,16 +88,16 @@ extern_protocol!(
 
         #[unsafe(method(status))]
         #[unsafe(method_family = none)]
-        fn status(&self) -> CommandBufferStatus;
+        fn status(&self) -> MTLCommandBufferStatus;
 
         #[unsafe(method(logs))]
         #[unsafe(method_family = none)]
-        unsafe fn logs(&self) -> Retained<ProtocolObject<dyn LogContainer>>;
+        unsafe fn logs(&self) -> Retained<ProtocolObject<dyn MTLLogContainer>>;
 
         // Completion handler API omitted in this port.
 
         #[unsafe(method(presentDrawable:))]
         #[unsafe(method_family = none)]
-        fn present_drawable(&self, drawable: &ProtocolObject<dyn Drawable>);
+        fn present_drawable(&self, drawable: &ProtocolObject<dyn MTLDrawable>);
     }
 );

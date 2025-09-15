@@ -5,47 +5,46 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use super::RenderPassAttachmentDescriptor;
+use super::MTLRenderPassAttachmentDescriptor;
 
 /// Controls the MSAA stencil resolve operation.
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum MultisampleStencilResolveFilter {
+pub enum MTLMultisampleStencilResolveFilter {
     /// The stencil sample corresponding to sample 0. Default.
     Sample0 = 0,
     /// The stencil sample corresponding to the depth-resolved sample.
     DepthResolvedSample = 1,
 }
 
-unsafe impl Encode for MultisampleStencilResolveFilter {
+unsafe impl Encode for MTLMultisampleStencilResolveFilter {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for MultisampleStencilResolveFilter {
+unsafe impl RefEncode for MTLMultisampleStencilResolveFilter {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 extern_class!(
     /// Stencil attachment descriptor for a render pass.
-    #[unsafe(super(RenderPassAttachmentDescriptor, NSObject))]
-    #[name = "MTLRenderPassStencilAttachmentDescriptor"]
+    #[unsafe(super(MTLRenderPassAttachmentDescriptor, NSObject))]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct RenderPassStencilAttachmentDescriptor;
+    pub struct MTLRenderPassStencilAttachmentDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for RenderPassStencilAttachmentDescriptor {}
+    unsafe impl NSCopying for MTLRenderPassStencilAttachmentDescriptor {}
 );
 
-unsafe impl CopyingHelper for RenderPassStencilAttachmentDescriptor {
+unsafe impl CopyingHelper for MTLRenderPassStencilAttachmentDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for RenderPassStencilAttachmentDescriptor {}
+    unsafe impl NSObjectProtocol for MTLRenderPassStencilAttachmentDescriptor {}
 );
 
-impl RenderPassStencilAttachmentDescriptor {
+impl MTLRenderPassStencilAttachmentDescriptor {
     extern_methods!(
         /// The clear stencil value to be used if the load action is Clear.
         #[unsafe(method(clearStencil))]
@@ -60,11 +59,11 @@ impl RenderPassStencilAttachmentDescriptor {
         /// The filter to be used for stencil multisample resolve. Defaults to Sample0.
         #[unsafe(method(stencilResolveFilter))]
         #[unsafe(method_family = none)]
-        pub fn stencil_resolve_filter(&self) -> MultisampleStencilResolveFilter;
+        pub fn stencil_resolve_filter(&self) -> MTLMultisampleStencilResolveFilter;
 
         /// Setter for [`stencil_resolve_filter`][Self::stencil_resolve_filter].
         #[unsafe(method(setStencilResolveFilter:))]
         #[unsafe(method_family = none)]
-        pub fn set_stencil_resolve_filter(&self, filter: MultisampleStencilResolveFilter);
+        pub fn set_stencil_resolve_filter(&self, filter: MTLMultisampleStencilResolveFilter);
     );
 }

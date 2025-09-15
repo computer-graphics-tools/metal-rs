@@ -7,14 +7,14 @@ mod resource_id;
 mod sample_position;
 mod size;
 
-pub use data_type::DataType;
-pub use gpu_address::GpuAddress;
-pub use index_type::IndexType;
-pub use origin::Origin;
-pub use region::Region;
-pub use resource_id::ResourceID;
-pub use sample_position::SamplePosition;
-pub use size::Size;
+pub use data_type::MTLDataType;
+pub use gpu_address::MTLGpuAddress;
+pub use index_type::MTLIndexType;
+pub use origin::MTLOrigin;
+pub use region::MTLRegion;
+pub use resource_id::MTLResourceID;
+pub use sample_position::MTLSamplePosition;
+pub use size::MTLSize;
 
 /// A floating point coordinate in an abstract 2D space.
-pub type Coordinate2D = SamplePosition;
+pub type Coordinate2D = MTLSamplePosition;

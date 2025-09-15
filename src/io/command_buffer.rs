@@ -4,31 +4,30 @@ use core::ptr::NonNull;
 use objc2::{Encode, Encoding, RefEncode, extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSError, NSObjectProtocol, NSString, NSUInteger};
 
-use crate::types::{Origin, Size};
-use crate::{Buffer, Texture};
+use crate::types::{MTLOrigin, MTLSize};
+use crate::{MTLBuffer, MTLTexture};
 
 /// Status of an IO command buffer (ported from `MTLIOStatus`).
 #[repr(i64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum IoStatus {
+pub enum MTLIOStatus {
     Pending = 0,
     Cancelled = 1,
     Error = 2,
     Complete = 3,
 }
 
-unsafe impl Encode for IoStatus {
+unsafe impl Encode for MTLIOStatus {
     const ENCODING: Encoding = i64::ENCODING;
 }
 
-unsafe impl RefEncode for IoStatus {
+unsafe impl RefEncode for MTLIOStatus {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
 extern_protocol!(
     /// Represents a list of IO commands for a queue to execute.
-    #[name = "MTLIOCommandBuffer"]
-    pub unsafe trait IoCommandBuffer: NSObjectProtocol {
+    pub unsafe trait MTLIOCommandBuffer: NSObjectProtocol {
         /// Encodes a command that loads from a handle and offset into a memory location.
         ///
         /// Safety: `pointer` must be valid for writes of `size` bytes.
@@ -47,7 +46,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn load_buffer_offset_size_source_handle_source_handle_offset(
             &self,
-            buffer: &ProtocolObject<dyn Buffer>,
+            buffer: &ProtocolObject<dyn MTLBuffer>,
             offset: NSUInteger,
             size: NSUInteger,
             source_handle: &ProtocolObject<dyn crate::io::IoFileHandle>,
@@ -59,13 +58,13 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn load_texture_slice_level_size_source_bytes_per_row_source_bytes_per_image_destination_origin_source_handle_source_handle_offset(
             &self,
-            texture: &ProtocolObject<dyn Texture>,
+            texture: &ProtocolObject<dyn MTLTexture>,
             slice: NSUInteger,
             level: NSUInteger,
-            size: Size,
+            size: MTLSize,
             source_bytes_per_row: NSUInteger,
             source_bytes_per_image: NSUInteger,
-            destination_origin: Origin,
+            destination_origin: MTLOrigin,
             source_handle: &ProtocolObject<dyn crate::io::IoFileHandle>,
             source_handle_offset: NSUInteger,
         );
@@ -75,7 +74,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn copy_status_to_buffer_offset(
             &self,
-            buffer: &ProtocolObject<dyn Buffer>,
+            buffer: &ProtocolObject<dyn MTLBuffer>,
             offset: NSUInteger,
         );
 
@@ -112,7 +111,7 @@ extern_protocol!(
         /// Completion status of the command buffer.
         #[unsafe(method(status))]
         #[unsafe(method_family = none)]
-        unsafe fn status(&self) -> IoStatus;
+        unsafe fn status(&self) -> MTLIOStatus;
 
         /// If an error occurred during execution, the NSError may contain more details.
         #[unsafe(method(error))]

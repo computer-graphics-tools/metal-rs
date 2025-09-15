@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Step function for buffer layouts (ported from `MTLStepFunction`).
 #[repr(u64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum StepFunction {
+pub enum MTLStepFunction {
     Constant = 0,
     PerVertex = 1,
     PerInstance = 2,
@@ -15,10 +15,10 @@ pub enum StepFunction {
     ThreadPositionInGridYIndexed = 8,
 }
 
-unsafe impl Encode for StepFunction {
+unsafe impl Encode for MTLStepFunction {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for StepFunction {
+unsafe impl RefEncode for MTLStepFunction {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Describes texture dimensionality and arrangement (from `MTLTextureType`).
 #[repr(u64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum TextureType {
+pub enum MTLTextureType {
     Type1D = 0,
     Type1DArray = 1,
     Type2D = 2,
@@ -16,12 +16,10 @@ pub enum TextureType {
     TextureBuffer = 9,
 }
 
-unsafe impl Encode for TextureType {
+unsafe impl Encode for MTLTextureType {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for TextureType {
+unsafe impl RefEncode for MTLTextureType {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-

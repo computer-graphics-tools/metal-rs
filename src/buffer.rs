@@ -3,8 +3,8 @@ use objc2_foundation::{NSError, NSRange, NSString};
 use std::{ops::Range, os::raw::c_void, ptr::NonNull};
 
 use crate::{
-    BufferSparseTier, Device, Resource, Tensor, Texture, TextureDescriptor,
-    tensor::TensorDescriptor,
+    MTLBufferSparseTier, MTLDevice, MTLResource, MTLTensor, MTLTexture, MTLTextureDescriptor,
+    tensor::MTLTensorDescriptor,
 };
 
 extern_protocol!(
@@ -19,8 +19,7 @@ extern_protocol!(
     /// This is true even when the regions written do not overlap.
     ///
     /// See also [Apple's documentation](https://developer.apple.com/documentation/metal/mtlbuffer?language=objc)
-    #[name = "MTLBuffer"]
-    pub unsafe trait Buffer: Resource {
+    pub unsafe trait MTLBuffer: MTLResource {
         /// The length of the buffer in bytes.
         #[unsafe(method(length))]
         #[unsafe(method_family = none)]
@@ -36,10 +35,10 @@ extern_protocol!(
         #[unsafe(method_family = new)]
         fn new_texture(
             &self,
-            descriptor: &TextureDescriptor,
+            descriptor: &MTLTextureDescriptor,
             offset: usize,
             bytes_per_row: usize,
-        ) -> Option<Retained<ProtocolObject<dyn Texture>>>;
+        ) -> Option<Retained<ProtocolObject<dyn MTLTexture>>>;
 
         /// Removes all debug markers from a buffer.
         #[unsafe(method(removeAllDebugMarkers))]
@@ -49,7 +48,7 @@ extern_protocol!(
         /// For Metal buffer objects that are remote views, this returns the buffer associated with the storage on the originating device.
         #[unsafe(method(remoteStorageBuffer))]
         #[unsafe(method_family = none)]
-        fn remote_storage_buffer(&self) -> Option<Retained<ProtocolObject<dyn Buffer>>>;
+        fn remote_storage_buffer(&self) -> Option<Retained<ProtocolObject<dyn MTLBuffer>>>;
 
         /// On Metal devices that support peer to peer transfers, this method is used to create a remote buffer view on another device
         /// within the peer group.  The receiver must use MTLStorageModePrivate or be backed by an IOSurface.
@@ -57,8 +56,8 @@ extern_protocol!(
         #[unsafe(method_family = new)]
         fn new_remote_buffer_view_for_device(
             &self,
-            device: &ProtocolObject<dyn Device>,
-        ) -> Option<Retained<ProtocolObject<dyn Buffer>>>;
+            device: &ProtocolObject<dyn MTLDevice>,
+        ) -> Option<Retained<ProtocolObject<dyn MTLBuffer>>>;
 
         /// Represents the GPU virtual address of a buffer resource
         #[unsafe(method(gpuAddress))]
@@ -68,7 +67,7 @@ extern_protocol!(
         /// Query support tier for sparse buffers.
         #[unsafe(method(sparseBufferTier))]
         #[unsafe(method_family = none)]
-        fn sparse_buffer_tier(&self) -> BufferSparseTier;
+        fn sparse_buffer_tier(&self) -> MTLBufferSparseTier;
 
         /// Creates a tensor that shares storage with this buffer.
         ///
@@ -86,14 +85,14 @@ extern_protocol!(
         #[unsafe(method_family = new)]
         unsafe fn new_tensor_with_descriptor_offset_error(
             &self,
-            descriptor: &TensorDescriptor,
+            descriptor: &MTLTensorDescriptor,
             offset: usize,
             error: *mut *mut NSError,
-        ) -> Option<Retained<ProtocolObject<dyn Tensor>>>;
+        ) -> Option<Retained<ProtocolObject<dyn MTLTensor>>>;
     }
 );
 
-pub trait BufferExt: Buffer + Message {
+pub trait BufferExt: MTLBuffer + Message {
     /// Inform the device of the range of a buffer that the CPU has modified, allowing the implementation to invalidate
     /// its caches of the buffer's content.
     ///
@@ -117,7 +116,7 @@ pub trait BufferExt: Buffer + Message {
     fn add_debug_marker(&self, marker: &str, range: Range<usize>);
 }
 
-impl BufferExt for ProtocolObject<dyn Buffer> {
+impl BufferExt for ProtocolObject<dyn MTLBuffer> {
     fn did_modify_range(&self, range: Range<usize>) {
         let _: () = unsafe {
             msg_send![

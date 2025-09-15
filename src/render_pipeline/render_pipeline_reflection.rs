@@ -4,14 +4,13 @@ use objc2_foundation::NSObjectProtocol;
 extern_class!(
     /// Reflection info for a render pipeline.
     #[unsafe(super(NSObject))]
-    #[name = "MTLRenderPipelineReflection"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct RenderPipelineReflection;
+    pub struct MTLRenderPipelineReflection;
 );
 
-unsafe impl Send for RenderPipelineReflection {}
-unsafe impl Sync for RenderPipelineReflection {}
+unsafe impl Send for MTLRenderPipelineReflection {}
+unsafe impl Sync for MTLRenderPipelineReflection {}
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for RenderPipelineReflection {}
+    unsafe impl NSObjectProtocol for MTLRenderPipelineReflection {}
 );

@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Metal feature sets (ported from `MTLFeatureSet`).
 #[repr(u64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum FeatureSet {
+pub enum MTLFeatureSet {
     IosGpuFamily1V1 = 0,
     IosGpuFamily2V1 = 1,
 
@@ -44,12 +44,10 @@ pub enum FeatureSet {
     TvosGpuFamily2V2 = 30005,
 }
 
-unsafe impl Encode for FeatureSet {
+unsafe impl Encode for MTLFeatureSet {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for FeatureSet {
+unsafe impl RefEncode for MTLFeatureSet {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-

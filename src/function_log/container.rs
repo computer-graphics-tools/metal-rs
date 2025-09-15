@@ -3,6 +3,5 @@ use objc2_foundation::NSObjectProtocol;
 
 extern_protocol!(
     /// Container of logs emitted by Metal (bridged from `MTLLogContainer`).
-    #[name = "MTLLogContainer"]
-    pub unsafe trait LogContainer: NSObjectProtocol {}
+    pub unsafe trait MTLLogContainer: NSObjectProtocol {}
 );

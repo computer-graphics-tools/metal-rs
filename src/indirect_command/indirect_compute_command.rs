@@ -1,25 +1,24 @@
 use objc2::{extern_protocol, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSUInteger};
 
-use crate::types::{Region, Size};
-use crate::{Buffer, ComputePipelineState};
+use crate::types::{MTLRegion, MTLSize};
+use crate::{MTLBuffer, MTLComputePipelineState};
 
 extern_protocol!(
     /// Bridged protocol for `MTLIndirectComputeCommand`.
-    #[name = "MTLIndirectComputeCommand"]
-    pub unsafe trait IndirectComputeCommand: NSObjectProtocol {
+    pub unsafe trait MTLIndirectComputeCommand: NSObjectProtocol {
         #[unsafe(method(setComputePipelineState:))]
         #[unsafe(method_family = none)]
         unsafe fn set_compute_pipeline_state(
             &self,
-            pipeline_state: &ProtocolObject<dyn ComputePipelineState>,
+            pipeline_state: &ProtocolObject<dyn MTLComputePipelineState>,
         );
 
         #[unsafe(method(setKernelBuffer:offset:atIndex:))]
         #[unsafe(method_family = none)]
         unsafe fn set_kernel_buffer_offset_at_index(
             &self,
-            buffer: &ProtocolObject<dyn Buffer>,
+            buffer: &ProtocolObject<dyn MTLBuffer>,
             offset: usize,
             index: usize,
         );
@@ -29,7 +28,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn set_kernel_buffer_offset_attribute_stride_at_index(
             &self,
-            buffer: &ProtocolObject<dyn Buffer>,
+            buffer: &ProtocolObject<dyn MTLBuffer>,
             offset: usize,
             stride: usize,
             index: usize,
@@ -39,16 +38,16 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn concurrent_dispatch_threadgroups_threads_per_threadgroup(
             &self,
-            threadgroups_per_grid: Size,
-            threads_per_threadgroup: Size,
+            threadgroups_per_grid: MTLSize,
+            threads_per_threadgroup: MTLSize,
         );
 
         #[unsafe(method(concurrentDispatchThreads:threadsPerThreadgroup:))]
         #[unsafe(method_family = none)]
         unsafe fn concurrent_dispatch_threads_threads_per_threadgroup(
             &self,
-            threads_per_grid: Size,
-            threads_per_threadgroup: Size,
+            threads_per_grid: MTLSize,
+            threads_per_threadgroup: MTLSize,
         );
 
         #[unsafe(method(setBarrier))]
@@ -73,6 +72,6 @@ extern_protocol!(
 
         #[unsafe(method(setStageInRegion:))]
         #[unsafe(method_family = none)]
-        unsafe fn set_stage_in_region(&self, region: Region);
+        unsafe fn set_stage_in_region(&self, region: MTLRegion);
     }
 );

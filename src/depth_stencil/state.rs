@@ -1,12 +1,11 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSString};
 
-use crate::{Device, ResourceID};
+use crate::{MTLDevice, MTLResourceID};
 
 extern_protocol!(
     /// An immutable collection of depth-stencil state compiled for a single device.
-    #[name = "MTLDepthStencilState"]
-    pub unsafe trait DepthStencilState: NSObjectProtocol + Send + Sync {
+    pub unsafe trait MTLDepthStencilState: NSObjectProtocol + Send + Sync {
         /// A string to help identify this object.
         #[unsafe(method(label))]
         #[unsafe(method_family = none)]
@@ -15,13 +14,11 @@ extern_protocol!(
         /// The device this resource was created against.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
-        fn device(&self) -> Retained<ProtocolObject<dyn Device>>;
+        fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
 
         /// Handle of the GPU resource suitable for storing in an Argument Buffer
         #[unsafe(method(gpuResourceID))]
         #[unsafe(method_family = none)]
-        unsafe fn gpu_resource_id(&self) -> ResourceID;
+        unsafe fn gpu_resource_id(&self) -> MTLResourceID;
     }
 );
-
-

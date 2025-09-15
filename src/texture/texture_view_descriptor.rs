@@ -5,49 +5,48 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSRange};
 
-use crate::{PixelFormat, TextureSwizzleChannels, TextureType};
+use crate::{MTLPixelFormat, MTLTextureSwizzleChannels, MTLTextureType};
 
 extern_class!(
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtltextureviewdescriptor?language=objc)
     #[unsafe(super(NSObject))]
-    #[name = "MTLTextureViewDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct TextureViewDescriptor;
+    pub struct MTLTextureViewDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for TextureViewDescriptor {}
+    unsafe impl NSCopying for MTLTextureViewDescriptor {}
 );
 
-unsafe impl CopyingHelper for TextureViewDescriptor {
+unsafe impl CopyingHelper for MTLTextureViewDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for TextureViewDescriptor {}
+    unsafe impl NSObjectProtocol for MTLTextureViewDescriptor {}
 );
 
-impl TextureViewDescriptor {
+impl MTLTextureViewDescriptor {
     extern_methods!(
         /// A desired pixel format of a texture view.
         #[unsafe(method(pixelFormat))]
         #[unsafe(method_family = none)]
-        pub fn pixel_format(&self) -> PixelFormat;
+        pub fn pixel_format(&self) -> MTLPixelFormat;
 
         /// Setter for [`pixelFormat`][Self::pixelFormat].
         #[unsafe(method(setPixelFormat:))]
         #[unsafe(method_family = none)]
-        pub fn set_pixel_format(&self, pixel_format: PixelFormat);
+        pub fn set_pixel_format(&self, pixel_format: MTLPixelFormat);
 
         /// A desired texture view of a texture view.
         #[unsafe(method(textureType))]
         #[unsafe(method_family = none)]
-        pub fn texture_type(&self) -> TextureType;
+        pub fn texture_type(&self) -> MTLTextureType;
 
         /// Setter for [`textureType`][Self::textureType].
         #[unsafe(method(setTextureType:))]
         #[unsafe(method_family = none)]
-        pub fn set_texture_type(&self, texture_type: TextureType);
+        pub fn set_texture_type(&self, texture_type: MTLTextureType);
 
         /// A desired range of mip levels of a texture view.
         #[unsafe(method(levelRange))]
@@ -72,17 +71,17 @@ impl TextureViewDescriptor {
         /// A desired swizzle format of a texture view.
         #[unsafe(method(swizzle))]
         #[unsafe(method_family = none)]
-        pub fn swizzle(&self) -> TextureSwizzleChannels;
+        pub fn swizzle(&self) -> MTLTextureSwizzleChannels;
 
         /// Setter for [`swizzle`][Self::swizzle].
         #[unsafe(method(setSwizzle:))]
         #[unsafe(method_family = none)]
-        pub fn set_swizzle(&self, swizzle: TextureSwizzleChannels);
+        pub fn set_swizzle(&self, swizzle: MTLTextureSwizzleChannels);
     );
 }
 
 /// Methods declared on superclass `NSObject`.
-impl TextureViewDescriptor {
+impl MTLTextureViewDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

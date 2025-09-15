@@ -2,18 +2,17 @@ use core::ptr::NonNull;
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSString};
 
-use crate::{Allocation, Device};
+use crate::{MTLAllocation, MTLDevice};
 
 extern_protocol!(
     /// A residency set manages resource and heap residency, referenced by a command buffer or queue.
     ///
     /// Apple's documentation: `https://developer.apple.com/documentation/metal/mtlresidencyset?language=objc`
-    #[name = "MTLResidencySet"]
-    pub unsafe trait ResidencySet: NSObjectProtocol + Send + Sync {
+    pub unsafe trait MTLResidencySet: NSObjectProtocol + Send + Sync {
         /// The device that created the residency set
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
-        fn device(&self) -> Retained<ProtocolObject<dyn Device>>;
+        fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
 
         /// The label specified at creation.
         #[unsafe(method(label))]
@@ -38,7 +37,7 @@ extern_protocol!(
         /// Adds one allocation to the set, leaving it uncommitted until commit is called.
         #[unsafe(method(addAllocation:))]
         #[unsafe(method_family = none)]
-        fn add_allocation(&self, allocation: &ProtocolObject<dyn Allocation>);
+        fn add_allocation(&self, allocation: &ProtocolObject<dyn MTLAllocation>);
 
         /// Adds allocations to the set, leaving them uncommitted until commit is called.
         ///
@@ -47,14 +46,14 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn add_allocations(
             &self,
-            allocations: NonNull<NonNull<ProtocolObject<dyn Allocation>>>,
+            allocations: NonNull<NonNull<ProtocolObject<dyn MTLAllocation>>>,
             count: usize,
         );
 
         /// Marks an allocation to be removed from the set on the next commit call.
         #[unsafe(method(removeAllocation:))]
         #[unsafe(method_family = none)]
-        fn remove_allocation(&self, allocation: &ProtocolObject<dyn Allocation>);
+        fn remove_allocation(&self, allocation: &ProtocolObject<dyn MTLAllocation>);
 
         /// Marks allocations to be removed from the set on the next commit call.
         ///
@@ -63,7 +62,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn remove_allocations(
             &self,
-            allocations: NonNull<NonNull<ProtocolObject<dyn Allocation>>>,
+            allocations: NonNull<NonNull<ProtocolObject<dyn MTLAllocation>>>,
             count: usize,
         );
 
@@ -76,7 +75,7 @@ extern_protocol!(
         /// This check includes non-committed allocations in the set.
         #[unsafe(method(containsAllocation:))]
         #[unsafe(method_family = none)]
-        fn contains_allocation(&self, allocation: &ProtocolObject<dyn Allocation>) -> bool;
+        fn contains_allocation(&self, allocation: &ProtocolObject<dyn MTLAllocation>) -> bool;
 
         /// Array of all allocations associated with the set.
         /// This property includes non-committed allocations in the set.
@@ -84,7 +83,7 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         fn all_allocations(
             &self,
-        ) -> Retained<objc2_foundation::NSArray<ProtocolObject<dyn Allocation>>>;
+        ) -> Retained<objc2_foundation::NSArray<ProtocolObject<dyn MTLAllocation>>>;
 
         /// Returns the current number of unique allocations present in the set.
         /// This property includes non-committed allocations in the set.

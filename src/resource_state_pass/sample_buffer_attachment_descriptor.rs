@@ -8,24 +8,23 @@ use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 extern_class!(
     /// Sample buffer attachment descriptor for resource state passes
     #[unsafe(super(NSObject))]
-    #[name = "MTLResourceStatePassSampleBufferAttachmentDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct ResourceStatePassSampleBufferAttachmentDescriptor;
+    pub struct MTLResourceStatePassSampleBufferAttachmentDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for ResourceStatePassSampleBufferAttachmentDescriptor {}
+    unsafe impl NSCopying for MTLResourceStatePassSampleBufferAttachmentDescriptor {}
 );
 
-unsafe impl CopyingHelper for ResourceStatePassSampleBufferAttachmentDescriptor {
+unsafe impl CopyingHelper for MTLResourceStatePassSampleBufferAttachmentDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for ResourceStatePassSampleBufferAttachmentDescriptor {}
+    unsafe impl NSObjectProtocol for MTLResourceStatePassSampleBufferAttachmentDescriptor {}
 );
 
-impl ResourceStatePassSampleBufferAttachmentDescriptor {
+impl MTLResourceStatePassSampleBufferAttachmentDescriptor {
     extern_methods!(
         /// The sample index to use to store the sample taken at the start of encoder processing.
         #[unsafe(method(startOfEncoderSampleIndex))]
@@ -50,7 +49,7 @@ impl ResourceStatePassSampleBufferAttachmentDescriptor {
 }
 
 /// Methods declared on superclass `NSObject`.
-impl ResourceStatePassSampleBufferAttachmentDescriptor {
+impl MTLResourceStatePassSampleBufferAttachmentDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]

@@ -1,37 +1,40 @@
-use objc2::{extern_class, extern_conformance, extern_methods, rc::{Allocated, Retained}, runtime::NSObject};
+use objc2::{
+    extern_class, extern_conformance, extern_methods,
+    rc::{Allocated, Retained},
+    runtime::NSObject,
+};
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSString};
 
-use super::{CompareFunction, StencilDescriptor};
+use super::{MTLCompareFunction, MTLStencilDescriptor};
 
 extern_class!(
     /// Descriptor for creating a `DepthStencilState`.
     #[unsafe(super(NSObject))]
-    #[name = "MTLDepthStencilDescriptor"]
     #[derive(Debug, PartialEq, Eq, Hash)]
-    pub struct DepthStencilDescriptor;
+    pub struct MTLDepthStencilDescriptor;
 );
 
 extern_conformance!(
-    unsafe impl NSCopying for DepthStencilDescriptor {}
+    unsafe impl NSCopying for MTLDepthStencilDescriptor {}
 );
 
-unsafe impl CopyingHelper for DepthStencilDescriptor {
+unsafe impl CopyingHelper for MTLDepthStencilDescriptor {
     type Result = Self;
 }
 
 extern_conformance!(
-    unsafe impl NSObjectProtocol for DepthStencilDescriptor {}
+    unsafe impl NSObjectProtocol for MTLDepthStencilDescriptor {}
 );
 
-impl DepthStencilDescriptor {
+impl MTLDepthStencilDescriptor {
     extern_methods!(
         #[unsafe(method(depthCompareFunction))]
         #[unsafe(method_family = none)]
-        pub fn depth_compare_function(&self) -> CompareFunction;
+        pub fn depth_compare_function(&self) -> MTLCompareFunction;
 
         #[unsafe(method(setDepthCompareFunction:))]
         #[unsafe(method_family = none)]
-        pub fn set_depth_compare_function(&self, value: CompareFunction);
+        pub fn set_depth_compare_function(&self, value: MTLCompareFunction);
 
         #[unsafe(method(isDepthWriteEnabled))]
         #[unsafe(method_family = none)]
@@ -43,19 +46,19 @@ impl DepthStencilDescriptor {
 
         #[unsafe(method(frontFaceStencil))]
         #[unsafe(method_family = none)]
-        pub fn front_face_stencil(&self) -> Retained<StencilDescriptor>;
+        pub fn front_face_stencil(&self) -> Retained<MTLStencilDescriptor>;
 
         #[unsafe(method(setFrontFaceStencil:))]
         #[unsafe(method_family = none)]
-        pub fn set_front_face_stencil(&self, value: Option<&StencilDescriptor>);
+        pub fn set_front_face_stencil(&self, value: Option<&MTLStencilDescriptor>);
 
         #[unsafe(method(backFaceStencil))]
         #[unsafe(method_family = none)]
-        pub fn back_face_stencil(&self) -> Retained<StencilDescriptor>;
+        pub fn back_face_stencil(&self) -> Retained<MTLStencilDescriptor>;
 
         #[unsafe(method(setBackFaceStencil:))]
         #[unsafe(method_family = none)]
-        pub fn set_back_face_stencil(&self, value: Option<&StencilDescriptor>);
+        pub fn set_back_face_stencil(&self, value: Option<&MTLStencilDescriptor>);
 
         #[unsafe(method(label))]
         #[unsafe(method_family = none)]
@@ -67,7 +70,7 @@ impl DepthStencilDescriptor {
     );
 }
 
-impl DepthStencilDescriptor {
+impl MTLDepthStencilDescriptor {
     extern_methods!(
         #[unsafe(method(init))]
         #[unsafe(method_family = init)]
@@ -78,5 +81,3 @@ impl DepthStencilDescriptor {
         pub fn new() -> Retained<Self>;
     );
 }
-
-

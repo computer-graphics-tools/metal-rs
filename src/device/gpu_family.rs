@@ -3,7 +3,7 @@ use objc2::{Encode, Encoding, RefEncode};
 /// Metal GPU family (ported from `MTLGPUFamily`).
 #[repr(i64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub enum GpuFamily {
+pub enum MTLGPUFamily {
     Apple1 = 1001,
     Apple2 = 1002,
     Apple3 = 1003,
@@ -28,12 +28,10 @@ pub enum GpuFamily {
     Metal4 = 5002,
 }
 
-unsafe impl Encode for GpuFamily {
+unsafe impl Encode for MTLGPUFamily {
     const ENCODING: Encoding = i64::ENCODING;
 }
 
-unsafe impl RefEncode for GpuFamily {
+unsafe impl RefEncode for MTLGPUFamily {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
-
-
