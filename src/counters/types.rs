@@ -115,5 +115,3 @@ extern "C" {
 pub fn counter_error_domain() -> &'static NSErrorDomain {
     unsafe { MTLCounterErrorDomain }
 }
-
-
