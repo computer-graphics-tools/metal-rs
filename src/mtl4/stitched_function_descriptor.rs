@@ -32,19 +32,19 @@ impl MTL4StitchedFunctionDescriptor {
         /// Sets the graph representing how to stitch functions together.
         #[unsafe(method(functionGraph))]
         #[unsafe(method_family = none)]
-        pub unsafe fn functionGraph(&self) -> Option<Retained<MTLFunctionStitchingGraph>>;
+        pub unsafe fn function_graph(&self) -> Option<Retained<MTLFunctionStitchingGraph>>;
 
         /// Setter for [`functionGraph`][Self::functionGraph].
         ///
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setFunctionGraph:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setFunctionGraph(&self, function_graph: Option<&MTLFunctionStitchingGraph>);
+        pub unsafe fn set_function_graph(&self, function_graph: Option<&MTLFunctionStitchingGraph>);
 
         /// Configures an array of function descriptors with references to functions that contribute to the stitching process.
         #[unsafe(method(functionDescriptors))]
         #[unsafe(method_family = none)]
-        pub unsafe fn functionDescriptors(
+        pub unsafe fn function_descriptors(
             &self,
         ) -> Option<Retained<NSArray<MTL4FunctionDescriptor>>>;
 
@@ -53,7 +53,7 @@ impl MTL4StitchedFunctionDescriptor {
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setFunctionDescriptors:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setFunctionDescriptors(
+        pub unsafe fn set_function_descriptors(
             &self,
             function_descriptors: Option<&NSArray<MTL4FunctionDescriptor>>,
         );

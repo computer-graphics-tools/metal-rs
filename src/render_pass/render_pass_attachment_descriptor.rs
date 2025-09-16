@@ -1,11 +1,7 @@
-use objc2::{
-    extern_class, extern_conformance, extern_methods,
-    runtime::NSObject,
-};
+use objc2::{extern_class, extern_conformance, extern_methods, runtime::NSObject};
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
 use super::{MTLLoadAction, MTLStoreAction, MTLStoreActionOptions};
-use crate::MTLTexture;
 
 extern_class!(
     /// Common attachment descriptor fields.

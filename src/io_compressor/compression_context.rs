@@ -9,12 +9,12 @@ use crate::io_compressor::MTLCompressionStatus;
 pub struct MTLCompressionContext(*mut c_void);
 
 unsafe extern "C-unwind" {
-    fn MTLIOCompressionContextDefaultChunkSize() -> usize;
+    fn mtlio_compression_context_default_chunk_size() -> usize;
 }
 
 unsafe extern "C-unwind" {
     /// Safety: `path` must be a valid, null-terminated C string.
-    fn MTLIOCreateCompressionContext(
+    fn mtlio_create_compression_context(
         path: NonNull<c_char>,
         r#type: MTLIOCompressionMethod,
         chunk_size: usize,
@@ -23,18 +23,18 @@ unsafe extern "C-unwind" {
 
 unsafe extern "C-unwind" {
     /// Safety: `context` and `data` must be valid pointers.
-    fn MTLIOCompressionContextAppendData(context: *mut c_void, data: NonNull<c_void>, size: usize);
+    fn mtlio_compression_context_append_data(context: *mut c_void, data: NonNull<c_void>, size: usize);
 }
 
 unsafe extern "C-unwind" {
     /// Safety: `context` must be a valid pointer.
-    fn MTLIOFlushAndDestroyCompressionContext(context: *mut c_void) -> MTLCompressionStatus;
+    fn mtlio_flush_and_destroy_compression_context(context: *mut c_void) -> MTLCompressionStatus;
 }
 
 impl MTLCompressionContext {
     /// Returns Apple's default chunk size for the compression context.
     pub fn default_chunk_size() -> usize {
-        unsafe { MTLIOCompressionContextDefaultChunkSize() }
+        unsafe { mtlio_compression_context_default_chunk_size() }
     }
 
     /// Create a new compression context that writes to the file at `path`.
@@ -45,7 +45,7 @@ impl MTLCompressionContext {
         method: MTLIOCompressionMethod,
         chunk_size: usize,
     ) -> Option<Self> {
-        let raw = unsafe { MTLIOCreateCompressionContext(path, method, chunk_size) };
+        let raw = unsafe { mtlio_create_compression_context(path, method, chunk_size) };
         if raw.is_null() { None } else { Some(Self(raw)) }
     }
 
@@ -53,13 +53,13 @@ impl MTLCompressionContext {
     ///
     /// Safety: `data` must be valid for reads of `size` bytes for the duration of the call.
     pub unsafe fn append_data(&mut self, data: NonNull<c_void>, size: usize) {
-        unsafe { MTLIOCompressionContextAppendData(self.0, data, size) };
+        unsafe { mtlio_compression_context_append_data(self.0, data, size) };
     }
 
     /// Flush pending data and destroy the context, returning the final status.
     /// The handle becomes invalid after this call.
     pub unsafe fn flush_and_destroy(self) -> MTLCompressionStatus {
-        let status = unsafe { MTLIOFlushAndDestroyCompressionContext(self.0) };
+        let status = unsafe { mtlio_flush_and_destroy_compression_context(self.0) };
         core::mem::forget(self);
         status
     }
@@ -70,7 +70,7 @@ impl Drop for MTLCompressionContext {
         // Best-effort: avoid double-drop by consuming in `flush_and_destroy`.
         // If user forgot to call it, attempt to flush and destroy here.
         unsafe {
-            let _ = MTLIOFlushAndDestroyCompressionContext(self.0);
+            let _ = mtlio_flush_and_destroy_compression_context(self.0);
         }
     }
 }

@@ -1,10 +1,8 @@
 use core::ptr::NonNull;
 
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::NSObjectProtocol;
 
-use super::MTLEvent;
-use super::{MTLSharedEventHandle, MTLSharedEventListener};
+use super::{MTLEvent, MTLSharedEventHandle, MTLSharedEventListener};
 
 pub type SharedEventNotificationBlock =
     *mut block2::DynBlock<dyn Fn(NonNull<ProtocolObject<dyn MTLSharedEvent>>, u64)>;

@@ -5,9 +5,8 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use crate::{MTLCPUCacheMode, MTLHazardTrackingMode, MTLResourceOptions, MTLStorageMode};
-
 use super::{MTLTensorDataType, MTLTensorExtents, MTLTensorUsage};
+use crate::{MTLCPUCacheMode, MTLHazardTrackingMode, MTLResourceOptions, MTLStorageMode};
 
 extern_class!(
     /// A configuration type for creating new tensor instances.
@@ -148,8 +147,6 @@ impl MTLTensorDescriptor {
 mod tests {
     use super::*;
     use crate::tensor::MTLTensorExtents;
-    
-    
 
     fn make_extents(vals: &[isize]) -> Retained<MTLTensorExtents> {
         // Safety: We pass a correct pointer or null based on rank.
@@ -158,11 +155,6 @@ mod tests {
 
     #[test]
     fn tensor_descriptor_round_trip() {
-        // Skip if class is unavailable (older OS/toolchain)
-        if AnyClass::get(CStr::from_bytes_with_nul(b"MTLTensorDescriptor\0").unwrap()).is_none() {
-            return;
-        }
-
         let desc = unsafe { MTLTensorDescriptor::new() };
 
         // dimensions

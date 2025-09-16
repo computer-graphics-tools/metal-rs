@@ -6,7 +6,7 @@ use objc2::{Encode, Encoding, RefEncode};
 pub struct MTLFunctionLogType(pub usize);
 
 impl MTLFunctionLogType {
-    pub const Validation: Self = Self(0);
+    pub const VALIDATION: Self = Self(0);
 }
 
 unsafe impl Encode for MTLFunctionLogType {

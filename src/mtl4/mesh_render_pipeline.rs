@@ -36,14 +36,14 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// Assigns a function descriptor representing the function this pipeline executes for each *object* in the object shader stage.
         #[unsafe(method(objectFunctionDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn objectFunctionDescriptor(&self) -> Option<Retained<MTL4FunctionDescriptor>>;
+        pub unsafe fn object_function_descriptor(&self) -> Option<Retained<MTL4FunctionDescriptor>>;
 
         /// Setter for [`objectFunctionDescriptor`][Self::objectFunctionDescriptor].
         ///
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setObjectFunctionDescriptor:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setObjectFunctionDescriptor(
+        pub unsafe fn set_object_function_descriptor(
             &self,
             object_function_descriptor: Option<&MTL4FunctionDescriptor>,
         );
@@ -51,14 +51,14 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// Assigns a function descriptor representing the function this pipeline executes for each primitive in the mesh shader stage.
         #[unsafe(method(meshFunctionDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn meshFunctionDescriptor(&self) -> Option<Retained<MTL4FunctionDescriptor>>;
+        pub unsafe fn mesh_function_descriptor(&self) -> Option<Retained<MTL4FunctionDescriptor>>;
 
         /// Setter for [`meshFunctionDescriptor`][Self::meshFunctionDescriptor].
         ///
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setMeshFunctionDescriptor:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setMeshFunctionDescriptor(
+        pub unsafe fn set_mesh_function_descriptor(
             &self,
             mesh_function_descriptor: Option<&MTL4FunctionDescriptor>,
         );
@@ -66,7 +66,7 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// Assigns a function descriptor representing the function this pipeline executes for each fragment.
         #[unsafe(method(fragmentFunctionDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn fragmentFunctionDescriptor(&self)
+        pub unsafe fn fragment_function_descriptor(&self)
         -> Option<Retained<MTL4FunctionDescriptor>>;
 
         /// Setter for [`fragmentFunctionDescriptor`][Self::fragmentFunctionDescriptor].
@@ -74,7 +74,7 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setFragmentFunctionDescriptor:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setFragmentFunctionDescriptor(
+        pub unsafe fn set_fragment_function_descriptor(
             &self,
             fragment_function_descriptor: Option<&MTL4FunctionDescriptor>,
         );
@@ -101,12 +101,12 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// ://developer.apple.com/metal/Metal-Feature-Set-Tables.pdf>.
         #[unsafe(method(maxTotalThreadsPerObjectThreadgroup))]
         #[unsafe(method_family = none)]
-        pub unsafe fn maxTotalThreadsPerObjectThreadgroup(&self) -> NSUInteger;
+        pub unsafe fn max_total_threads_per_object_threadgroup(&self) -> NSUInteger;
 
         /// Setter for [`maxTotalThreadsPerObjectThreadgroup`][Self::maxTotalThreadsPerObjectThreadgroup].
         #[unsafe(method(setMaxTotalThreadsPerObjectThreadgroup:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setMaxTotalThreadsPerObjectThreadgroup(
+        pub unsafe fn set_max_total_threads_per_object_threadgroup(
             &self,
             max_total_threads_per_object_threadgroup: NSUInteger,
         );
@@ -133,12 +133,12 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// ://developer.apple.com/metal/Metal-Feature-Set-Tables.pdf>.
         #[unsafe(method(maxTotalThreadsPerMeshThreadgroup))]
         #[unsafe(method_family = none)]
-        pub unsafe fn maxTotalThreadsPerMeshThreadgroup(&self) -> NSUInteger;
+        pub unsafe fn max_total_threads_per_mesh_threadgroup(&self) -> NSUInteger;
 
         /// Setter for [`maxTotalThreadsPerMeshThreadgroup`][Self::maxTotalThreadsPerMeshThreadgroup].
         #[unsafe(method(setMaxTotalThreadsPerMeshThreadgroup:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setMaxTotalThreadsPerMeshThreadgroup(
+        pub unsafe fn set_max_total_threads_per_mesh_threadgroup(
             &self,
             max_total_threads_per_mesh_threadgroup: NSUInteger,
         );
@@ -156,12 +156,12 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// Setting this value to a size of 0 in every dimension disables this property.
         #[unsafe(method(requiredThreadsPerObjectThreadgroup))]
         #[unsafe(method_family = none)]
-        pub unsafe fn requiredThreadsPerObjectThreadgroup(&self) -> MTLSize;
+        pub unsafe fn required_threads_per_object_threadgroup(&self) -> MTLSize;
 
         /// Setter for [`requiredThreadsPerObjectThreadgroup`][Self::requiredThreadsPerObjectThreadgroup].
         #[unsafe(method(setRequiredThreadsPerObjectThreadgroup:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setRequiredThreadsPerObjectThreadgroup(
+        pub unsafe fn set_required_threads_per_object_threadgroup(
             &self,
             required_threads_per_object_threadgroup: MTLSize,
         );
@@ -179,12 +179,12 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// Setting this value to a size of 0 in every dimension disables this property.
         #[unsafe(method(requiredThreadsPerMeshThreadgroup))]
         #[unsafe(method_family = none)]
-        pub unsafe fn requiredThreadsPerMeshThreadgroup(&self) -> MTLSize;
+        pub unsafe fn required_threads_per_mesh_threadgroup(&self) -> MTLSize;
 
         /// Setter for [`requiredThreadsPerMeshThreadgroup`][Self::requiredThreadsPerMeshThreadgroup].
         #[unsafe(method(setRequiredThreadsPerMeshThreadgroup:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setRequiredThreadsPerMeshThreadgroup(
+        pub unsafe fn set_required_threads_per_mesh_threadgroup(
             &self,
             required_threads_per_mesh_threadgroup: MTLSize,
         );
@@ -204,12 +204,12 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// ://com.apple.documentation/documentation/swift/false>.
         #[unsafe(method(objectThreadgroupSizeIsMultipleOfThreadExecutionWidth))]
         #[unsafe(method_family = none)]
-        pub unsafe fn objectThreadgroupSizeIsMultipleOfThreadExecutionWidth(&self) -> bool;
+        pub unsafe fn object_threadgroup_size_is_multiple_of_thread_execution_width(&self) -> bool;
 
         /// Setter for [`objectThreadgroupSizeIsMultipleOfThreadExecutionWidth`][Self::objectThreadgroupSizeIsMultipleOfThreadExecutionWidth].
         #[unsafe(method(setObjectThreadgroupSizeIsMultipleOfThreadExecutionWidth:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setObjectThreadgroupSizeIsMultipleOfThreadExecutionWidth(
+        pub unsafe fn set_object_threadgroup_size_is_multiple_of_thread_execution_width(
             &self,
             object_threadgroup_size_is_multiple_of_thread_execution_width: bool,
         );
@@ -229,12 +229,12 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// ://com.apple.documentation/documentation/swift/false>.
         #[unsafe(method(meshThreadgroupSizeIsMultipleOfThreadExecutionWidth))]
         #[unsafe(method_family = none)]
-        pub unsafe fn meshThreadgroupSizeIsMultipleOfThreadExecutionWidth(&self) -> bool;
+        pub unsafe fn mesh_threadgroup_size_is_multiple_of_thread_execution_width(&self) -> bool;
 
         /// Setter for [`meshThreadgroupSizeIsMultipleOfThreadExecutionWidth`][Self::meshThreadgroupSizeIsMultipleOfThreadExecutionWidth].
         #[unsafe(method(setMeshThreadgroupSizeIsMultipleOfThreadExecutionWidth:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setMeshThreadgroupSizeIsMultipleOfThreadExecutionWidth(
+        pub unsafe fn set_mesh_threadgroup_size_is_multiple_of_thread_execution_width(
             &self,
             mesh_threadgroup_size_is_multiple_of_thread_execution_width: bool,
         );
@@ -250,12 +250,12 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// The default value is `0`.
         #[unsafe(method(payloadMemoryLength))]
         #[unsafe(method_family = none)]
-        pub unsafe fn payloadMemoryLength(&self) -> NSUInteger;
+        pub unsafe fn payload_memory_length(&self) -> NSUInteger;
 
         /// Setter for [`payloadMemoryLength`][Self::payloadMemoryLength].
         #[unsafe(method(setPayloadMemoryLength:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setPayloadMemoryLength(&self, payload_memory_length: NSUInteger);
+        pub unsafe fn set_payload_memory_length(&self, payload_memory_length: NSUInteger);
 
         /// Controls the largest number of threads the pipeline state can execute when the object stage of a mesh
         /// render pipeline you create from this descriptor dispatches its mesh stage.
@@ -276,12 +276,12 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// ://developer.apple.com/metal/Metal-Feature-Set-Tables.pdf>.
         #[unsafe(method(maxTotalThreadgroupsPerMeshGrid))]
         #[unsafe(method_family = none)]
-        pub unsafe fn maxTotalThreadgroupsPerMeshGrid(&self) -> NSUInteger;
+        pub unsafe fn max_total_threadgroups_per_mesh_grid(&self) -> NSUInteger;
 
         /// Setter for [`maxTotalThreadgroupsPerMeshGrid`][Self::maxTotalThreadgroupsPerMeshGrid].
         #[unsafe(method(setMaxTotalThreadgroupsPerMeshGrid:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setMaxTotalThreadgroupsPerMeshGrid(
+        pub unsafe fn set_max_total_threadgroups_per_mesh_grid(
             &self,
             max_total_threadgroups_per_mesh_grid: NSUInteger,
         );
@@ -289,22 +289,22 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// Sets number of samples this pipeline applies for each fragment.
         #[unsafe(method(rasterSampleCount))]
         #[unsafe(method_family = none)]
-        pub unsafe fn rasterSampleCount(&self) -> NSUInteger;
+        pub unsafe fn raster_sample_count(&self) -> NSUInteger;
 
         /// Setter for [`rasterSampleCount`][Self::rasterSampleCount].
         #[unsafe(method(setRasterSampleCount:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setRasterSampleCount(&self, raster_sample_count: NSUInteger);
+        pub unsafe fn set_raster_sample_count(&self, raster_sample_count: NSUInteger);
 
         /// Indicates whether to read and use the alpha channel fragment output of color attachments to compute a sample coverage mask.
         #[unsafe(method(alphaToCoverageState))]
         #[unsafe(method_family = none)]
-        pub unsafe fn alphaToCoverageState(&self) -> MTL4AlphaToCoverageState;
+        pub unsafe fn alpha_to_coverage_state(&self) -> MTL4AlphaToCoverageState;
 
         /// Setter for [`alphaToCoverageState`][Self::alphaToCoverageState].
         #[unsafe(method(setAlphaToCoverageState:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setAlphaToCoverageState(
+        pub unsafe fn set_alpha_to_coverage_state(
             &self,
             alpha_to_coverage_state: MTL4AlphaToCoverageState,
         );
@@ -312,12 +312,12 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// Indicates whether the pipeline forces alpha channel values of color attachments to the largest representable value.
         #[unsafe(method(alphaToOneState))]
         #[unsafe(method_family = none)]
-        pub unsafe fn alphaToOneState(&self) -> MTL4AlphaToOneState;
+        pub unsafe fn alpha_to_one_state(&self) -> MTL4AlphaToOneState;
 
         /// Setter for [`alphaToOneState`][Self::alphaToOneState].
         #[unsafe(method(setAlphaToOneState:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setAlphaToOneState(&self, alpha_to_one_state: MTL4AlphaToOneState);
+        pub unsafe fn set_alpha_to_one_state(&self, alpha_to_one_state: MTL4AlphaToOneState);
 
         /// Determines whether the pipeline rasterizes primitives.
         ///
@@ -330,12 +330,12 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// don't provide a fragment shader function via function ``fragmentFunctionDescriptor``.
         #[unsafe(method(isRasterizationEnabled))]
         #[unsafe(method_family = none)]
-        pub unsafe fn isRasterizationEnabled(&self) -> bool;
+        pub unsafe fn is_rasterization_enabled(&self) -> bool;
 
         /// Setter for [`isRasterizationEnabled`][Self::isRasterizationEnabled].
         #[unsafe(method(setRasterizationEnabled:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setRasterizationEnabled(&self, rasterization_enabled: bool);
+        pub unsafe fn set_rasterization_enabled(&self, rasterization_enabled: bool);
 
         /// Determines the maximum value that can you can pass as the pipeline's amplification count.
         ///
@@ -343,12 +343,12 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// when using vertex amplification with this pipeline.
         #[unsafe(method(maxVertexAmplificationCount))]
         #[unsafe(method_family = none)]
-        pub unsafe fn maxVertexAmplificationCount(&self) -> NSUInteger;
+        pub unsafe fn max_vertex_amplification_count(&self) -> NSUInteger;
 
         /// Setter for [`maxVertexAmplificationCount`][Self::maxVertexAmplificationCount].
         #[unsafe(method(setMaxVertexAmplificationCount:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setMaxVertexAmplificationCount(
+        pub unsafe fn set_max_vertex_amplification_count(
             &self,
             max_vertex_amplification_count: NSUInteger,
         );
@@ -356,7 +356,7 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// Accesses an array containing descriptions of the color attachments this pipeline writes to.
         #[unsafe(method(colorAttachments))]
         #[unsafe(method_family = none)]
-        pub unsafe fn colorAttachments(
+        pub unsafe fn color_attachments(
             &self,
         ) -> Retained<MTL4RenderPipelineColorAttachmentDescriptorArray>;
 
@@ -365,7 +365,7 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// Use this property to link extra shader functions to the object stage of the render pipeline.
         #[unsafe(method(objectStaticLinkingDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn objectStaticLinkingDescriptor(&self)
+        pub unsafe fn object_static_linking_descriptor(&self)
         -> Retained<MTL4StaticLinkingDescriptor>;
 
         /// Setter for [`objectStaticLinkingDescriptor`][Self::objectStaticLinkingDescriptor].
@@ -373,7 +373,7 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setObjectStaticLinkingDescriptor:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setObjectStaticLinkingDescriptor(
+        pub unsafe fn set_object_static_linking_descriptor(
             &self,
             object_static_linking_descriptor: Option<&MTL4StaticLinkingDescriptor>,
         );
@@ -383,14 +383,14 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// Use this property to link extra shader functions to the mesh stage of the render pipeline.
         #[unsafe(method(meshStaticLinkingDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn meshStaticLinkingDescriptor(&self) -> Retained<MTL4StaticLinkingDescriptor>;
+        pub unsafe fn mesh_static_linking_descriptor(&self) -> Retained<MTL4StaticLinkingDescriptor>;
 
         /// Setter for [`meshStaticLinkingDescriptor`][Self::meshStaticLinkingDescriptor].
         ///
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setMeshStaticLinkingDescriptor:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setMeshStaticLinkingDescriptor(
+        pub unsafe fn set_mesh_static_linking_descriptor(
             &self,
             mesh_static_linking_descriptor: Option<&MTL4StaticLinkingDescriptor>,
         );
@@ -400,7 +400,7 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// Use this property to link extra shader functions to the fragment stage of the render pipeline.
         #[unsafe(method(fragmentStaticLinkingDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn fragmentStaticLinkingDescriptor(
+        pub unsafe fn fragment_static_linking_descriptor(
             &self,
         ) -> Retained<MTL4StaticLinkingDescriptor>;
 
@@ -409,7 +409,7 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setFragmentStaticLinkingDescriptor:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setFragmentStaticLinkingDescriptor(
+        pub unsafe fn set_fragment_static_linking_descriptor(
             &self,
             fragment_static_linking_descriptor: Option<&MTL4StaticLinkingDescriptor>,
         );
@@ -418,34 +418,34 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// shader function’s callable functions list.
         #[unsafe(method(supportObjectBinaryLinking))]
         #[unsafe(method_family = none)]
-        pub unsafe fn supportObjectBinaryLinking(&self) -> bool;
+        pub unsafe fn support_object_binary_linking(&self) -> bool;
 
         /// Setter for [`supportObjectBinaryLinking`][Self::supportObjectBinaryLinking].
         #[unsafe(method(setSupportObjectBinaryLinking:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setSupportObjectBinaryLinking(&self, support_object_binary_linking: bool);
+        pub unsafe fn set_support_object_binary_linking(&self, support_object_binary_linking: bool);
 
         /// Indicates whether you can use the render pipeline to create new pipelines by adding binary functions to the mesh
         /// shader function’s callable functions list.
         #[unsafe(method(supportMeshBinaryLinking))]
         #[unsafe(method_family = none)]
-        pub unsafe fn supportMeshBinaryLinking(&self) -> bool;
+        pub unsafe fn support_mesh_binary_linking(&self) -> bool;
 
         /// Setter for [`supportMeshBinaryLinking`][Self::supportMeshBinaryLinking].
         #[unsafe(method(setSupportMeshBinaryLinking:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setSupportMeshBinaryLinking(&self, support_mesh_binary_linking: bool);
+        pub unsafe fn set_support_mesh_binary_linking(&self, support_mesh_binary_linking: bool);
 
         /// Indicates whether you can use the render pipeline to create new pipelines by adding binary functions to the fragment
         /// shader function’s callable functions list.
         #[unsafe(method(supportFragmentBinaryLinking))]
         #[unsafe(method_family = none)]
-        pub unsafe fn supportFragmentBinaryLinking(&self) -> bool;
+        pub unsafe fn support_fragment_binary_linking(&self) -> bool;
 
         /// Setter for [`supportFragmentBinaryLinking`][Self::supportFragmentBinaryLinking].
         #[unsafe(method(setSupportFragmentBinaryLinking:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setSupportFragmentBinaryLinking(&self, support_fragment_binary_linking: bool);
+        pub unsafe fn set_support_fragment_binary_linking(&self, support_fragment_binary_linking: bool);
 
         /// Sets the logical-to-physical rendering remap state.
         ///
@@ -453,14 +453,14 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// physical color attachments.
         #[unsafe(method(colorAttachmentMappingState))]
         #[unsafe(method_family = none)]
-        pub unsafe fn colorAttachmentMappingState(
+        pub unsafe fn color_attachment_mapping_state(
             &self,
         ) -> MTL4LogicalToPhysicalColorAttachmentMappingState;
 
         /// Setter for [`colorAttachmentMappingState`][Self::colorAttachmentMappingState].
         #[unsafe(method(setColorAttachmentMappingState:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setColorAttachmentMappingState(
+        pub unsafe fn set_color_attachment_mapping_state(
             &self,
             color_attachment_mapping_state: MTL4LogicalToPhysicalColorAttachmentMappingState,
         );
@@ -468,13 +468,13 @@ impl MTL4MeshRenderPipelineDescriptor {
         /// Indicates whether the pipeline supports indirect command buffers.
         #[unsafe(method(supportIndirectCommandBuffers))]
         #[unsafe(method_family = none)]
-        pub unsafe fn supportIndirectCommandBuffers(&self)
+        pub unsafe fn support_indirect_command_buffers(&self)
         -> MTL4IndirectCommandBufferSupportState;
 
         /// Setter for [`supportIndirectCommandBuffers`][Self::supportIndirectCommandBuffers].
         #[unsafe(method(setSupportIndirectCommandBuffers:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setSupportIndirectCommandBuffers(
+        pub unsafe fn set_support_indirect_command_buffers(
             &self,
             support_indirect_command_buffers: MTL4IndirectCommandBufferSupportState,
         );

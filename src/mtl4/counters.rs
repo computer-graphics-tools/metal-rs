@@ -37,10 +37,10 @@ pub struct MTL4CounterHeapType(pub NSInteger);
 impl MTL4CounterHeapType {
     /// Specifies that ``MTL4CounterHeap`` entries contain invalid data.
     #[doc(alias = "MTL4CounterHeapTypeInvalid")]
-    pub const Invalid: Self = Self(0);
+    pub const INVALID: Self = Self(0);
     /// Specifies that ``MTL4CounterHeap`` entries contain GPU timestamp data.
     #[doc(alias = "MTL4CounterHeapTypeTimestamp")]
-    pub const Timestamp: Self = Self(1);
+    pub const TIMESTAMP: Self = Self(1);
 }
 
 unsafe impl Encode for MTL4CounterHeapType {
@@ -68,12 +68,12 @@ impl MTL4TimestampGranularity {
     /// Using this granularity incurs in the lowest overhead, at the cost of precision. For example, it may sample at
     /// command encoder boundaries.
     #[doc(alias = "MTL4TimestampGranularityRelaxed")]
-    pub const Relaxed: Self = Self(0);
+    pub const RELAXED: Self = Self(0);
     /// A timestamp as precise as possible.
     ///
     /// Using this granularity may incur in a performance penalty, for example, it may cause splitting of command encoders.
     #[doc(alias = "MTL4TimestampGranularityPrecise")]
-    pub const Precise: Self = Self(1);
+    pub const PRECISE: Self = Self(1);
 }
 
 unsafe impl Encode for MTL4TimestampGranularity {
@@ -115,7 +115,7 @@ impl MTL4CounterHeapDescriptor {
         /// Setter for [`type`][Self::type].
         #[unsafe(method(setType:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setType(&self, r#type: MTL4CounterHeapType);
+        pub unsafe fn set_type(&self, r#type: MTL4CounterHeapType);
 
         /// Assigns the number of entries in the heap.
         ///
@@ -127,7 +127,7 @@ impl MTL4CounterHeapDescriptor {
         /// Setter for [`count`][Self::count].
         #[unsafe(method(setCount:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setCount(&self, count: NSUInteger);
+        pub unsafe fn set_count(&self, count: NSUInteger);
     );
 }
 
@@ -161,7 +161,7 @@ extern_protocol!(
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setLabel:))]
         #[unsafe(method_family = none)]
-        unsafe fn setLabel(&self, label: Option<&NSString>);
+        unsafe fn set_label(&self, label: Option<&NSString>);
 
         /// Queries the number of entries in the heap.
         #[unsafe(method(count))]
@@ -186,7 +186,7 @@ extern_protocol!(
         /// - Returns a newly allocated autoreleased NSData containing tightly packed resolved heap counter values.
         #[unsafe(method(resolveCounterRange:))]
         #[unsafe(method_family = none)]
-        unsafe fn resolveCounterRange(&self, range: NSRange) -> Option<Retained<NSData>>;
+        unsafe fn resolve_counter_range(&self, range: NSRange) -> Option<Retained<NSData>>;
 
         /// Invalidates a range of entries in this counter heap.
         ///
@@ -198,6 +198,6 @@ extern_protocol!(
         /// - range: A heap index range to invalidate.
         #[unsafe(method(invalidateCounterRange:))]
         #[unsafe(method_family = none)]
-        unsafe fn invalidateCounterRange(&self, range: NSRange);
+        unsafe fn invalidate_counter_range(&self, range: NSRange);
     }
 );

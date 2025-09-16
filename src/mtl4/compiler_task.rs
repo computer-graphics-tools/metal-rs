@@ -18,16 +18,16 @@ pub struct MTL4CompilerTaskStatus(pub NSInteger);
 impl MTL4CompilerTaskStatus {
     /// No status.
     #[doc(alias = "MTL4CompilerTaskStatusNone")]
-    pub const None: Self = Self(0);
+    pub const NONE: Self = Self(0);
     /// The compiler task is currently scheduled.
     #[doc(alias = "MTL4CompilerTaskStatusScheduled")]
-    pub const Scheduled: Self = Self(1);
+    pub const SCHEDULED: Self = Self(1);
     /// The compiler task is currently compiling.
     #[doc(alias = "MTL4CompilerTaskStatusCompiling")]
-    pub const Compiling: Self = Self(2);
+    pub const COMPILING: Self = Self(2);
     /// The compiler task is finished.
     #[doc(alias = "MTL4CompilerTaskStatusFinished")]
-    pub const Finished: Self = Self(3);
+    pub const FINISHED: Self = Self(3);
 }
 
 unsafe impl Encode for MTL4CompilerTaskStatus {
@@ -58,6 +58,6 @@ extern_protocol!(
         /// Waits synchronously for this compile task to complete by blocking the calling thread.
         #[unsafe(method(waitUntilCompleted))]
         #[unsafe(method_family = none)]
-        unsafe fn waitUntilCompleted(&self);
+        unsafe fn wait_until_completed(&self);
     }
 );

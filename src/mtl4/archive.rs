@@ -48,7 +48,7 @@ extern_protocol!(
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setLabel:))]
         #[unsafe(method_family = none)]
-        unsafe fn setLabel(&self, label: Option<&NSString>);
+        unsafe fn set_label(&self, label: Option<&NSString>);
 
         /// Creates a compute pipeline state from the archive with a descriptor.
         ///
@@ -59,7 +59,7 @@ extern_protocol!(
         /// - Returns: A compute pipeline state if the method succeeds, otherwise `nil`.
         #[unsafe(method(newComputePipelineStateWithDescriptor:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newComputePipelineStateWithDescriptor_error(
+        unsafe fn new_compute_pipeline_state_with_descriptor_error(
             &self,
             descriptor: &MTL4ComputePipelineDescriptor,
         ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, Retained<NSError>>;
@@ -75,7 +75,7 @@ extern_protocol!(
         /// - Returns: A compute pipeline state if the method succeeds, otherwise `nil`.
         #[unsafe(method(newComputePipelineStateWithDescriptor:dynamicLinkingDescriptor:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newComputePipelineStateWithDescriptor_dynamicLinkingDescriptor_error(
+        unsafe fn new_compute_pipeline_state_with_descriptor_dynamic_linking_descriptor_error(
             &self,
             descriptor: &MTL4ComputePipelineDescriptor,
             dynamic_linking_descriptor: &MTL4PipelineStageDynamicLinkingDescriptor,
@@ -95,7 +95,7 @@ extern_protocol!(
         /// - Returns: A render pipeline state if the method succeeds, otherwise `nil`.
         #[unsafe(method(newRenderPipelineStateWithDescriptor:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newRenderPipelineStateWithDescriptor_error(
+        unsafe fn new_render_pipeline_state_with_descriptor_error(
             &self,
             descriptor: &MTL4PipelineDescriptor,
         ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Retained<NSError>>;
@@ -116,7 +116,7 @@ extern_protocol!(
         /// - Returns: A render pipeline state if the method succeeds, otherwise `nil`.
         #[unsafe(method(newRenderPipelineStateWithDescriptor:dynamicLinkingDescriptor:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newRenderPipelineStateWithDescriptor_dynamicLinkingDescriptor_error(
+        unsafe fn new_render_pipeline_state_with_descriptor_dynamic_linking_descriptor_error(
             &self,
             descriptor: &MTL4PipelineDescriptor,
             dynamic_linking_descriptor: &MTL4RenderPipelineDynamicLinkingDescriptor,
@@ -129,7 +129,7 @@ extern_protocol!(
         /// - Returns: a binary function object, otherwise `nil`.
         #[unsafe(method(newBinaryFunctionWithDescriptor:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newBinaryFunctionWithDescriptor_error(
+        unsafe fn new_binary_function_with_descriptor_error(
             &self,
             descriptor: &MTL4BinaryFunctionDescriptor,
         ) -> Result<Retained<ProtocolObject<dyn MTL4BinaryFunction>>, Retained<NSError>>;

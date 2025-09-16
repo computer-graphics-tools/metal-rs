@@ -25,7 +25,7 @@ extern_conformance!(
 
 impl MTLRenderPipelineColorAttachmentDescriptor {
     extern_methods!(
-        /// Pixel format. Defaults to PixelFormat::Invalid
+        /// Pixel format. Defaults to PixelFormat::INVALID
         #[unsafe(method(pixelFormat))]
         #[unsafe(method_family = none)]
         pub fn pixel_format(&self) -> MTLPixelFormat;

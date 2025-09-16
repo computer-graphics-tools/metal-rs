@@ -17,11 +17,11 @@ pub unsafe fn binary_archive_domain() -> &'static NSErrorDomain { unsafe {
 pub struct MTLBinaryArchiveError(pub u64);
 
 impl MTLBinaryArchiveError {
-    pub const None: Self = Self(0);
-    pub const InvalidFile: Self = Self(1);
-    pub const UnexpectedElement: Self = Self(2);
-    pub const CompilationFailure: Self = Self(3);
-    pub const InternalError: Self = Self(4);
+    pub const NONE: Self = Self(0);
+    pub const INVALID_FILE: Self = Self(1);
+    pub const UNEXPECTED_ELEMENT: Self = Self(2);
+    pub const COMPILATION_FAILURE: Self = Self(3);
+    pub const INTERNAL_ERROR: Self = Self(4);
 }
 
 unsafe impl Encode for MTLBinaryArchiveError {

@@ -55,19 +55,19 @@ impl MTL4CompilerDescriptor {
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setLabel:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setLabel(&self, label: Option<&NSString>);
+        pub unsafe fn set_label(&self, label: Option<&NSString>);
 
         /// Assigns a pipeline data set serializer into which this compiler stores data for all pipelines it creates.
         #[unsafe(method(pipelineDataSetSerializer))]
         #[unsafe(method_family = none)]
-        pub unsafe fn pipelineDataSetSerializer(
+        pub unsafe fn pipeline_data_set_serializer(
             &self,
         ) -> Option<Retained<ProtocolObject<dyn MTL4PipelineDataSetSerializer>>>;
 
         /// Setter for [`pipelineDataSetSerializer`][Self::pipelineDataSetSerializer].
         #[unsafe(method(setPipelineDataSetSerializer:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setPipelineDataSetSerializer(
+        pub unsafe fn set_pipeline_data_set_serializer(
             &self,
             pipeline_data_set_serializer: Option<
                 &ProtocolObject<dyn MTL4PipelineDataSetSerializer>,
@@ -115,7 +115,7 @@ impl MTL4CompilerTaskOptions {
         /// In case of a match in the archive, the compiler can skip one or more compilation tasks, speeding up the build process.
         #[unsafe(method(lookupArchives))]
         #[unsafe(method_family = none)]
-        pub unsafe fn lookupArchives(
+        pub unsafe fn lookup_archives(
             &self,
         ) -> Option<Retained<NSArray<ProtocolObject<dyn MTL4Archive>>>>;
 
@@ -124,7 +124,7 @@ impl MTL4CompilerTaskOptions {
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setLookupArchives:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setLookupArchives(
+        pub unsafe fn set_lookup_archives(
             &self,
             lookup_archives: Option<&NSArray<ProtocolObject<dyn MTL4Archive>>>,
         );
@@ -175,7 +175,7 @@ extern_protocol!(
         /// Returns the pipeline data set serializer into which this compiler stores data for all pipelines it creates.
         #[unsafe(method(pipelineDataSetSerializer))]
         #[unsafe(method_family = none)]
-        unsafe fn pipelineDataSetSerializer(
+        unsafe fn pipeline_data_set_serializer(
             &self,
         ) -> Option<Retained<ProtocolObject<dyn MTL4PipelineDataSetSerializer>>>;
 
@@ -188,7 +188,7 @@ extern_protocol!(
         /// - Returns: a Metal library instance upon success, `nil` otherwise.
         #[unsafe(method(newLibraryWithDescriptor:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newLibraryWithDescriptor_error(
+        unsafe fn new_library_with_descriptor_error(
             &self,
             descriptor: &MTL4LibraryDescriptor,
         ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, Retained<NSError>>;
@@ -202,7 +202,7 @@ extern_protocol!(
         /// - Returns: A new dynamic Metal library upon success, `nil` otherwise.
         #[unsafe(method(newDynamicLibrary:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newDynamicLibrary_error(
+        unsafe fn new_dynamic_library_error(
             &self,
             library: &ProtocolObject<dyn MTLLibrary>,
         ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, Retained<NSError>>;
@@ -216,7 +216,7 @@ extern_protocol!(
         /// - Returns: A new dynamic Metal library upon success, `nil` otherwise.
         #[unsafe(method(newDynamicLibraryWithURL:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newDynamicLibraryWithURL_error(
+        unsafe fn new_dynamic_library_with_url_error(
             &self,
             url: &NSURL,
         ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, Retained<NSError>>;
@@ -232,7 +232,7 @@ extern_protocol!(
         /// - Returns: A new compute pipeline state object upon success, `nil` otherwise.
         #[unsafe(method(newComputePipelineStateWithDescriptor:compilerTaskOptions:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newComputePipelineStateWithDescriptor_compilerTaskOptions_error(
+        unsafe fn new_compute_pipeline_state_with_descriptor_compiler_task_options_error(
             &self,
             descriptor: &MTL4ComputePipelineDescriptor,
             compiler_task_options: Option<&MTL4CompilerTaskOptions>,
@@ -250,7 +250,7 @@ extern_protocol!(
         /// - Returns: A new compute pipeline state object upon success, `nil` otherwise.
         #[unsafe(method(newComputePipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newComputePipelineStateWithDescriptor_dynamicLinkingDescriptor_compilerTaskOptions_error(
+        unsafe fn new_compute_pipeline_state_with_descriptor_dynamic_linking_descriptor_compiler_task_options_error(
             &self,
             descriptor: &MTL4ComputePipelineDescriptor,
             dynamic_linking_descriptor: Option<&MTL4PipelineStageDynamicLinkingDescriptor>,
@@ -273,7 +273,7 @@ extern_protocol!(
         /// - Returns: A new render pipeline state object upon success, `nil` otherwise.
         #[unsafe(method(newRenderPipelineStateWithDescriptor:compilerTaskOptions:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newRenderPipelineStateWithDescriptor_compilerTaskOptions_error(
+        unsafe fn new_render_pipeline_state_with_descriptor_compiler_task_options_error(
             &self,
             descriptor: &MTL4PipelineDescriptor,
             compiler_task_options: Option<&MTL4CompilerTaskOptions>,
@@ -296,7 +296,7 @@ extern_protocol!(
         /// - Returns: A new render pipeline state object upon success, `nil` otherwise.
         #[unsafe(method(newRenderPipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newRenderPipelineStateWithDescriptor_dynamicLinkingDescriptor_compilerTaskOptions_error(
+        unsafe fn new_render_pipeline_state_with_descriptor_dynamic_linking_descriptor_compiler_task_options_error(
             &self,
             descriptor: &MTL4PipelineDescriptor,
             dynamic_linking_descriptor: Option<&MTL4RenderPipelineDynamicLinkingDescriptor>,
@@ -322,7 +322,7 @@ extern_protocol!(
         /// - Returns: a fully-specialized pipeline state object.
         #[unsafe(method(newRenderPipelineStateBySpecializationWithDescriptor:pipeline:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newRenderPipelineStateBySpecializationWithDescriptor_pipeline_error(
+        unsafe fn new_render_pipeline_state_by_specialization_with_descriptor_pipeline_error(
             &self,
             descriptor: &MTL4PipelineDescriptor,
             pipeline: &ProtocolObject<dyn MTLRenderPipelineState>,
@@ -339,7 +339,7 @@ extern_protocol!(
         /// - Returns: a new binary function upon success, `nil` otherwise.
         #[unsafe(method(newBinaryFunctionWithDescriptor:compilerTaskOptions:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newBinaryFunctionWithDescriptor_compilerTaskOptions_error(
+        unsafe fn new_binary_function_with_descriptor_compiler_task_options_error(
             &self,
             descriptor: &MTL4BinaryFunctionDescriptor,
             compiler_task_options: Option<&MTL4CompilerTaskOptions>,
@@ -358,7 +358,7 @@ extern_protocol!(
         /// `completion_handler` must be a valid pointer.
         #[unsafe(method(newLibraryWithDescriptor:completionHandler:))]
         #[unsafe(method_family = new)]
-        unsafe fn newLibraryWithDescriptor_completionHandler(
+        unsafe fn new_library_with_descriptor_completion_handler(
             &self,
             descriptor: &MTL4LibraryDescriptor,
             completion_handler: MTLNewLibraryCompletionHandler,
@@ -377,7 +377,7 @@ extern_protocol!(
         /// `completion_handler` must be a valid pointer.
         #[unsafe(method(newDynamicLibrary:completionHandler:))]
         #[unsafe(method_family = new)]
-        unsafe fn newDynamicLibrary_completionHandler(
+        unsafe fn new_dynamic_library_completion_handler(
             &self,
             library: &ProtocolObject<dyn MTLLibrary>,
             completion_handler: MTLNewDynamicLibraryCompletionHandler,
@@ -396,7 +396,7 @@ extern_protocol!(
         /// `completion_handler` must be a valid pointer.
         #[unsafe(method(newDynamicLibraryWithURL:completionHandler:))]
         #[unsafe(method_family = new)]
-        unsafe fn newDynamicLibraryWithURL_completionHandler(
+        unsafe fn new_dynamic_library_with_url_completion_handler(
             &self,
             url: &NSURL,
             completion_handler: MTLNewDynamicLibraryCompletionHandler,
@@ -417,7 +417,7 @@ extern_protocol!(
         /// `completion_handler` must be a valid pointer.
         #[unsafe(method(newComputePipelineStateWithDescriptor:compilerTaskOptions:completionHandler:))]
         #[unsafe(method_family = new)]
-        unsafe fn newComputePipelineStateWithDescriptor_compilerTaskOptions_completionHandler(
+        unsafe fn new_compute_pipeline_state_with_descriptor_compiler_task_options_completion_handler(
             &self,
             descriptor: &MTL4ComputePipelineDescriptor,
             compiler_task_options: Option<&MTL4CompilerTaskOptions>,
@@ -440,7 +440,7 @@ extern_protocol!(
         /// `completion_handler` must be a valid pointer.
         #[unsafe(method(newComputePipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:completionHandler:))]
         #[unsafe(method_family = new)]
-        unsafe fn newComputePipelineStateWithDescriptor_dynamicLinkingDescriptor_compilerTaskOptions_completionHandler(
+        unsafe fn new_compute_pipeline_state_with_descriptor_dynamic_linking_descriptor_compiler_task_options_completion_handler(
             &self,
             descriptor: &MTL4ComputePipelineDescriptor,
             dynamic_linking_descriptor: Option<&MTL4PipelineStageDynamicLinkingDescriptor>,
@@ -468,7 +468,7 @@ extern_protocol!(
         /// `completion_handler` must be a valid pointer.
         #[unsafe(method(newRenderPipelineStateWithDescriptor:compilerTaskOptions:completionHandler:))]
         #[unsafe(method_family = new)]
-        unsafe fn newRenderPipelineStateWithDescriptor_compilerTaskOptions_completionHandler(
+        unsafe fn new_render_pipeline_state_with_descriptor_compiler_task_options_completion_handler(
             &self,
             descriptor: &MTL4PipelineDescriptor,
             compiler_task_options: Option<&MTL4CompilerTaskOptions>,
@@ -496,7 +496,7 @@ extern_protocol!(
         /// `completion_handler` must be a valid pointer.
         #[unsafe(method(newRenderPipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:completionHandler:))]
         #[unsafe(method_family = new)]
-        unsafe fn newRenderPipelineStateWithDescriptor_dynamicLinkingDescriptor_compilerTaskOptions_completionHandler(
+        unsafe fn new_render_pipeline_state_with_descriptor_dynamic_linking_descriptor_compiler_task_options_completion_handler(
             &self,
             descriptor: &MTL4PipelineDescriptor,
             dynamic_linking_descriptor: Option<&MTL4RenderPipelineDynamicLinkingDescriptor>,
@@ -527,7 +527,7 @@ extern_protocol!(
         /// `completion_handler` must be a valid pointer.
         #[unsafe(method(newRenderPipelineStateBySpecializationWithDescriptor:pipeline:completionHandler:))]
         #[unsafe(method_family = new)]
-        unsafe fn newRenderPipelineStateBySpecializationWithDescriptor_pipeline_completionHandler(
+        unsafe fn new_render_pipeline_state_by_specialization_with_descriptor_pipeline_completion_handler(
             &self,
             descriptor: &MTL4PipelineDescriptor,
             pipeline: &ProtocolObject<dyn MTLRenderPipelineState>,
@@ -547,7 +547,7 @@ extern_protocol!(
         /// `completion_handler` must be a valid pointer.
         #[unsafe(method(newBinaryFunctionWithDescriptor:compilerTaskOptions:completionHandler:))]
         #[unsafe(method_family = new)]
-        unsafe fn newBinaryFunctionWithDescriptor_compilerTaskOptions_completionHandler(
+        unsafe fn new_binary_function_with_descriptor_compiler_task_options_completion_handler(
             &self,
             descriptor: &MTL4BinaryFunctionDescriptor,
             compiler_task_options: Option<&MTL4CompilerTaskOptions>,
@@ -563,7 +563,7 @@ extern_protocol!(
         /// - Returns: A machine learning pipeline state if operation is successful, otherwise `nil`.
         #[unsafe(method(newMachineLearningPipelineStateWithDescriptor:error:_))]
         #[unsafe(method_family = new)]
-        unsafe fn newMachineLearningPipelineStateWithDescriptor_error(
+        unsafe fn new_machine_learning_pipeline_state_with_descriptor_error(
             &self,
             descriptor: &MTL4MachineLearningPipelineDescriptor,
         ) -> Result<Retained<ProtocolObject<dyn MTL4MachineLearningPipelineState>>, Retained<NSError>>;
@@ -581,7 +581,7 @@ extern_protocol!(
         /// `completion_handler` must be a valid pointer.
         #[unsafe(method(newMachineLearningPipelineStateWithDescriptor:completionHandler:))]
         #[unsafe(method_family = new)]
-        unsafe fn newMachineLearningPipelineStateWithDescriptor_completionHandler(
+        unsafe fn new_machine_learning_pipeline_state_with_descriptor_completion_handler(
             &self,
             descriptor: &MTL4MachineLearningPipelineDescriptor,
             completion_handler: MTL4NewMachineLearningPipelineStateCompletionHandler,

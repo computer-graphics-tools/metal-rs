@@ -49,10 +49,10 @@ pub struct MTL4AlphaToOneState(pub NSInteger);
 impl MTL4AlphaToOneState {
     /// Disables alpha-to-one.
     #[doc(alias = "MTL4AlphaToOneStateDisabled")]
-    pub const Disabled: Self = Self(0);
+    pub const DISABLED: Self = Self(0);
     /// Enables alpha-to-one.
     #[doc(alias = "MTL4AlphaToOneStateEnabled")]
-    pub const Enabled: Self = Self(1);
+    pub const ENABLED: Self = Self(1);
 }
 
 unsafe impl Encode for MTL4AlphaToOneState {
@@ -73,10 +73,10 @@ pub struct MTL4AlphaToCoverageState(pub NSInteger);
 impl MTL4AlphaToCoverageState {
     /// Disables alpha-to-coverage.
     #[doc(alias = "MTL4AlphaToCoverageStateDisabled")]
-    pub const Disabled: Self = Self(0);
+    pub const DISABLED: Self = Self(0);
     /// Enables alpha-to-coverage.
     #[doc(alias = "MTL4AlphaToCoverageStateEnabled")]
-    pub const Enabled: Self = Self(1);
+    pub const ENABLED: Self = Self(1);
 }
 
 unsafe impl Encode for MTL4AlphaToCoverageState {
@@ -97,15 +97,15 @@ pub struct MTL4BlendState(pub NSInteger);
 impl MTL4BlendState {
     /// Disables blending.
     #[doc(alias = "MTL4BlendStateDisabled")]
-    pub const Disabled: Self = Self(0);
+    pub const DISABLED: Self = Self(0);
     /// Enables blending.
     #[doc(alias = "MTL4BlendStateEnabled")]
-    pub const Enabled: Self = Self(1);
+    pub const ENABLED: Self = Self(1);
     /// Defers determining the blending stage.
     ///
     /// Behaves as ``MTL4BlendStateDisabled`` until you specialize this pipeline value.
     #[doc(alias = "MTL4BlendStateUnspecialized")]
-    pub const Unspecialized: Self = Self(2);
+    pub const UNSPECIALIZED: Self = Self(2);
 }
 
 unsafe impl Encode for MTL4BlendState {
@@ -126,10 +126,10 @@ pub struct MTL4IndirectCommandBufferSupportState(pub NSInteger);
 impl MTL4IndirectCommandBufferSupportState {
     /// Disables support for indirect command buffers.
     #[doc(alias = "MTL4IndirectCommandBufferSupportStateDisabled")]
-    pub const Disabled: Self = Self(0);
+    pub const DISABLED: Self = Self(0);
     /// Enables support for indirect command buffers.
     #[doc(alias = "MTL4IndirectCommandBufferSupportStateEnabled")]
-    pub const Enabled: Self = Self(1);
+    pub const ENABLED: Self = Self(1);
 }
 
 unsafe impl Encode for MTL4IndirectCommandBufferSupportState {
@@ -168,22 +168,22 @@ impl MTL4PipelineOptions {
         /// Controls whether to enable or disable Metal Shader Validation for the pipeline.
         #[unsafe(method(shaderValidation))]
         #[unsafe(method_family = none)]
-        pub unsafe fn shaderValidation(&self) -> MTLShaderValidation;
+        pub unsafe fn shader_validation(&self) -> MTLShaderValidation;
 
         /// Setter for [`shaderValidation`][Self::shaderValidation].
         #[unsafe(method(setShaderValidation:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setShaderValidation(&self, shader_validation: MTLShaderValidation);
+        pub unsafe fn set_shader_validation(&self, shader_validation: MTLShaderValidation);
 
         /// Controls whether to include Metal shader reflection in this pipeline.
         #[unsafe(method(shaderReflection))]
         #[unsafe(method_family = none)]
-        pub unsafe fn shaderReflection(&self) -> MTL4ShaderReflection;
+        pub unsafe fn shader_reflection(&self) -> MTL4ShaderReflection;
 
         /// Setter for [`shaderReflection`][Self::shaderReflection].
         #[unsafe(method(setShaderReflection:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setShaderReflection(&self, shader_reflection: MTL4ShaderReflection);
+        pub unsafe fn set_shader_reflection(&self, shader_reflection: MTL4ShaderReflection);
     );
 }
 
@@ -235,7 +235,7 @@ impl MTL4PipelineDescriptor {
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setLabel:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setLabel(&self, label: Option<&NSString>);
+        pub unsafe fn set_label(&self, label: Option<&NSString>);
 
         /// Provides compile-time options when you build the pipeline.
         #[unsafe(method(options))]
@@ -245,7 +245,7 @@ impl MTL4PipelineDescriptor {
         /// Setter for [`options`][Self::options].
         #[unsafe(method(setOptions:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setOptions(&self, options: Option<&MTL4PipelineOptions>);
+        pub unsafe fn set_options(&self, options: Option<&MTL4PipelineOptions>);
     );
 }
 

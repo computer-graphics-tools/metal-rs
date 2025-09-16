@@ -14,7 +14,7 @@ use crate::*;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct MTL4BufferRange {
     /// Buffer address returned by the gpuAddress property of an MTLBuffer plus any offset into the buffer
-    pub bufferAddress: MTLGPUAddress,
+    pub buffer_address: MTLGPUAddress,
     /// Length of the region which begins at the given address. If the length is not known, a value of
     /// (uint64_t)-1 represents the range from the given address to the end of the buffer.
     pub length: u64,
@@ -32,5 +32,5 @@ unsafe impl RefEncode for MTL4BufferRange {
 }
 
 impl MTL4BufferRange {
-    // TODO: pub fn MTL4BufferRangeMake(buffer_address: MTLGPUAddress,length: u64,) -> MTL4BufferRange;
+    // TODO: pub fn mtl4_buffer_range_make(buffer_address: MTLGPUAddress,length: u64,) -> MTL4BufferRange;
 }

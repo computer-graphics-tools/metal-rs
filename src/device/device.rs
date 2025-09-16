@@ -56,8 +56,8 @@ extern_protocol!(
 pub extern "C-unwind" fn create_system_default_device()
 -> Option<Retained<ProtocolObject<dyn MTLDevice>>> {
     unsafe extern "C-unwind" {
-        fn MTLCreateSystemDefaultDevice() -> *mut ProtocolObject<dyn MTLDevice>;
+        fn mtl_create_system_default_device() -> *mut ProtocolObject<dyn MTLDevice>;
     }
-    let ret = unsafe { MTLCreateSystemDefaultDevice() };
+    let ret = unsafe { mtl_create_system_default_device() };
     unsafe { Retained::from_raw(ret) }
 }

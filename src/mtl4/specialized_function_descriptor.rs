@@ -35,14 +35,14 @@ impl MTL4SpecializedFunctionDescriptor {
         /// Provides a descriptor that corresponds to a base function that the specialization applies to.
         #[unsafe(method(functionDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn functionDescriptor(&self) -> Option<Retained<MTL4FunctionDescriptor>>;
+        pub unsafe fn function_descriptor(&self) -> Option<Retained<MTL4FunctionDescriptor>>;
 
         /// Setter for [`functionDescriptor`][Self::functionDescriptor].
         ///
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setFunctionDescriptor:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setFunctionDescriptor(
+        pub unsafe fn set_function_descriptor(
             &self,
             function_descriptor: Option<&MTL4FunctionDescriptor>,
         );
@@ -50,26 +50,26 @@ impl MTL4SpecializedFunctionDescriptor {
         /// Assigns an optional name to the specialized function.
         #[unsafe(method(specializedName))]
         #[unsafe(method_family = none)]
-        pub unsafe fn specializedName(&self) -> Option<Retained<NSString>>;
+        pub unsafe fn specialized_name(&self) -> Option<Retained<NSString>>;
 
         /// Setter for [`specializedName`][Self::specializedName].
         ///
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setSpecializedName:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setSpecializedName(&self, specialized_name: Option<&NSString>);
+        pub unsafe fn set_specialized_name(&self, specialized_name: Option<&NSString>);
 
         /// Configures optional function constant values to associate with the function.
         #[unsafe(method(constantValues))]
         #[unsafe(method_family = none)]
-        pub unsafe fn constantValues(&self) -> Option<Retained<MTLFunctionConstantValues>>;
+        pub unsafe fn constant_values(&self) -> Option<Retained<MTLFunctionConstantValues>>;
 
         /// Setter for [`constantValues`][Self::constantValues].
         ///
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setConstantValues:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setConstantValues(&self, constant_values: Option<&MTLFunctionConstantValues>);
+        pub unsafe fn set_constant_values(&self, constant_values: Option<&MTLFunctionConstantValues>);
     );
 }
 

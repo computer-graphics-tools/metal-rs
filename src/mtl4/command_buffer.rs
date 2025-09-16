@@ -41,12 +41,12 @@ impl MTL4CommandBufferOptions {
         /// Shader functions log messages until the command buffer ends.
         #[unsafe(method(logState))]
         #[unsafe(method_family = none)]
-        pub unsafe fn logState(&self) -> Option<Retained<ProtocolObject<dyn MTLLogState>>>;
+        pub unsafe fn log_state(&self) -> Option<Retained<ProtocolObject<dyn MTLLogState>>>;
 
         /// Setter for [`logState`][Self::logState].
         #[unsafe(method(setLogState:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setLogState(&self, log_state: Option<&ProtocolObject<dyn MTLLogState>>);
+        pub unsafe fn set_log_state(&self, log_state: Option<&ProtocolObject<dyn MTLLogState>>);
     );
 }
 
@@ -83,7 +83,7 @@ extern_protocol!(
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setLabel:))]
         #[unsafe(method_family = none)]
-        unsafe fn setLabel(&self, label: Option<&NSString>);
+        unsafe fn set_label(&self, label: Option<&NSString>);
 
         /// Prepares a command buffer for encoding.
         ///
@@ -104,7 +104,7 @@ extern_protocol!(
         /// - Parameter allocator: ``MTL4CommandAllocator`` to attach to.
         #[unsafe(method(beginCommandBufferWithAllocator:))]
         #[unsafe(method_family = none)]
-        unsafe fn beginCommandBufferWithAllocator(
+        unsafe fn begin_command_buffer_with_allocator(
             &self,
             allocator: &ProtocolObject<dyn MTL4CommandAllocator>,
         );
@@ -133,7 +133,7 @@ extern_protocol!(
         /// - options: ``MTL4CommandBufferOptions`` to configure the command buffer.
         #[unsafe(method(beginCommandBufferWithAllocator:options:))]
         #[unsafe(method_family = none)]
-        unsafe fn beginCommandBufferWithAllocator_options(
+        unsafe fn begin_command_buffer_with_allocator_options(
             &self,
             allocator: &ProtocolObject<dyn MTL4CommandAllocator>,
             options: &MTL4CommandBufferOptions,
@@ -146,7 +146,7 @@ extern_protocol!(
         /// method.
         #[unsafe(method(endCommandBuffer))]
         #[unsafe(method_family = none)]
-        unsafe fn endCommandBuffer(&self);
+        unsafe fn end_command_buffer(&self);
 
         /// Creates a render command encoder from a render pass descriptor.
         ///
@@ -155,7 +155,7 @@ extern_protocol!(
         /// - Returns: The created ``MTL4RenderCommandEncoder`` instance, or `nil` if the function failed.
         #[unsafe(method(renderCommandEncoderWithDescriptor:))]
         #[unsafe(method_family = none)]
-        unsafe fn renderCommandEncoderWithDescriptor(
+        unsafe fn render_command_encoder_with_descriptor(
             &self,
             descriptor: &MTL4RenderPassDescriptor,
         ) -> Option<Retained<ProtocolObject<dyn MTL4RenderCommandEncoder>>>;
@@ -174,7 +174,7 @@ extern_protocol!(
         /// - Returns: The created ``MTL4RenderCommandEncoder`` instance, or `nil` if the function fails.
         #[unsafe(method(renderCommandEncoderWithDescriptor:options:))]
         #[unsafe(method_family = none)]
-        unsafe fn renderCommandEncoderWithDescriptor_options(
+        unsafe fn render_command_encoder_with_descriptor_options(
             &self,
             descriptor: &MTL4RenderPassDescriptor,
             options: MTL4RenderEncoderOptions,
@@ -185,7 +185,7 @@ extern_protocol!(
         /// - Returns: The created ``MTL4ComputeCommandEncoder`` instance, or `nil` if the function fails.
         #[unsafe(method(computeCommandEncoder))]
         #[unsafe(method_family = none)]
-        unsafe fn computeCommandEncoder(
+        unsafe fn compute_command_encoder(
             &self,
         ) -> Option<Retained<ProtocolObject<dyn MTL4ComputeCommandEncoder>>>;
 
@@ -194,7 +194,7 @@ extern_protocol!(
         /// - Returns: The created ``MTL4MachineLearningCommandEncoder`` instance , or `nil` if the function fails.
         #[unsafe(method(machineLearningCommandEncoder))]
         #[unsafe(method_family = none)]
-        unsafe fn machineLearningCommandEncoder(
+        unsafe fn machine_learning_command_encoder(
             &self,
         ) -> Option<Retained<ProtocolObject<dyn MTL4MachineLearningCommandEncoder>>>;
 
@@ -205,7 +205,7 @@ extern_protocol!(
         /// - Parameter residencySet: ``MTLResidencySet`` instance to mark resident.
         #[unsafe(method(useResidencySet:))]
         #[unsafe(method_family = none)]
-        unsafe fn useResidencySet(&self, residency_set: &ProtocolObject<dyn MTLResidencySet>);
+        unsafe fn use_residency_set(&self, residency_set: &ProtocolObject<dyn MTLResidencySet>);
 
         /// Marks an array of residency sets as part of the command buffer's execution.
         ///
@@ -220,7 +220,7 @@ extern_protocol!(
         /// `residency_sets` must be a valid pointer.
         #[unsafe(method(useResidencySets:count:))]
         #[unsafe(method_family = none)]
-        unsafe fn useResidencySets_count(
+        unsafe fn use_residency_sets_count(
             &self,
             residency_sets: NonNull<NonNull<ProtocolObject<dyn MTLResidencySet>>>,
             count: NSUInteger,
@@ -231,12 +231,12 @@ extern_protocol!(
         /// - Parameter string: The string to push.
         #[unsafe(method(pushDebugGroup:))]
         #[unsafe(method_family = none)]
-        unsafe fn pushDebugGroup(&self, string: &NSString);
+        unsafe fn push_debug_group(&self, string: &NSString);
 
         /// Pops the latest string from the stack of debug groups for this command buffer.
         #[unsafe(method(popDebugGroup))]
         #[unsafe(method_family = none)]
-        unsafe fn popDebugGroup(&self);
+        unsafe fn pop_debug_group(&self);
 
         /// Writes a GPU timestamp into the given counter heap.
         ///
@@ -250,7 +250,7 @@ extern_protocol!(
         /// - index: The index within the ``MTL4CounterHeap`` that Metal writes the timestamp to.
         #[unsafe(method(writeTimestampIntoHeap:atIndex:))]
         #[unsafe(method_family = none)]
-        unsafe fn writeTimestampIntoHeap_atIndex(
+        unsafe fn write_timestamp_into_heap_at_index(
             &self,
             counter_heap: &ProtocolObject<dyn MTL4CounterHeap>,
             index: NSUInteger,
@@ -287,7 +287,7 @@ extern_protocol!(
         /// - fenceToUpdate: A fence the system updates after the command finishes resolving the data; otherwise `nil`.
         #[unsafe(method(resolveCounterHeap:withRange:intoBuffer:waitFence:updateFence:))]
         #[unsafe(method_family = none)]
-        unsafe fn resolveCounterHeap_withRange_intoBuffer_waitFence_updateFence(
+        unsafe fn resolve_counter_heap_with_range_into_buffer_wait_fence_update_fence(
             &self,
             counter_heap: &ProtocolObject<dyn MTL4CounterHeap>,
             range: NSRange,

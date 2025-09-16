@@ -35,11 +35,11 @@ extern_protocol!(
         /// The host time, in seconds, when the GPU starts execution of the committed command buffers.
         #[unsafe(method(GPUStartTime))]
         #[unsafe(method_family = none)]
-        unsafe fn GPUStartTime(&self) -> CFTimeInterval;
+        unsafe fn gpu_start_time(&self) -> CFTimeInterval;
 
         /// The host time, in seconds, when the GPU finishes execution of the committed command buffers.
         #[unsafe(method(GPUEndTime))]
         #[unsafe(method_family = none)]
-        unsafe fn GPUEndTime(&self) -> CFTimeInterval;
+        unsafe fn gpu_end_time(&self) -> CFTimeInterval;
     }
 );

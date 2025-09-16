@@ -36,7 +36,7 @@ impl MTL4StaticLinkingDescriptor {
         /// Provides an array of functions to link at the Metal IR level.
         #[unsafe(method(functionDescriptors))]
         #[unsafe(method_family = none)]
-        pub unsafe fn functionDescriptors(
+        pub unsafe fn function_descriptors(
             &self,
         ) -> Option<Retained<NSArray<MTL4FunctionDescriptor>>>;
 
@@ -45,7 +45,7 @@ impl MTL4StaticLinkingDescriptor {
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setFunctionDescriptors:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setFunctionDescriptors(
+        pub unsafe fn set_function_descriptors(
             &self,
             function_descriptors: Option<&NSArray<MTL4FunctionDescriptor>>,
         );
@@ -56,7 +56,7 @@ impl MTL4StaticLinkingDescriptor {
         /// - Note: You can link private functions even when your ``MTLDevice`` doesn't support function pointers.
         #[unsafe(method(privateFunctionDescriptors))]
         #[unsafe(method_family = none)]
-        pub unsafe fn privateFunctionDescriptors(
+        pub unsafe fn private_function_descriptors(
             &self,
         ) -> Option<Retained<NSArray<MTL4FunctionDescriptor>>>;
 
@@ -65,7 +65,7 @@ impl MTL4StaticLinkingDescriptor {
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setPrivateFunctionDescriptors:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setPrivateFunctionDescriptors(
+        pub unsafe fn set_private_function_descriptors(
             &self,
             private_function_descriptors: Option<&NSArray<MTL4FunctionDescriptor>>,
         );
@@ -84,7 +84,7 @@ impl MTL4StaticLinkingDescriptor {
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setGroups:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setGroups(
+        pub unsafe fn set_groups(
             &self,
             groups: Option<&NSDictionary<NSString, NSArray<MTL4FunctionDescriptor>>>,
         );
@@ -130,12 +130,12 @@ impl MTL4PipelineStageDynamicLinkingDescriptor {
         /// Limits the maximum depth of the call stack for indirect function calls in the pipeline stage function.
         #[unsafe(method(maxCallStackDepth))]
         #[unsafe(method_family = none)]
-        pub unsafe fn maxCallStackDepth(&self) -> NSUInteger;
+        pub unsafe fn max_call_stack_depth(&self) -> NSUInteger;
 
         /// Setter for [`maxCallStackDepth`][Self::maxCallStackDepth].
         #[unsafe(method(setMaxCallStackDepth:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setMaxCallStackDepth(&self, max_call_stack_depth: NSUInteger);
+        pub unsafe fn set_max_call_stack_depth(&self, max_call_stack_depth: NSUInteger);
 
         /// Provides the array of binary functions to link.
         ///
@@ -143,7 +143,7 @@ impl MTL4PipelineStageDynamicLinkingDescriptor {
         /// using instances of ``MTL4Compiler``.
         #[unsafe(method(binaryLinkedFunctions))]
         #[unsafe(method_family = none)]
-        pub unsafe fn binaryLinkedFunctions(
+        pub unsafe fn binary_linked_functions(
             &self,
         ) -> Option<Retained<NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>>;
 
@@ -152,7 +152,7 @@ impl MTL4PipelineStageDynamicLinkingDescriptor {
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setBinaryLinkedFunctions:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setBinaryLinkedFunctions(
+        pub unsafe fn set_binary_linked_functions(
             &self,
             binary_linked_functions: Option<&NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>,
         );
@@ -160,7 +160,7 @@ impl MTL4PipelineStageDynamicLinkingDescriptor {
         /// Provides an array of dynamic libraries the compiler loads when it builds the pipeline.
         #[unsafe(method(preloadedLibraries))]
         #[unsafe(method_family = none)]
-        pub unsafe fn preloadedLibraries(
+        pub unsafe fn preloaded_libraries(
             &self,
         ) -> Retained<NSArray<ProtocolObject<dyn MTLDynamicLibrary>>>;
 
@@ -169,7 +169,7 @@ impl MTL4PipelineStageDynamicLinkingDescriptor {
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
         #[unsafe(method(setPreloadedLibraries:))]
         #[unsafe(method_family = none)]
-        pub unsafe fn setPreloadedLibraries(
+        pub unsafe fn set_preloaded_libraries(
             &self,
             preloaded_libraries: &NSArray<ProtocolObject<dyn MTLDynamicLibrary>>,
         );
@@ -215,35 +215,35 @@ impl MTL4RenderPipelineDynamicLinkingDescriptor {
         /// Controls properties for linking the vertex stage of the render pipeline.
         #[unsafe(method(vertexLinkingDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn vertexLinkingDescriptor(
+        pub unsafe fn vertex_linking_descriptor(
             &self,
         ) -> Retained<MTL4PipelineStageDynamicLinkingDescriptor>;
 
         /// Controls properties for linking the fragment stage of the render pipeline.
         #[unsafe(method(fragmentLinkingDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn fragmentLinkingDescriptor(
+        pub unsafe fn fragment_linking_descriptor(
             &self,
         ) -> Retained<MTL4PipelineStageDynamicLinkingDescriptor>;
 
         /// Controls properties for linking the tile stage of the render pipeline.
         #[unsafe(method(tileLinkingDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn tileLinkingDescriptor(
+        pub unsafe fn tile_linking_descriptor(
             &self,
         ) -> Retained<MTL4PipelineStageDynamicLinkingDescriptor>;
 
         /// Controls properties for link the object stage of the render pipeline.
         #[unsafe(method(objectLinkingDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn objectLinkingDescriptor(
+        pub unsafe fn object_linking_descriptor(
             &self,
         ) -> Retained<MTL4PipelineStageDynamicLinkingDescriptor>;
 
         /// Controls properties for linking the mesh stage of the render pipeline.
         #[unsafe(method(meshLinkingDescriptor))]
         #[unsafe(method_family = none)]
-        pub unsafe fn meshLinkingDescriptor(
+        pub unsafe fn mesh_linking_descriptor(
             &self,
         ) -> Retained<MTL4PipelineStageDynamicLinkingDescriptor>;
     );
