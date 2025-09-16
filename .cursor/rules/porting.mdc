@@ -1,8 +1,21 @@
 ---
 alwaysApply: true
 ---
-- each .h file in external/Headers should have a port in rust in a form of a single .rs file if there is only one type declared in .h, or a rust module in a form of a directory with mod.rs and dedicated .rs files if there are multiple types declared in .h.
-- rust file names should be in camel case w/o mtl or mtl4 prefix
-- if multiple types in rust are found, it should be split into multiple, so each .rs file contain only one type declaration
-- all files in rust shoud be grouped by modules with names, corresponding to the original .h file name
-- all original documentation of .h should be copied to .rs with the only allowed change in the mentioned type names following rust doc convention 
+- each .h file in external/Headers should be ported as:
+  - a single .rs file if the header declares one type, or
+  - a rust module (directory named after the header) with mod.rs and one .rs file per type if the header declares multiple types.
+- rust file names use snake_case without mtl/mtl4 prefixes; module directory names mirror the header's base name.
+- ensure one public type per .rs file. If a consolidated file (e.g., types.rs) exists, split it so each type has its own file.
+- group rust files under modules whose names correspond to the original .h file name; expose items via mod.rs with pub use re-exports to keep crate-level APIs stable.
+- copy original .h documentation verbatim into rust doc comments. Only adjust referenced type names/paths to follow rust naming/docs conventions; keep external Apple doc links when present.
+- FFI layout and encoding conventions:
+  - structs mirror C layout with #[repr(C)] and implement objc2::{Encode, RefEncode} with accurate Encoding.
+  - enums mirror underlying C type with #[repr(u32|u64)] and implement Encode/RefEncode.
+  - option/flag bitmasks are newtype wrappers with #[repr(transparent)] and use bitflags::bitflags over the correct integer width.
+- Derive conventions:
+  - for FFI structs containing floating-point fields, derive Copy, Clone, Debug, PartialEq (avoid Eq/Hash).
+  - for pure integer enums/newtypes, derive Eq, Hash, Ord as appropriate.
+- Type/file naming:
+  - keep Metal type names (e.g., MTLAccelerationStructureUsage) for rust types; omit MTL/MTL4 prefixes from filenames.
+  - when moving types out of grouped files (e.g., from packed.rs), place each in a dedicated file and update mod.rs re-exports.
+- After adding/moving types: update the module's mod.rs to declare submodules and re-export all public items; remove old definitions; run lints.
