@@ -1,5 +1,4 @@
-#![allow(dead_code)]
-mod acceleration;
+mod acceleration_structure;
 mod acceleration_structure_command_encoder;
 mod acceleration_structure_pass;
 mod allocation;
@@ -24,6 +23,7 @@ mod event;
 mod fence;
 mod function_constant_values;
 mod function_descriptor;
+mod function_handle;
 mod function_log;
 mod function_stitching;
 mod heap;
@@ -56,11 +56,7 @@ mod types;
 mod vertex_descriptor;
 mod visible_function_table;
 
-pub use block2;
-pub use objc2;
-pub use objc2_foundation;
-
-pub use acceleration::*;
+pub use acceleration_structure::*;
 pub use acceleration_structure_command_encoder::*;
 pub use acceleration_structure_pass::*;
 pub use allocation::*;
@@ -68,6 +64,7 @@ pub use argument::*;
 pub use binary_archive::*;
 pub use blit_command_encoder::*;
 pub use blit_pass::*;
+pub use block2;
 pub use buffer::*;
 pub use capture::*;
 pub use command_buffer::*;
@@ -85,6 +82,7 @@ pub use event::*;
 pub use fence::*;
 pub use function_constant_values::*;
 pub use function_descriptor::*;
+pub use function_handle::*;
 pub use function_log::*;
 pub use function_stitching::*;
 pub use heap::*;

@@ -1,11 +1,12 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSError, NSErrorDomain, NSObjectProtocol, NSString, NSURL};
 
-use crate::function_stitching::MTLStitchedLibraryDescriptor;
 use crate::{
     MTLComputePipelineDescriptor, MTLFunctionDescriptor, MTLLibrary, MTLRenderPipelineDescriptor,
+    function_stitching::MTLStitchedLibraryDescriptor,
 };
 
+#[allow(unused)]
 unsafe extern "C" {
     pub static MTLBinaryArchiveDomain: &'static NSErrorDomain;
 }

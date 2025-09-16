@@ -144,6 +144,7 @@ impl MTLTensorDescriptor {
     );
 }
 
+#[allow(unused)]
 mod tests {
     use super::*;
     use crate::tensor::MTLTensorExtents;

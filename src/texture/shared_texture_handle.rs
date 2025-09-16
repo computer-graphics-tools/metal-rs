@@ -37,6 +37,7 @@ impl MTLSharedTextureHandle {
     );
 }
 
+#[allow(unused)]
 impl MTLSharedTextureHandle {
     fn label(&self) -> Option<String> {
         let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };

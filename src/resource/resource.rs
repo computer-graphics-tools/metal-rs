@@ -1,12 +1,10 @@
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::NSString;
 
-use crate::allocation::MTLAllocation;
-use crate::device::MTLDevice;
-
 use super::{
     MTLCPUCacheMode, MTLHazardTrackingMode, MTLPurgeableState, MTLResourceOptions, MTLStorageMode,
 };
+use crate::{allocation::MTLAllocation, device::MTLDevice};
 
 extern_protocol!(
     /// Common APIs available for MTLBuffer and MTLTexture instances
@@ -91,6 +89,7 @@ extern_protocol!(
     }
 );
 
+#[allow(unused)]
 pub trait MTLResourceExt: MTLResource + Message {
     fn label(&self) -> Option<String>;
     fn set_label(&self, label: Option<&str>);

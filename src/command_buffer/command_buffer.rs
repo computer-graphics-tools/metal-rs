@@ -1,7 +1,7 @@
-use crate::drawable::MTLDrawable;
-use crate::function_log::MTLLogContainer;
 use objc2::{Encode, Encoding, RefEncode, extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSError, NSErrorDomain, NSObjectProtocol, NSString};
+
+use crate::{drawable::MTLDrawable, function_log::MTLLogContainer};
 
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -24,11 +24,14 @@ unsafe impl RefEncode for MTLCommandBufferStatus {
 unsafe extern "C" {
     static MTLCommandBufferErrorDomain: &'static NSErrorDomain;
 }
+
+#[allow(unused)]
 #[inline]
 pub fn command_buffer_error_domain() -> &'static NSErrorDomain {
     unsafe { MTLCommandBufferErrorDomain }
 }
 
+#[allow(unused)]
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum MTLCommandBufferError {

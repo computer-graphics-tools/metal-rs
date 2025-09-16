@@ -1,7 +1,8 @@
+use std::{ops::Range, os::raw::c_void, ptr::NonNull};
+
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::NSRange;
 use objc2_io_surface::IOSurfaceRef;
-use std::{ops::Range, os::raw::c_void, ptr::NonNull};
 
 use crate::{
     MTLBuffer, MTLDevice, MTLPixelFormat, MTLRegion, MTLResource, MTLResourceID,
@@ -283,6 +284,7 @@ extern_protocol!(
     }
 );
 
+#[allow(unused)]
 pub trait TextureExt: MTLTexture + Message {
     /// Create a new texture which shares the same storage as the source texture, but with a different (but compatible) pixel format, texture type, levels and slices.
     unsafe fn new_texture_view_with_pixel_format_texture_type_levels_slices(

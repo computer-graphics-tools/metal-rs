@@ -15,7 +15,7 @@ extern_protocol!(
         fn build_acceleration_structure(
             &self,
             acceleration_structure: &ProtocolObject<dyn MTLAccelerationStructure>,
-            descriptor: &crate::acceleration::MTLAccelerationStructureDescriptor,
+            descriptor: &crate::acceleration_structure::MTLAccelerationStructureDescriptor,
             scratch_buffer: &ProtocolObject<dyn MTLBuffer>,
             scratch_buffer_offset: usize,
         );
@@ -26,7 +26,7 @@ extern_protocol!(
         unsafe fn refit_acceleration_structure(
             &self,
             source_acceleration_structure: &ProtocolObject<dyn MTLAccelerationStructure>,
-            descriptor: &crate::acceleration::MTLAccelerationStructureDescriptor,
+            descriptor: &crate::acceleration_structure::MTLAccelerationStructureDescriptor,
             destination_acceleration_structure: Option<
                 &ProtocolObject<dyn MTLAccelerationStructure>,
             >,
@@ -40,13 +40,13 @@ extern_protocol!(
         unsafe fn refit_acceleration_structure_with_options(
             &self,
             source_acceleration_structure: &ProtocolObject<dyn MTLAccelerationStructure>,
-            descriptor: &crate::acceleration::MTLAccelerationStructureDescriptor,
+            descriptor: &crate::acceleration_structure::MTLAccelerationStructureDescriptor,
             destination_acceleration_structure: Option<
                 &ProtocolObject<dyn MTLAccelerationStructure>,
             >,
             scratch_buffer: Option<&ProtocolObject<dyn MTLBuffer>>,
             scratch_buffer_offset: usize,
-            options: crate::acceleration::MTLAccelerationStructureRefitOptions,
+            options: crate::acceleration_structure::MTLAccelerationStructureRefitOptions,
         );
 
         /// Copy an acceleration structure.

@@ -4,6 +4,7 @@ use objc2_foundation::{NSErrorDomain, NSString};
 /// Common counters that, when present, have similar meanings across implementations.
 pub type MTLCommonCounter = NSString;
 
+#[allow(unused)]
 unsafe extern "C" {
     pub static MTLCommonCounterTimestamp: &'static MTLCommonCounter;
     pub static MTLCommonCounterTessellationInputPatches: &'static MTLCommonCounter;
@@ -25,6 +26,7 @@ unsafe extern "C" {
 /// Common counter set names.
 pub type MTLCommonCounterSet = NSString;
 
+#[allow(unused)]
 unsafe extern "C" {
     pub static MTLCommonCounterSetTimestamp: &'static MTLCommonCounterSet;
     pub static MTLCommonCounterSetStageUtilization: &'static MTLCommonCounterSet;
