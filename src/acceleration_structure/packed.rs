@@ -1,4 +1,5 @@
 use core::ffi::c_float;
+
 use objc2::{Encode, Encoding, RefEncode};
 
 /// Quaternion of 4 f32 values (from `MTLPackedFloatQuaternion`).
@@ -64,52 +65,5 @@ unsafe impl Encode for MTLPackedFloat4x3 {
 }
 
 unsafe impl RefEncode for MTLPackedFloat4x3 {
-    const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
-}
-
-/// Axis aligned bounding box with min and max points.
-#[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct MTLAxisAlignedBoundingBox {
-    pub min: MTLPackedFloat3,
-    pub max: MTLPackedFloat3,
-}
-
-unsafe impl Encode for MTLAxisAlignedBoundingBox {
-    const ENCODING: Encoding = Encoding::Struct(
-        "_MTLAxisAlignedBoundingBox",
-        &[<MTLPackedFloat3>::ENCODING, <MTLPackedFloat3>::ENCODING],
-    );
-}
-
-unsafe impl RefEncode for MTLAxisAlignedBoundingBox {
-    const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
-}
-
-/// Transformation represented by scale, shear, pivot, rotation (quaternion) and translation.
-#[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct MTLComponentTransform {
-    pub scale: MTLPackedFloat3,
-    pub shear: MTLPackedFloat3,
-    pub pivot: MTLPackedFloat3,
-    pub rotation: MTLPackedFloatQuaternion,
-    pub translation: MTLPackedFloat3,
-}
-
-unsafe impl Encode for MTLComponentTransform {
-    const ENCODING: Encoding = Encoding::Struct(
-        "MTLComponentTransform",
-        &[
-            <MTLPackedFloat3>::ENCODING,
-            <MTLPackedFloat3>::ENCODING,
-            <MTLPackedFloat3>::ENCODING,
-            <MTLPackedFloatQuaternion>::ENCODING,
-            <MTLPackedFloat3>::ENCODING,
-        ],
-    );
-}
-
-unsafe impl RefEncode for MTLComponentTransform {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
