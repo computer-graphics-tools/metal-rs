@@ -5,6 +5,8 @@ use crate::MTLResourceID;
 
 /// Motion instance descriptor with a resource handle for the instanced acceleration structure
 /// (from `MTLIndirectAccelerationStructureMotionInstanceDescriptor`).
+///
+/// Availability: API_AVAILABLE(macos(14.0), ios(17.0))
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct MTLIndirectAccelerationStructureMotionInstanceDescriptor {

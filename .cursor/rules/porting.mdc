@@ -1,5 +1,5 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
 - each .h file in external/Headers should be ported as:
   - a single .rs file if the header declares one type, or

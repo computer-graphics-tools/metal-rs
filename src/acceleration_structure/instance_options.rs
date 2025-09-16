@@ -1,6 +1,8 @@
 use objc2::{Encode, Encoding, RefEncode};
 
-/// Per-instance options (from `MTLAccelerationStructureInstanceOptions`).
+/// Per-instance options.
+///
+/// Availability: API_AVAILABLE(macos(11.0), ios(14.0), tvos(16.0))
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct MTLAccelerationStructureInstanceOptions(pub u32);

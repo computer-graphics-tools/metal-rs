@@ -1,14 +1,17 @@
 use objc2::{Encode, Encoding, RefEncode};
 
-/// Curve end caps (from `MTLCurveEndCaps`).
+/// Type of end cap to insert at the beginning and end of each connected
+/// sequence of curve segments (from `MTLCurveEndCaps`).
+///
+/// Availability: API_AVAILABLE(macos(14.0), ios(17.0))
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum MTLCurveEndCaps {
-    /// No end caps.
+    /// No end caps
     None = 0,
-    /// Disk end caps.
+    /// Disk end caps
     Disk = 1,
-    /// Spherical end caps.
+    /// Spherical end caps
     Sphere = 2,
 }
 

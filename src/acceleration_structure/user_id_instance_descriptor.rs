@@ -4,6 +4,8 @@ use super::{MTLAccelerationStructureInstanceOptions, MTLPackedFloat4x3};
 
 /// Instance descriptor with a user-assigned ID to help identify the instance (from
 /// `MTLAccelerationStructureUserIDInstanceDescriptor`).
+///
+/// Availability: API_AVAILABLE(macos(12.0), ios(15.0), tvos(16.0))
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct MTLAccelerationStructureUserIDInstanceDescriptor {

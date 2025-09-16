@@ -1,6 +1,6 @@
 use objc2::{Encode, Encoding, RefEncode};
 
-/// Usage flags for an acceleration structure (from `MTLAccelerationStructureUsage`).
+/// Usage flags for an acceleration structure.
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct MTLAccelerationStructureUsage(pub u64);

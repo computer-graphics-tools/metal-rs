@@ -5,6 +5,8 @@ use crate::MTLResourceID;
 
 /// Indirect instance descriptor with a resource handle for the instanced acceleration structure
 /// (from `MTLIndirectAccelerationStructureInstanceDescriptor`).
+///
+/// Availability: API_AVAILABLE(macos(14.0), ios(17.0))
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct MTLIndirectAccelerationStructureInstanceDescriptor {

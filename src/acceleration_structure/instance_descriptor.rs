@@ -4,6 +4,8 @@ use super::{MTLAccelerationStructureInstanceOptions, MTLPackedFloat4x3};
 
 /// Instance descriptor describing how to transform and reference a bottom-level acceleration structure
 /// (from `MTLAccelerationStructureInstanceDescriptor`).
+///
+/// Availability: API_AVAILABLE(macos(11.0), ios(14.0))
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct MTLAccelerationStructureInstanceDescriptor {

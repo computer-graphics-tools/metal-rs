@@ -4,6 +4,8 @@ use super::{MTLAccelerationStructureInstanceOptions, MTLMotionBorderMode};
 
 /// Motion instance descriptor describing per-instance motion parameters
 /// (from `MTLAccelerationStructureMotionInstanceDescriptor`).
+///
+/// Availability: API_AVAILABLE(macos(12.0), ios(15.0), tvos(16.0))
 #[repr(C)]
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct MTLAccelerationStructureMotionInstanceDescriptor {
