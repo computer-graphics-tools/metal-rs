@@ -1,5 +1,5 @@
 use objc2::{extern_protocol, runtime::ProtocolObject};
-use objc2_foundation::{NSObjectProtocol, NSUInteger};
+use objc2_foundation::NSObjectProtocol;
 
 use crate::types::{MTLRegion, MTLSize};
 use crate::{MTLBuffer, MTLComputePipelineState};

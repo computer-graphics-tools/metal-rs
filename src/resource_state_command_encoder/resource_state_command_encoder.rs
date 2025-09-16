@@ -3,7 +3,7 @@ use objc2::{extern_protocol, runtime::ProtocolObject};
 
 use crate::types::{MTLOrigin, MTLRegion, MTLSize};
 use crate::{MTLBuffer, MTLFence, MTLTexture};
-use crate::{MTLCommandEncoder, MTLMapIndirectArguments, MTLSparseTextureMappingMode};
+use crate::{MTLCommandEncoder, MTLSparseTextureMappingMode};
 
 extern_protocol!(
     /// Resource state command encoder

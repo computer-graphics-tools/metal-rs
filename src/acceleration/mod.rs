@@ -12,7 +12,7 @@ pub use packed::{
     MTLPackedFloatQuaternion,
 };
 pub use types::{
-    MTLAccelerationStructureInstanceOptions, MTLAccelerationStructureRefitOptions,
-    MTLAccelerationStructureUsage, MTLCurveBasis, MTLCurveEndCaps, MTLCurveType, MTLMatrixLayout,
-    MTLMotionBorderMode, MTLTransformType,
+    MTLAccelerationStructureInstanceDescriptorType, MTLAccelerationStructureInstanceOptions,
+    MTLAccelerationStructureRefitOptions, MTLAccelerationStructureUsage, MTLCurveBasis,
+    MTLCurveEndCaps, MTLCurveType, MTLMatrixLayout, MTLMotionBorderMode, MTLTransformType,
 };

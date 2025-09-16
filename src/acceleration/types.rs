@@ -1,5 +1,18 @@
-use core::ffi::c_float;
 use objc2::{Encode, Encoding, RefEncode};
+
+/// Type of instance descriptor layout used in acceleration structures.
+#[repr(u64)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub enum MTLAccelerationStructureInstanceDescriptorType {
+    Indirect = 0,
+    IndirectMotion = 1,
+}
+unsafe impl Encode for MTLAccelerationStructureInstanceDescriptorType {
+    const ENCODING: Encoding = u64::ENCODING;
+}
+unsafe impl RefEncode for MTLAccelerationStructureInstanceDescriptorType {
+    const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
+}
 
 /// Controls the acceleration structure refit operation (from `MTLAccelerationStructureRefitOptions`).
 #[repr(transparent)]

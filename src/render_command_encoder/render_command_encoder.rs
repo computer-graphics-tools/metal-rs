@@ -1,20 +1,11 @@
 use core::ptr::NonNull;
-use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::{NSObjectProtocol, NSRange};
+use objc2::{extern_protocol, runtime::ProtocolObject};
 
 use super::{
-    MTLCullMode, MTLDepthClipMode, MTLPrimitiveType, MTLScissorRect, MTLTriangleFillMode,
-    MTLVertexAmplificationViewMapping, MTLViewport, MTLVisibilityResultMode,
+    MTLCullMode, MTLDepthClipMode, MTLScissorRect, MTLTriangleFillMode, MTLViewport, MTLVisibilityResultMode,
 };
-use crate::command_encoder::{MTLBarrierScope, MTLStages as MTLRenderStages};
 use crate::render_pipeline::{MTLLogicalToPhysicalColorAttachmentMap, MTLRenderPipelineState};
-use crate::texture::MTLTexture;
-use crate::types::{MTLIndexType, MTLResourceID, MTLSize};
-use crate::{
-    MTLAccelerationStructure, MTLBuffer, MTLCommandEncoder, MTLCounterSampleBuffer, MTLFence,
-    MTLIntersectionFunctionTable, MTLRasterizationRateMap, MTLResource, MTLResourceUsage,
-    MTLSamplerState, MTLVisibleFunctionTable,
-};
+use crate::MTLCommandEncoder;
 
 extern_protocol!(
     /// Render command encoder interface.

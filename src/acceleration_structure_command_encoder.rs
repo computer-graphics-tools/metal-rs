@@ -1,6 +1,5 @@
 use core::ptr::NonNull;
-use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::{NSObjectProtocol, NSRange};
+use objc2::{extern_protocol, runtime::ProtocolObject};
 
 use crate::{
     MTLAccelerationStructure, MTLBuffer, MTLCommandEncoder, MTLCounterSampleBuffer, MTLDataType,

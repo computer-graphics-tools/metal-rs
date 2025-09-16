@@ -3,7 +3,7 @@ use objc2::{
     rc::{Allocated, Retained},
     runtime::NSObject,
 };
-use objc2_foundation::{CopyingHelper, NSCopying, NSInteger, NSObjectProtocol};
+use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
 use super::MTLLogLevel;
 

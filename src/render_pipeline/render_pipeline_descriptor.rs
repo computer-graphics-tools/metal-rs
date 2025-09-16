@@ -1,13 +1,13 @@
 use objc2::{
     extern_class, extern_conformance, extern_methods,
     rc::{Allocated, Retained},
-    runtime::{NSObject, ProtocolObject},
+    runtime::NSObject,
 };
-use objc2_foundation::{CopyingHelper, NSArray, NSCopying, NSObjectProtocol, NSString};
+use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSString};
 
 use super::{MTLPrimitiveTopologyClass, MTLRenderPipelineColorAttachmentDescriptorArray};
 use crate::{
-    MTLPipelineBufferDescriptorArray, MTLPixelFormat, MTLShaderValidation, MTLVertexDescriptor,
+    MTLPixelFormat, MTLShaderValidation, MTLVertexDescriptor,
 };
 
 extern_class!(

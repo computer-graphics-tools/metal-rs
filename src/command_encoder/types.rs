@@ -43,9 +43,9 @@ unsafe impl RefEncode for MTLBarrierScope {
 /// Describes stages of GPU work (from `MTLStages`).
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct MTLStages(pub u64);
+pub struct MTLRenderStages(pub u64);
 bitflags::bitflags! {
-    impl MTLStages: u64 {
+    impl MTLRenderStages: u64 {
         const Vertex = 1<<0;
         const Fragment = 1<<1;
         const Tile = 1<<2;
@@ -60,10 +60,10 @@ bitflags::bitflags! {
     }
 }
 
-unsafe impl Encode for MTLStages {
+unsafe impl Encode for MTLRenderStages {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for MTLStages {
+unsafe impl RefEncode for MTLRenderStages {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }

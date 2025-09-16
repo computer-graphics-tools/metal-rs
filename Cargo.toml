@@ -18,7 +18,9 @@ libc = "0.2.175"
 
 objc2 = { version = "0.6.2" }
 objc2-foundation = { version = "0.3.1" }
+objc2-core-foundation = { version = "0.3.1" }
 objc2-io-surface = { version = "0.3.1" }
+dispatch2 = { version = "0.3.0" }
 block2 = { version = "0.6.1" }
 once_cell = { version = "1.21.3" }
 bitflags = "2.9.4"

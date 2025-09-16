@@ -1,4 +1,4 @@
-use objc2::{extern_class, extern_conformance, extern_methods, rc::Retained, runtime::NSObject};
+use objc2::{extern_class, extern_conformance, extern_methods, runtime::NSObject};
 use objc2_foundation::NSObjectProtocol;
 
 extern_class!(

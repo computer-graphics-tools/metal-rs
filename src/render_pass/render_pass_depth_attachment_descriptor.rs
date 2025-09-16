@@ -1,7 +1,6 @@
 use objc2::{
     Encode, Encoding, RefEncode, extern_class, extern_conformance, extern_methods,
-    rc::Retained,
-    runtime::{NSObject, ProtocolObject},
+    runtime::NSObject,
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 

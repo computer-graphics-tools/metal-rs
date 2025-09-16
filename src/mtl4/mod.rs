@@ -28,7 +28,7 @@ mod render_pass;
 mod render_pipeline;
 mod specialized_function_descriptor;
 mod stitched_function_descriptor;
-mod tile_render_pipeline;
+mod tile_render_ripeline;
 
 pub use acceleration_structure::*;
 pub use archive::*;
@@ -60,4 +60,4 @@ pub use render_pass::*;
 pub use render_pipeline::*;
 pub use specialized_function_descriptor::*;
 pub use stitched_function_descriptor::*;
-pub use tile_render_pipeline::*;
+pub use tile_render_ripeline::*;

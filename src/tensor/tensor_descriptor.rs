@@ -145,15 +145,11 @@ impl MTLTensorDescriptor {
     );
 }
 
-#[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        MTLCPUCacheMode, MTLHazardTrackingMode, MTLResourceOptions, MTLStorageMode,
-        tensor::{MTLTensorDataType, MTLTensorExtents, MTLTensorUsage},
-    };
-    use core::ffi::CStr;
-    use objc2::runtime::AnyClass;
+    use crate::tensor::MTLTensorExtents;
+    
+    
 
     fn make_extents(vals: &[isize]) -> Retained<MTLTensorExtents> {
         // Safety: We pass a correct pointer or null based on rank.

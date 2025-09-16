@@ -3,7 +3,7 @@ use objc2::{
     rc::{Allocated, Retained},
     runtime::NSObject,
 };
-use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSUInteger};
+use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
 use crate::MTLPixelFormat;
 

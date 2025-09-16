@@ -8,7 +8,7 @@ mod sample_position;
 mod size;
 
 pub use data_type::MTLDataType;
-pub use gpu_address::MTLGpuAddress;
+pub use gpu_address::MTLGPUAddress;
 pub use index_type::MTLIndexType;
 pub use origin::MTLOrigin;
 pub use region::MTLRegion;

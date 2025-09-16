@@ -1,7 +1,7 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSString};
 
-use super::MTLStages;
+use super::MTLRenderStages;
 use crate::device::MTLDevice;
 
 extern_protocol!(
@@ -32,8 +32,8 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         unsafe fn barrier_after_queue_stages_before_stages(
             &self,
-            after_queue_stages: MTLStages,
-            before_stages: MTLStages,
+            after_queue_stages: MTLRenderStages,
+            before_stages: MTLRenderStages,
         );
 
         /// Inserts a debug string into the command buffer.

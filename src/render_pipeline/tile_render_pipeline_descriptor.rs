@@ -1,10 +1,16 @@
-use crate::MTLTileRenderPipelineColorAttachmentDescriptorArray;
 use objc2::{
     extern_class, extern_conformance, extern_methods,
     rc::{Allocated, Retained},
-    runtime::NSObject,
+    runtime::{NSObject, ProtocolObject},
 };
-use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSString, NSUInteger};
+use objc2_foundation::{CopyingHelper, NSArray, NSCopying, NSObjectProtocol, NSString, NSUInteger};
+
+use crate::{
+    MTLBinaryArchive as BinaryArchive, MTLFunction, MTLLinkedFunctions,
+    MTLPipelineBufferDescriptorArray, MTLShaderValidation, MTLSize,
+    MTLTileRenderPipelineColorAttachmentDescriptorArray,
+    dynamic_library::MTLDynamicLibrary as DynamicLibrary,
+};
 
 extern_class!(
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtltilerenderpipelinedescriptor?language=objc)
@@ -39,7 +45,6 @@ impl MTLTileRenderPipelineDescriptor {
         #[unsafe(method_family = none)]
         pub unsafe fn setLabel(&self, label: Option<&NSString>);
 
-        #[cfg(feature = "MTLLibrary")]
         /// The kernel or fragment function that serves as the tile shader for this pipeline.
         ///
         /// Both kernel-based and fragment-based tile pipelines dispatches will barrier against previous
@@ -49,7 +54,6 @@ impl MTLTileRenderPipelineDescriptor {
         #[unsafe(method_family = none)]
         pub unsafe fn tileFunction(&self) -> Retained<ProtocolObject<dyn MTLFunction>>;
 
-        #[cfg(feature = "MTLLibrary")]
         /// Setter for [`tileFunction`][Self::tileFunction].
         #[unsafe(method(setTileFunction:))]
         #[unsafe(method_family = none)]
@@ -85,10 +89,9 @@ impl MTLTileRenderPipelineDescriptor {
             threadgroup_size_matches_tile_size: bool,
         );
 
-        #[cfg(feature = "MTLPipeline")]
         #[unsafe(method(tileBuffers))]
         #[unsafe(method_family = none)]
-        pub unsafe fn tileBuffers(&self) -> Retained<PipelineBufferDescriptorArray>;
+        pub unsafe fn tileBuffers(&self) -> Retained<MTLPipelineBufferDescriptorArray>;
 
         /// Optional property. Set the maxTotalThreadsPerThreadgroup. If it is not set, returns zero.
         #[unsafe(method(maxTotalThreadsPerThreadgroup))]
@@ -103,7 +106,6 @@ impl MTLTileRenderPipelineDescriptor {
             max_total_threads_per_threadgroup: NSUInteger,
         );
 
-        #[cfg(feature = "MTLBinaryArchive")]
         /// The set of MTLBinaryArchive to search for compiled code when creating the pipeline state.
         ///
         /// Accelerate pipeline state creation by providing archives of compiled code such that no compilation needs to happen on the fast path.
@@ -115,7 +117,6 @@ impl MTLTileRenderPipelineDescriptor {
             &self,
         ) -> Option<Retained<NSArray<ProtocolObject<dyn BinaryArchive>>>>;
 
-        #[cfg(feature = "MTLBinaryArchive")]
         /// Setter for [`binaryArchives`][Self::binaryArchives].
         ///
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
@@ -126,7 +127,6 @@ impl MTLTileRenderPipelineDescriptor {
             binary_archives: Option<&NSArray<ProtocolObject<dyn BinaryArchive>>>,
         );
 
-        #[cfg(feature = "MTLDynamicLibrary")]
         /// The set of MTLDynamicLibrary to use to resolve external symbols before considering symbols from dependent MTLDynamicLibrary.
         ///
         /// Typical workflows use the libraries property of MTLCompileOptions to record dependent libraries at compile time without having to use preloadedLibraries.
@@ -140,7 +140,6 @@ impl MTLTileRenderPipelineDescriptor {
             &self,
         ) -> Retained<NSArray<ProtocolObject<dyn DynamicLibrary>>>;
 
-        #[cfg(feature = "MTLDynamicLibrary")]
         /// Setter for [`preloadedLibraries`][Self::preloadedLibraries].
         ///
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
@@ -151,15 +150,13 @@ impl MTLTileRenderPipelineDescriptor {
             preloaded_libraries: &NSArray<ProtocolObject<dyn DynamicLibrary>>,
         );
 
-        #[cfg(feature = "MTLLinkedFunctions")]
         /// The set of functions to be linked with the pipeline state and accessed from the tile function.
         ///
         /// See: MTLLinkedFunctions
         #[unsafe(method(linkedFunctions))]
         #[unsafe(method_family = none)]
-        pub unsafe fn linkedFunctions(&self) -> Retained<LinkedFunctions>;
+        pub unsafe fn linkedFunctions(&self) -> Retained<MTLLinkedFunctions>;
 
-        #[cfg(feature = "MTLLinkedFunctions")]
         /// Setter for [`linkedFunctions`][Self::linkedFunctions].
         ///
         /// This is [copied][objc2_foundation::NSCopying::copy] when set.
@@ -191,7 +188,6 @@ impl MTLTileRenderPipelineDescriptor {
         #[unsafe(method_family = none)]
         pub unsafe fn reset(&self);
 
-        #[cfg(feature = "MTLPipeline")]
         /// Toggle that determines whether Metal Shader Validation should be enabled or disabled for the pipeline.
         ///
         /// The value can be overridden using `MTL_SHADER_VALIDATION_ENABLE_PIPELINES` or `MTL_SHADER_VALIDATION_DISABLE_PIPELINES` Environment Variables.
@@ -199,13 +195,11 @@ impl MTLTileRenderPipelineDescriptor {
         #[unsafe(method_family = none)]
         pub unsafe fn shaderValidation(&self) -> MTLShaderValidation;
 
-        #[cfg(feature = "MTLPipeline")]
         /// Setter for [`shaderValidation`][Self::shaderValidation].
         #[unsafe(method(setShaderValidation:))]
         #[unsafe(method_family = none)]
         pub unsafe fn setShaderValidation(&self, shader_validation: MTLShaderValidation);
 
-        #[cfg(feature = "MTLTypes")]
         /// Sets the required threads-per-threadgroup during tile dispatches. The `threadsPerTile` argument of any tile dispatch must match to this value if it is set.
         /// Optional, unless the pipeline is going to use CooperativeTensors in which case this must be set.
         /// Setting this to a size of 0 in every dimension disables this property
@@ -213,7 +207,6 @@ impl MTLTileRenderPipelineDescriptor {
         #[unsafe(method_family = none)]
         pub unsafe fn requiredThreadsPerThreadgroup(&self) -> MTLSize;
 
-        #[cfg(feature = "MTLTypes")]
         /// Setter for [`requiredThreadsPerThreadgroup`][Self::requiredThreadsPerThreadgroup].
         #[unsafe(method(setRequiredThreadsPerThreadgroup:))]
         #[unsafe(method_family = none)]
