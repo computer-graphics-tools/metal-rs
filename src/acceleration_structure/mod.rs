@@ -1,7 +1,5 @@
 mod acceleration_structure;
-mod axis_aligned_bounding_box;
 mod bounding_box_geometry_descriptor;
-mod component_transform;
 mod curve_basis;
 mod curve_end_caps;
 mod curve_geometry_descriptor;
@@ -22,7 +20,6 @@ mod motion_curve_geometry_descriptor;
 mod motion_instance_descriptor;
 mod motion_keyframe_data;
 mod motion_triangle_geometry_descriptor;
-mod packed;
 mod primitive_acceleration_structure_descriptor;
 mod refit_options;
 mod sizes;
@@ -32,9 +29,7 @@ mod usage;
 mod user_id_instance_descriptor;
 
 pub use acceleration_structure::MTLAccelerationStructure;
-pub use axis_aligned_bounding_box::MTLAxisAlignedBoundingBox;
 pub use bounding_box_geometry_descriptor::MTLAccelerationStructureBoundingBoxGeometryDescriptor;
-pub use component_transform::MTLComponentTransform;
 pub use curve_basis::MTLCurveBasis;
 pub use curve_end_caps::MTLCurveEndCaps;
 pub use curve_geometry_descriptor::MTLAccelerationStructureCurveGeometryDescriptor;
@@ -55,7 +50,6 @@ pub use motion_curve_geometry_descriptor::MTLAccelerationStructureMotionCurveGeo
 pub use motion_instance_descriptor::MTLAccelerationStructureMotionInstanceDescriptor;
 pub use motion_keyframe_data::MTLMotionKeyframeData;
 pub use motion_triangle_geometry_descriptor::MTLAccelerationStructureMotionTriangleGeometryDescriptor;
-pub use packed::{MTLPackedFloat3, MTLPackedFloat4x3, MTLPackedFloatQuaternion};
 pub use primitive_acceleration_structure_descriptor::MTLPrimitiveAccelerationStructureDescriptor;
 pub use refit_options::MTLAccelerationStructureRefitOptions;
 pub use sizes::MTLAccelerationStructureSizes;

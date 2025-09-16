@@ -1,7 +1,6 @@
 use objc2::{Encode, Encoding, RefEncode};
 
-use super::{MTLAccelerationStructureInstanceOptions, MTLPackedFloat4x3};
-use crate::MTLResourceID;
+use crate::{MTLAccelerationStructureInstanceOptions, MTLPackedFloat4x3, MTLResourceID};
 
 /// Indirect instance descriptor with a resource handle for the instanced acceleration structure
 /// (from `MTLIndirectAccelerationStructureInstanceDescriptor`).

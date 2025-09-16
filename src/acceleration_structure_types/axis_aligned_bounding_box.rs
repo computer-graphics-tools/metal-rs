@@ -1,18 +1,20 @@
 use objc2::{Encode, Encoding, RefEncode};
 
-use super::packed::MTLPackedFloat3;
+use crate::MTLPackedFloat3;
 
-/// Axis aligned bounding box with min and max points.
+/// An axis aligned bounding box with a minimum and maximum point.
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct MTLAxisAlignedBoundingBox {
+    /// Minimum point.
     pub min: MTLPackedFloat3,
+    /// Maximum point.
     pub max: MTLPackedFloat3,
 }
 
 unsafe impl Encode for MTLAxisAlignedBoundingBox {
     const ENCODING: Encoding = Encoding::Struct(
-        "_MTLAxisAlignedBoundingBox",
+        "MTLAxisAlignedBoundingBox",
         &[<MTLPackedFloat3>::ENCODING, <MTLPackedFloat3>::ENCODING],
     );
 }

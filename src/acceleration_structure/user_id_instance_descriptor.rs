@@ -1,6 +1,6 @@
 use objc2::{Encode, Encoding, RefEncode};
 
-use super::{MTLAccelerationStructureInstanceOptions, MTLPackedFloat4x3};
+use crate::{MTLAccelerationStructureInstanceOptions, MTLPackedFloat4x3};
 
 /// Instance descriptor with a user-assigned ID to help identify the instance (from
 /// `MTLAccelerationStructureUserIDInstanceDescriptor`).

@@ -1,5 +1,6 @@
 mod acceleration_structure;
 mod acceleration_structure_command_encoder;
+mod acceleration_structure_types;
 mod allocation;
 mod argument;
 mod binary_archive;
@@ -57,6 +58,7 @@ mod visible_function_table;
 
 pub use acceleration_structure::*;
 pub use acceleration_structure_command_encoder::*;
+pub use acceleration_structure_types::*;
 pub use allocation::*;
 pub use argument::*;
 pub use binary_archive::*;
