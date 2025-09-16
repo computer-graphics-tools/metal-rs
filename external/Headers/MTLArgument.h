@@ -109,7 +109,16 @@ typedef NS_ENUM(NSUInteger, MTLArgumentType) {
 } API_DEPRECATED_WITH_REPLACEMENT("MTLBindingType", macos(10.11, 13.0), ios(8.0, 16.0));
 
 
- 
+typedef NS_ENUM(NSUInteger, MTLBindingAccess) {
+    MTLBindingAccessReadOnly   = 0,
+    MTLBindingAccessReadWrite  = 1,
+    MTLBindingAccessWriteOnly  = 2,
+    MTLArgumentAccessReadOnly API_DEPRECATED_WITH_REPLACEMENT("MTLBindingAccessReadOnly", macos(10.13, 14.0), ios(8.0, 17.0)) = MTLBindingAccessReadOnly,
+    MTLArgumentAccessReadWrite API_DEPRECATED_WITH_REPLACEMENT("MTLBindingAccessReadWrite", macos(10.13, 14.0), ios(8.0, 17.0)) = MTLBindingAccessReadWrite,
+    MTLArgumentAccessWriteOnly API_DEPRECATED_WITH_REPLACEMENT("MTLBindingAccessWriteOnly", macos(10.13, 14.0), ios(8.0, 17.0)) = MTLBindingAccessWriteOnly,
+};
+
+typedef MTLBindingAccess MTLArgumentAccess API_DEPRECATED_WITH_REPLACEMENT("MTLBindingAccess", macos(10.11, 14.0), ios(8.0, 17.0));
 
 
 @class MTLStructType;

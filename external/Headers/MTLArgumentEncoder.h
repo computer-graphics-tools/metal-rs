@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MTLVisibleFunctionTable;
 @protocol MTLAccelerationStructure;
 @protocol MTLIntersectionFunctionTable;
+@protocol MTLDepthStencilState;
 
 /*
  @brief
@@ -192,6 +193,17 @@ API_AVAILABLE(macos(10.13), ios(11.0))
 - (void)setIntersectionFunctionTables:(const id <MTLIntersectionFunctionTable> __nullable [__nonnull])intersectionFunctionTables withRange:(NSRange)range API_AVAILABLE(macos(11.0), ios(14.0), tvos(16.0));
 
 
+/*!
+ * @method setDepthStencilState:atIndex
+ * @brief Sets a depth stencil state at a given bind point index
+ */
+- (void)setDepthStencilState:(nullable id<MTLDepthStencilState>)depthStencilState atIndex:(NSUInteger)index API_AVAILABLE(macos(26.0), ios(26.0));
+
+/*!
+ * @method setDepthStencilStates:withRange:
+ * @brief Sets an array of depth stencil states at a given buffer index range
+ */
+- (void)setDepthStencilStates:(const id<MTLDepthStencilState> __nullable [__nonnull])depthStencilStates withRange:(NSRange)range API_AVAILABLE(macos(26.0), ios(26.0));
 
 @end
 

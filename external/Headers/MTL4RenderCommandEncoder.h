@@ -139,6 +139,17 @@ API_AVAILABLE(macos(26.0), ios(26.0))
           slopeScale:(float)slopeScale
                clamp:(float)clamp;
 
+/// Configures the minimum and maximum bounds for depth bounds testing.
+///
+/// The render command encoder disables depth bounds testing by default.
+/// The render command encoder also disables depth bounds testing when all of the following properties equal a specific value:
+/// - The `minBound` property is equal to `0.0f`.
+/// - The `maxBound` property is equal to `1.0f`.
+/// Both `minBound` and `maxBound` need to be within `[0.0f, 1.0f]`, and `minBound` needs to be less than or equal to `maxBound`.
+/// - Parameters:
+///   - minBound: A minimum bound for depth testing, which discards fragments with a stored depth that is less than `minBound`.
+///   - maxBound: A maximum bound for depth testing, which discards fragments with a stored depth that is greater than `maxBound`.
+- (void)setDepthTestMinBound:(float)minBound maxBound:(float)maxBound;
 
 /// Sets a scissor rectangle to discard fragments outside a specific area.
 ///

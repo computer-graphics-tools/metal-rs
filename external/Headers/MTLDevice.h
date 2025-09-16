@@ -111,7 +111,13 @@ NS_ASSUME_NONNULL_BEGIN
 @class MTLIOCommandQueueDescriptor;
 
 
- 
+typedef NS_ENUM(NSInteger, MTLIOCompressionMethod) {
+    MTLIOCompressionMethodZlib = 0,
+    MTLIOCompressionMethodLZFSE = 1,
+    MTLIOCompressionMethodLZ4 = 2,
+    MTLIOCompressionMethodLZMA = 3,
+    MTLIOCompressionMethodLZBitmap = 4,
+};
 
 
 /*!
@@ -171,6 +177,252 @@ MTL_EXTERN NSArray <id<MTLDevice>> *MTLCopyAllDevicesWithObserver(id <NSObject> 
  @brief Removes a previously installed observer for device change notifications.
 */
 MTL_EXTERN void MTLRemoveDeviceObserver(id <NSObject> observer) API_AVAILABLE(macos(10.13)) API_UNAVAILABLE(ios);
+
+typedef NS_ENUM(NSUInteger, MTLFeatureSet)
+{
+    MTLFeatureSet_iOS_GPUFamily1_v1 API_AVAILABLE(ios(8.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 0,
+    MTLFeatureSet_iOS_GPUFamily2_v1 API_AVAILABLE(ios(8.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 1,
+
+    MTLFeatureSet_iOS_GPUFamily1_v2 API_AVAILABLE(ios(9.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 2,
+    MTLFeatureSet_iOS_GPUFamily2_v2 API_AVAILABLE(ios(9.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 3,
+    MTLFeatureSet_iOS_GPUFamily3_v1 API_AVAILABLE(ios(9.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 4,
+
+    MTLFeatureSet_iOS_GPUFamily1_v3 API_AVAILABLE(ios(10.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 5,
+    MTLFeatureSet_iOS_GPUFamily2_v3 API_AVAILABLE(ios(10.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 6,
+    MTLFeatureSet_iOS_GPUFamily3_v2 API_AVAILABLE(ios(10.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 7,
+
+    MTLFeatureSet_iOS_GPUFamily1_v4 API_AVAILABLE(ios(11.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 8,
+    MTLFeatureSet_iOS_GPUFamily2_v4 API_AVAILABLE(ios(11.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 9,
+    MTLFeatureSet_iOS_GPUFamily3_v3 API_AVAILABLE(ios(11.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 10,
+    MTLFeatureSet_iOS_GPUFamily4_v1 API_AVAILABLE(ios(11.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 11,
+    
+    MTLFeatureSet_iOS_GPUFamily1_v5 API_AVAILABLE(ios(12.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 12,
+    MTLFeatureSet_iOS_GPUFamily2_v5 API_AVAILABLE(ios(12.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 13,
+    MTLFeatureSet_iOS_GPUFamily3_v4 API_AVAILABLE(ios(12.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 14,
+    MTLFeatureSet_iOS_GPUFamily4_v2 API_AVAILABLE(ios(12.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 15,
+    MTLFeatureSet_iOS_GPUFamily5_v1 API_AVAILABLE(ios(12.0)) API_UNAVAILABLE(macos, macCatalyst, tvos) = 16,
+
+    MTLFeatureSet_macOS_GPUFamily1_v1 API_AVAILABLE(macos(10.11)) API_UNAVAILABLE(ios) API_UNAVAILABLE(macCatalyst) = 10000,
+    MTLFeatureSet_OSX_GPUFamily1_v1 API_AVAILABLE(macos(10.11)) API_UNAVAILABLE(ios) = MTLFeatureSet_macOS_GPUFamily1_v1, // deprecated
+
+    MTLFeatureSet_macOS_GPUFamily1_v2 API_AVAILABLE(macos(10.12)) API_UNAVAILABLE(ios) API_UNAVAILABLE(macCatalyst) = 10001,
+    MTLFeatureSet_OSX_GPUFamily1_v2 API_AVAILABLE(macos(10.12)) API_UNAVAILABLE(ios) = MTLFeatureSet_macOS_GPUFamily1_v2, // deprecated
+    MTLFeatureSet_macOS_ReadWriteTextureTier2 API_AVAILABLE(macos(10.12)) API_UNAVAILABLE(ios) = 10002,
+    MTLFeatureSet_OSX_ReadWriteTextureTier2 API_AVAILABLE(macos(10.12)) API_UNAVAILABLE(ios) = MTLFeatureSet_macOS_ReadWriteTextureTier2, // deprecated
+
+    MTLFeatureSet_macOS_GPUFamily1_v3 API_AVAILABLE(macos(10.13)) API_UNAVAILABLE(ios) API_UNAVAILABLE(macCatalyst) = 10003,
+    
+    MTLFeatureSet_macOS_GPUFamily1_v4 API_AVAILABLE(macos(10.14)) API_UNAVAILABLE(ios) API_UNAVAILABLE(macCatalyst) = 10004,
+    MTLFeatureSet_macOS_GPUFamily2_v1 API_AVAILABLE(macos(10.14)) API_UNAVAILABLE(ios) API_UNAVAILABLE(macCatalyst) = 10005,
+
+
+    MTLFeatureSet_tvOS_GPUFamily1_v1 API_AVAILABLE(tvos(9.0)) API_UNAVAILABLE(macos, ios) = 30000,
+    MTLFeatureSet_TVOS_GPUFamily1_v1 API_AVAILABLE(tvos(9.0)) API_UNAVAILABLE(macos, ios) = MTLFeatureSet_tvOS_GPUFamily1_v1, // deprecated
+    
+    MTLFeatureSet_tvOS_GPUFamily1_v2 API_AVAILABLE(tvos(10.0)) API_UNAVAILABLE(macos, ios) = 30001,
+    
+    MTLFeatureSet_tvOS_GPUFamily1_v3 API_AVAILABLE(tvos(11.0)) API_UNAVAILABLE(macos, ios) = 30002,
+    MTLFeatureSet_tvOS_GPUFamily2_v1 API_AVAILABLE(tvos(11.0)) API_UNAVAILABLE(macos, ios) = 30003,
+    
+    MTLFeatureSet_tvOS_GPUFamily1_v4 API_AVAILABLE(tvos(12.0)) API_UNAVAILABLE(macos, ios) = 30004,
+    MTLFeatureSet_tvOS_GPUFamily2_v2 API_AVAILABLE(tvos(12.0)) API_UNAVAILABLE(macos, ios) = 30005,
+} API_DEPRECATED("Use MTLGPUFamily instead", macos(10.11, 13.0), ios(8.0, 16.0), tvos(9.0, 16.0));
+
+typedef NS_ENUM(NSInteger, MTLGPUFamily)
+{
+    MTLGPUFamilyApple1  = 1001,
+    MTLGPUFamilyApple2  = 1002,
+    MTLGPUFamilyApple3  = 1003,
+    MTLGPUFamilyApple4  = 1004,
+    MTLGPUFamilyApple5  = 1005,
+    MTLGPUFamilyApple6  = 1006,
+    MTLGPUFamilyApple7  = 1007,
+    MTLGPUFamilyApple8  = 1008,
+    MTLGPUFamilyApple9  = 1009,
+    MTLGPUFamilyApple10 = 1010,
+
+    MTLGPUFamilyMac1 API_DEPRECATED_WITH_REPLACEMENT("MTLGPUFamilyMac2", macos(10.15, 13.0), ios(13.0, 16.0)) = 2001,
+    MTLGPUFamilyMac2 = 2002,
+    
+    MTLGPUFamilyCommon1 = 3001,
+    MTLGPUFamilyCommon2 = 3002,
+    MTLGPUFamilyCommon3 = 3003,
+    
+    MTLGPUFamilyMacCatalyst1 API_DEPRECATED_WITH_REPLACEMENT("MTLGPUFamilyMac2", macos(10.15, 13.0), ios(13.0, 16.0)) = 4001,
+    MTLGPUFamilyMacCatalyst2 API_DEPRECATED_WITH_REPLACEMENT("MTLGPUFamilyMac2", macos(10.15, 13.0), ios(13.0, 16.0)) = 4002,
+    
+    MTLGPUFamilyMetal3 API_AVAILABLE(macos(13.0), ios(16.0)) = 5001,
+    MTLGPUFamilyMetal4 API_AVAILABLE(macos(26.0), ios(26.0)) = 5002,
+} API_AVAILABLE(macos(10.15), ios(13.0));
+
+/*!
+ @enum MTLDeviceLocation
+ @abstract Specifies the location of the GPU on macOS
+ */
+typedef NS_ENUM(NSUInteger, MTLDeviceLocation)
+{
+    MTLDeviceLocationBuiltIn = 0,
+    MTLDeviceLocationSlot = 1,
+    MTLDeviceLocationExternal = 2,
+    MTLDeviceLocationUnspecified = NSUIntegerMax,
+} API_AVAILABLE(macos(10.15)) API_UNAVAILABLE(ios);
+
+/*!
+ @enum MTLPipelineOption
+ @abstract Controls the creation of the pipeline
+ */
+typedef NS_OPTIONS(NSUInteger, MTLPipelineOption)
+{
+    MTLPipelineOptionNone               = 0,
+    MTLPipelineOptionArgumentInfo API_DEPRECATED_WITH_REPLACEMENT("MTLPipelineOptionBindingInfo", macos(10.11, 13.0), ios(8.0, 16.0)) = 1 << 0,
+    MTLPipelineOptionBindingInfo        = 1 << 0,
+    MTLPipelineOptionBufferTypeInfo     = 1 << 1,
+    MTLPipelineOptionFailOnBinaryArchiveMiss API_AVAILABLE(macos(11.0), ios(14.0)) = 1 << 2,
+} API_AVAILABLE(macos(10.11), ios(8.0));
+
+/*!
+ @enum MTLReadWriteTextureTier
+ @abstract MTLReadWriteTextureTier determines support level for read-write texture formats.
+ */
+typedef NS_ENUM(NSUInteger, MTLReadWriteTextureTier)
+{
+    MTLReadWriteTextureTierNone = 0,
+    MTLReadWriteTextureTier1 = 1,
+    MTLReadWriteTextureTier2 = 2,
+} API_AVAILABLE(macos(10.13), ios(11.0));
+
+/*!
+ @enum MTLArgumentBuffersTier
+ @abstract MTLArgumentBuffersTier determines support level for argument buffers.
+ */
+typedef NS_ENUM(NSUInteger, MTLArgumentBuffersTier)
+{
+    MTLArgumentBuffersTier1 = 0,
+    MTLArgumentBuffersTier2 = 1,
+} API_AVAILABLE(macos(10.13), ios(11.0));
+
+/*!
+ @enum MTLSparseTextureRegionAlignmentMode
+ @abstract MTLSparseTextureRegionAlignmentMode determines type of alignment used when converting from pixel region to tile region.
+ */
+typedef NS_ENUM(NSUInteger, MTLSparseTextureRegionAlignmentMode)
+{
+    MTLSparseTextureRegionAlignmentModeOutward   = 0,
+    MTLSparseTextureRegionAlignmentModeInward    = 1,
+} API_AVAILABLE(macos(11.0), macCatalyst(14.0), ios(13.0), tvos(16.0));
+
+/**
+ * @brief Describes the memory requirements for an acceleration structure
+ */
+typedef struct {
+    /**
+     * @brief The required size, in bytes, of the built acceleration structure
+     */
+    NSUInteger accelerationStructureSize;
+    
+    /**
+     * @brief The required size, in bytes, of the scratch buffer used to build the acceleration structure
+     */
+    NSUInteger buildScratchBufferSize;
+    
+    /**
+     * @brief The required size, in bytes, of the scratch buffer used to refit the acceleration structure
+     */
+    NSUInteger refitScratchBufferSize;
+} MTLAccelerationStructureSizes;
+
+/*!
+ @enum MTLCounterSamplingPoint
+ @abstract MTLCounterSamplingPoint determines type of sampling points that are supported on given device.
+
+ @constant MTLCounterSamplingPointAtStageBoundary
+ Counter sampling points at render, compute, and blit command encoder stage boundary are supported.
+
+ @constant MTLCounterSamplingPointAtDrawBoundary
+ Counter sampling at draw boundary is supported, render encoder method sampleCountersInBuffer can be used for sampling.
+
+ @constant MTLCounterSamplingPointAtDispatchBoundary
+ Counter sampling at compute dispatch boundary is supported, compute encoder method sampleCountersInBuffer can be used for sampling.
+
+ @constant MTLCounterSamplingPointAtTileDispatchBoundary
+ Counter sampling at tile shader dispatch boundary is supported.
+
+ @constant MTLCounterSamplingPointAtBlitBoundary
+ Counter sampling at blit boundary is supported, blit encoder method sampleCountersInBuffer can be used for sampling.
+*/
+typedef NS_ENUM(NSUInteger, MTLCounterSamplingPoint)
+{
+    MTLCounterSamplingPointAtStageBoundary,
+    MTLCounterSamplingPointAtDrawBoundary,
+    MTLCounterSamplingPointAtDispatchBoundary,
+    MTLCounterSamplingPointAtTileDispatchBoundary,
+    MTLCounterSamplingPointAtBlitBoundary
+} API_AVAILABLE(macos(11.0), ios(14.0));
+
+/*!
+ @abstract Represent a memory size and alignment in bytes.
+ */
+typedef struct {
+    NSUInteger size;
+    NSUInteger align;
+} MTLSizeAndAlign;
+
+
+
+/*!
+ * @class MTLArgumentDescriptor
+ * @abstract Represents a member of an argument buffer
+ */
+MTL_EXPORT API_AVAILABLE(macos(10.13), ios(11.0))
+@interface MTLArgumentDescriptor : NSObject <NSCopying>
+
+/*!
+ * @method argumentDescriptor
+ * @abstract Create an autoreleased default argument descriptor
+ */
++ (MTLArgumentDescriptor *)argumentDescriptor;
+
+/*!
+ * @property dataType
+ * @abstract For constants, the data type. Otherwise, MTLDataTypeTexture, MTLDataTypeSampler, or
+ * MTLDataTypePointer.
+ */
+@property (nonatomic) MTLDataType dataType;
+
+/*!
+ * @property index
+ * @abstract The binding point index of the argument
+ */
+@property (nonatomic) NSUInteger index;
+
+/*!
+ * @property arrayLength
+ * @abstract The length of an array of constants, textures, or samplers, or 0 for non-array arguments
+ */
+@property (nonatomic) NSUInteger arrayLength;
+
+/*!
+ * @property access
+ * @abstract Access flags for the argument
+ */
+@property (nonatomic) MTLBindingAccess access;
+
+/*!
+ * @property textureType
+ * @abstract For texture arguments, the texture type
+ */
+@property (nonatomic) MTLTextureType textureType;
+
+/*!
+ @property constantBlockAlignment
+ @abstract if set forces the constant block to be aligned to the given alignment
+ @discussion Should only be set on the first constant of the block and is only valid if a corresponding
+     explicit "alignas" is applied to the constant in the metal shader language.
+ */
+@property (nonatomic) NSUInteger constantBlockAlignment;
+
+@end
+
 
 /*!
  @class MTLArchitecture

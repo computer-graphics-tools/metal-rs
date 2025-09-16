@@ -1240,6 +1240,12 @@ Protocols:
     SwiftName: __setIntersectionFunctionTables(_:withBufferRange:)
     MethodKind: Instance
     SwiftPrivate: true
+  - Selector: 'setDepthStencilState:atIndex:'
+    SwiftName: setDepthStencilState(_:index:)
+    MethodKind: Instance
+  - Selector: 'setDepthStencilStates:withRange:'
+    SwiftPrivate: true
+    MethodKind: Instance
 
 - Name: MTLLibrary
   Methods:
@@ -1317,6 +1323,9 @@ Protocols:
   - Selector: 'setScissorRects:count:'
     MethodKind: Instance
     SwiftPrivate: true
+  - Selector: 'setDepthTestMinBound:maxBound:'
+    SwiftPrivate: true
+    MethodKind: Instance
   - Selector: 'setVertexBytes:length:atIndex:'
     SwiftName: setVertexBytes(_:length:index:)
     MethodKind: Instance
@@ -2080,6 +2089,9 @@ Protocols:
     MethodKind: Instance
   - Selector: 'writeTimestampWithGranularity:afterStage:intoHeap:atIndex:'
     SwiftName: writeTimestamp(granularity:after:counterHeap:index:)
+    MethodKind: Instance
+  - Selector: 'setDepthTestMinBound:maxBound:'
+    SwiftPrivate: true
     MethodKind: Instance
   
 - Name: MTL4MachineLearningCommandEncoder

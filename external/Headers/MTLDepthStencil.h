@@ -89,5 +89,10 @@ API_AVAILABLE(macos(10.11), ios(8.0)) NS_SWIFT_SENDABLE
  */
 @property (readonly) id <MTLDevice> device;
 
+/*!
+ @property gpuResourceID
+ @abstract Handle of the GPU resource suitable for storing in an Argument Buffer
+ */
+@property (readonly) MTLResourceID gpuResourceID API_AVAILABLE(macos(26.0), ios(26.0));
 @end
 NS_ASSUME_NONNULL_END
