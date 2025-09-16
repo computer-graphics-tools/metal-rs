@@ -9,6 +9,27 @@ use crate::MTLCounterSampleBuffer;
 
 extern_class!(
     /// Sample buffer attachment descriptor for acceleration structure passes.
+    ///
+    /// Availability: macOS 13.0+, iOS 16.0+
+    ///
+    /// - `sample_buffer`: The sample buffer to store samples for the
+    ///   acceleration structure pass defined samples. If non-`None`, the sample
+    ///   indices will be used to store samples into the sample buffer. If no
+    ///   sample buffer is provided, no samples will be taken. If any of the
+    ///   sample indices are specified as `MTLCounterDontSample`, no sample will
+    ///   be taken for that action.
+    /// - `start_of_encoder_sample_index`: Sample index to use to store the
+    ///   sample taken at the start of command encoder processing. Setting the
+    ///   value to `MTLCounterDontSample` omits this sample. On devices where
+    ///   `MTLCounterSamplingPointAtStageBoundary` is unsupported, this index is
+    ///   invalid and must be set to `MTLCounterDontSample` or creation of an
+    ///   acceleration structure pass will fail.
+    /// - `end_of_encoder_sample_index`: Sample index to use to store the sample
+    ///   taken at the end of command encoder processing. Setting the value to
+    ///   `MTLCounterDontSample` omits this sample. On devices where
+    ///   `MTLCounterSamplingPointAtStageBoundary` is unsupported, this index is
+    ///   invalid and must be set to `MTLCounterDontSample` or creation of an
+    ///   acceleration structure pass will fail.
     #[unsafe(super(NSObject))]
     #[derive(Debug, PartialEq, Eq, Hash)]
     pub struct MTLAccelerationStructurePassSampleBufferAttachmentDescriptor;
@@ -28,14 +49,20 @@ extern_conformance!(
 
 impl MTLAccelerationStructurePassSampleBufferAttachmentDescriptor {
     extern_methods!(
-        /// The sample buffer to store samples for the encoder-defined samples.
+        /// The sample buffer to store samples for the acceleration structure
+        /// pass defined samples. If `Some`, the sample indices will be used to
+        /// store samples into the sample buffer. If `None`, no samples will be
+        /// taken. If any sample index is `MTLCounterDontSample`, no sample is
+        /// taken for that action.
         #[unsafe(method(sampleBuffer))]
         #[unsafe(method_family = none)]
         pub unsafe fn sample_buffer(
             &self,
         ) -> Option<Retained<ProtocolObject<dyn MTLCounterSampleBuffer>>>;
 
-        /// Setter for `sample_buffer`.
+        /// Set the sample buffer used to store samples for encoder-defined
+        /// samples. See getter for behavior when `None` or when indices are
+        /// `MTLCounterDontSample`.
         #[unsafe(method(setSampleBuffer:))]
         #[unsafe(method_family = none)]
         pub unsafe fn set_sample_buffer(
@@ -43,7 +70,11 @@ impl MTLAccelerationStructurePassSampleBufferAttachmentDescriptor {
             sample_buffer: Option<&ProtocolObject<dyn MTLCounterSampleBuffer>>,
         );
 
-        /// Sample index for start-of-encoder sample.
+        /// Sample index used to store the sample taken at the start of command
+        /// encoder processing. Set to `MTLCounterDontSample` to omit.
+        /// On devices where `MTLCounterSamplingPointAtStageBoundary` is
+        /// unsupported, this must be `MTLCounterDontSample` or pass creation
+        /// will fail.
         #[unsafe(method(startOfEncoderSampleIndex))]
         #[unsafe(method_family = none)]
         pub unsafe fn start_of_encoder_sample_index(&self) -> usize;
@@ -52,7 +83,11 @@ impl MTLAccelerationStructurePassSampleBufferAttachmentDescriptor {
         #[unsafe(method_family = none)]
         pub unsafe fn set_start_of_encoder_sample_index(&self, value: usize);
 
-        /// Sample index for end-of-encoder sample.
+        /// Sample index used to store the sample taken at the end of command
+        /// encoder processing. Set to `MTLCounterDontSample` to omit.
+        /// On devices where `MTLCounterSamplingPointAtStageBoundary` is
+        /// unsupported, this must be `MTLCounterDontSample` or pass creation
+        /// will fail.
         #[unsafe(method(endOfEncoderSampleIndex))]
         #[unsafe(method_family = none)]
         pub unsafe fn end_of_encoder_sample_index(&self) -> usize;

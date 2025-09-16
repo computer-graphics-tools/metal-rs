@@ -8,7 +8,10 @@ use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 use super::MTLAccelerationStructurePassSampleBufferAttachmentDescriptorArray;
 
 extern_class!(
-    /// Pass descriptor for creating acceleration structure command encoders.
+    /// Pass descriptor representing a collection of attachments used to create
+    /// a concrete acceleration structure encoder.
+    ///
+    /// Availability: macOS 13.0+, iOS 16.0+
     #[unsafe(super(NSObject))]
     #[derive(Debug, PartialEq, Eq, Hash)]
     pub struct MTLAccelerationStructurePassDescriptor;
@@ -28,7 +31,8 @@ extern_conformance!(
 
 impl MTLAccelerationStructurePassDescriptor {
     extern_methods!(
-        /// Create a default acceleration structure pass descriptor.
+        /// Create a default acceleration structure pass descriptor (autoreleased
+        /// in Objective-C terms).
         #[unsafe(method(accelerationStructurePassDescriptor))]
         #[unsafe(method_family = none)]
         pub unsafe fn acceleration_structure_pass_descriptor()
