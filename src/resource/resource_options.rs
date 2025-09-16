@@ -14,7 +14,7 @@ bitflags! {
         /// Applications should only investigate changing the cache mode if writing to normally cached buffers is known to
         /// cause performance issues due to cache pollution, as write combined memory can have surprising performance pitfalls.
         /// Another approach is to use non-temporal stores to normally cached memory (STNP on ARMv8, _mm_stream_* on x86_64).
-        const CPU_CACHE_MODE_DEFAULT_CACHE  = 0 << 0;
+        const CPU_CACHE_MODE_DEFAULT_CACHE  = 0;
         /// Write combined memory is optimized for resources that the CPU will write into, but never read.
         /// On some implementations, writes may bypass caches avoiding cache pollution, and reads perform very poorly.
         const CPU_CACHE_MODE_WRITE_COMBINED = 1 << 0;

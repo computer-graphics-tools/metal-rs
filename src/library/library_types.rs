@@ -10,10 +10,10 @@ pub enum MLTLanguageVersion {
     Version2_2 = (2 << 16) + 2,
     Version2_3 = (2 << 16) + 3,
     Version2_4 = (2 << 16) + 4,
-    Version3_0 = (3 << 16) + 0,
+    Version3_0 = (3 << 16),
     Version3_1 = (3 << 16) + 1,
     Version3_2 = (3 << 16) + 2,
-    Version4_0 = (4 << 16) + 0,
+    Version4_0 = (4 << 16),
 }
 
 unsafe impl Encode for MLTLanguageVersion {
