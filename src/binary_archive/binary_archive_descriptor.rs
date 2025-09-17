@@ -7,6 +7,8 @@ use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSURL};
 
 extern_class!(
     /// A class used to indicate how an archive should be created.
+    ///
+    /// Availability: macOS 11.0+, iOS 14.0+
     #[unsafe(super(NSObject))]
     #[derive(Debug, PartialEq, Eq, Hash)]
     pub struct MTLBinaryArchiveDescriptor;
@@ -26,12 +28,16 @@ extern_conformance!(
 
 impl MTLBinaryArchiveDescriptor {
     extern_methods!(
-        /// The file URL from which to open a BinaryArchive, or nil to create an empty BinaryArchive.
+        /// The file URL from which to open a MTLBinaryArchive, or nil to create an empty MTLBinaryArchive.
+        ///
+        /// Availability: macOS 11.0+, iOS 14.0+
         #[unsafe(method(url))]
         #[unsafe(method_family = none)]
         pub fn url(&self) -> Option<Retained<NSURL>>;
 
         /// Setter for `url`. Copied when set.
+        ///
+        /// Availability: macOS 11.0+, iOS 14.0+
         #[unsafe(method(setUrl:))]
         #[unsafe(method_family = none)]
         pub fn set_url(&self, url: Option<&NSURL>);
