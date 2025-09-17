@@ -1,10 +1,14 @@
 use objc2::{Encode, Encoding, RefEncode};
 
-/// Index type used for indexed drawing (from `MTLIndexType`).
+/// The type used for mesh/vertex indices.
+///
+/// Availability: macOS 10.11+, iOS 8.0+
 #[repr(u64)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub enum MTLIndexType {
+    /// 16-bit unsigned integer indices.
     UInt16 = 0,
+    /// 32-bit unsigned integer indices.
     UInt32 = 1,
 }
 

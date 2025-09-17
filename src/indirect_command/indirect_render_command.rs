@@ -1,12 +1,12 @@
 use core::ffi::c_float;
+
 use objc2::{extern_protocol, runtime::ProtocolObject};
 use objc2_foundation::NSObjectProtocol;
 
-use crate::render_command_encoder::{
-    MTLCullMode, MTLDepthClipMode, MTLPrimitiveType, MTLTriangleFillMode, MTLWinding,
+use crate::{
+    MTLBuffer, MTLCullMode, MTLDepthClipMode, MTLDepthStencilState, MTLIndexType, MTLPrimitiveType,
+    MTLRenderPipelineState, MTLSize, MTLTriangleFillMode, MTLWinding,
 };
-use crate::types::{MTLIndexType, MTLSize};
-use crate::{MTLBuffer, MTLDepthStencilState, MTLRenderPipelineState};
 
 extern_protocol!(
     /// Bridged protocol for `MTLIndirectRenderCommand`.
