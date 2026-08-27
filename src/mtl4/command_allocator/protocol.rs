@@ -7,7 +7,7 @@ extern_protocol!(
     /// Manages the memory backing the encoding of GPU commands into command buffers.
     ///
     /// See also [Apple's documentation](https://developer.apple.com/documentation/metal/mtl4commandallocator?language=objc)
-    pub unsafe trait MTL4CommandAllocator: NSObjectProtocol {
+    pub unsafe trait MTL4CommandAllocator: NSObjectProtocol + Send + Sync {
         /// Returns the GPU device that this command allocator belongs to.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]

@@ -15,6 +15,9 @@ extern_class!(
     pub struct MTL4ArgumentTableDescriptor;
 );
 
+unsafe impl Send for MTL4ArgumentTableDescriptor {}
+unsafe impl Sync for MTL4ArgumentTableDescriptor {}
+
 extern_conformance!(
     unsafe impl NSCopying for MTL4ArgumentTableDescriptor {}
 );
