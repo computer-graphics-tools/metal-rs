@@ -6,7 +6,9 @@ use objc2::{
     extern_class, extern_conformance, extern_methods, extern_protocol, msg_send,
     rc::{Allocated, Retained},
 };
-use objc2_foundation::{CopyingHelper, NSCopying, NSData, NSError, NSObject, NSObjectProtocol, NSURL};
+use objc2_foundation::{CopyingHelper, NSCopying, NSData, NSError, NSObject, NSObjectProtocol};
+
+use crate::{MetalError, util::file_url};
 
 /// Configuration options for pipeline dataset serializer objects.
 ///
@@ -131,27 +133,41 @@ pub trait MTL4PipelineDataSetSerializerExt: MTL4PipelineDataSetSerializer + Mess
     fn serialize_as_archive_and_flush_to_path(
         &self,
         path: &Path,
-    ) -> Result<(), Retained<NSError>>
+    ) -> Result<(), MetalError>
     where
         Self: Sized,
     {
-        let url = NSURL::from_file_path(path).expect("path must be a valid file URL path");
-        unsafe { msg_send![self, serializeAsArchiveAndFlushToURL: &*url, error: _] }
+        let url = file_url(path, "serializeAsArchiveAndFlushToURL:error:")?;
+        unsafe { msg_send![self, serializeAsArchiveAndFlushToURL: &*url, error: _] }.map_err(MetalError::from_nserror)
     }
 
     /// Serializes a serializer data set to a pipeline script as bytes.
-    fn serialize_as_pipelines_script(&self) -> Result<Box<[u8]>, Retained<NSError>>
+    fn serialize_as_pipelines_script(&self) -> Result<Box<[u8]>, MetalError>
     where
         Self: Sized,
     {
-        let mut error: *mut NSError = std::ptr::null_mut();
-        let data: Option<Retained<NSData>> =
-            unsafe { msg_send![self, serializeAsPipelinesScriptWithError: &mut error] };
-        match data {
-            Some(data) => Ok(data.to_vec().into_boxed_slice()),
-            None => Err(unsafe { Retained::retain(error).unwrap() }),
-        }
+        let data: Result<Retained<NSData>, Retained<NSError>> =
+            unsafe { msg_send![self, serializeAsPipelinesScriptWithError: _] };
+        data.map(|data| data.to_vec().into_boxed_slice()).map_err(MetalError::from_nserror)
     }
 }
 
 impl<T: MTL4PipelineDataSetSerializer + Message> MTL4PipelineDataSetSerializerExt for T {}
+
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+
+    use objc2::runtime::ProtocolObject;
+
+    use super::{MTL4PipelineDataSetSerializer, MTL4PipelineDataSetSerializerExt};
+    use crate::MetalError;
+
+    #[test]
+    fn serialization_errors_have_rust_native_signatures() {
+        let _: fn(&ProtocolObject<dyn MTL4PipelineDataSetSerializer>, &Path) -> Result<(), MetalError> =
+            <ProtocolObject<dyn MTL4PipelineDataSetSerializer> as MTL4PipelineDataSetSerializerExt>::serialize_as_archive_and_flush_to_path;
+        let _: fn(&ProtocolObject<dyn MTL4PipelineDataSetSerializer>) -> Result<Box<[u8]>, MetalError> =
+            <ProtocolObject<dyn MTL4PipelineDataSetSerializer> as MTL4PipelineDataSetSerializerExt>::serialize_as_pipelines_script;
+    }
+}

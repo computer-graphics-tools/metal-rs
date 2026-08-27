@@ -1,7 +1,7 @@
 use objc2::{Encode, Encoding, RefEncode};
 
 /// Metal GPU family (ported from `MTLGPUFamily`).
-#[repr(i64)]
+#[repr(isize)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub enum MTLGPUFamily {
     Apple1 = 1001,
@@ -13,25 +13,43 @@ pub enum MTLGPUFamily {
     Apple7 = 1007,
     Apple8 = 1008,
     Apple9 = 1009,
+    Apple10 = 1010,
 
-    Mac1 = 2001, // deprecated in headers, kept for completeness
+    #[deprecated(note = "use Apple7")]
+    Mac1 = 2001,
+    #[deprecated(note = "use Apple7")]
     Mac2 = 2002,
 
+    #[deprecated(note = "use Apple1")]
     Common1 = 3001,
+    #[deprecated(note = "use Apple3")]
     Common2 = 3002,
+    #[deprecated(note = "use Apple5")]
     Common3 = 3003,
 
-    MacCatalyst1 = 4001, // deprecated in headers, kept for completeness
-    MacCatalyst2 = 4002, // deprecated in headers, kept for completeness
+    #[deprecated(note = "use Apple7")]
+    MacCatalyst1 = 4001,
+    #[deprecated(note = "use Apple7")]
+    MacCatalyst2 = 4002,
 
     Metal3 = 5001,
     Metal4 = 5002,
 }
 
 unsafe impl Encode for MTLGPUFamily {
-    const ENCODING: Encoding = i64::ENCODING;
+    const ENCODING: Encoding = isize::ENCODING;
 }
 
 unsafe impl RefEncode for MTLGPUFamily {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::MTLGPUFamily;
+
+    #[test]
+    fn apple10_matches_metal_header_value() {
+        assert_eq!(MTLGPUFamily::Apple10 as isize, 1010);
+    }
 }

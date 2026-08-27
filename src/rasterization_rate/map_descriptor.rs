@@ -1,12 +1,12 @@
 use objc2::{
-    extern_class, extern_conformance, extern_methods, msg_send,
+    ClassType, extern_class, extern_conformance, extern_methods, msg_send,
     rc::{Allocated, Retained},
     runtime::NSObject,
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSString};
 
 use super::{MTLRasterizationRateLayerArray, MTLRasterizationRateLayerDescriptor};
-use crate::types::MTLSize;
+use crate::{types::MTLSize, util::ref_slice_as_ptr};
 
 extern_class!(
     /// Describes a rasterization rate map containing layer descriptors.
@@ -84,6 +84,25 @@ impl MTLRasterizationRateMapDescriptor {
         #[unsafe(method_family = none)]
         pub fn layer_count(&self) -> usize;
     );
+
+    /// Creates a descriptor containing all layers in the slice.
+    ///
+    /// Metal copies the layer pointers before this method returns.
+    pub fn rasterization_rate_map_descriptor_with_screen_size_layers(
+        screen_size: MTLSize,
+        layers: &[&MTLRasterizationRateLayerDescriptor],
+    ) -> Retained<Self> {
+        let layer_count = layers.len();
+        let layers = ref_slice_as_ptr(layers);
+        unsafe {
+            msg_send![
+                Self::class(),
+                rasterizationRateMapDescriptorWithScreenSize: screen_size,
+                layerCount: layer_count,
+                layers: layers,
+            ]
+        }
+    }
 }
 
 /// Methods declared on superclass `NSObject`.
@@ -99,15 +118,14 @@ impl MTLRasterizationRateMapDescriptor {
     );
 }
 
-#[allow(unused)]
 impl MTLRasterizationRateMapDescriptor {
     /// Optional label for the descriptor.
-    fn label(&self) -> Option<String> {
+    pub fn label(&self) -> Option<String> {
         let s: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
         s.map(|s| s.to_string())
     }
     /// Setter for [`label`][Self::label].
-    fn set_label(
+    pub fn set_label(
         &self,
         label: Option<&str>,
     ) {

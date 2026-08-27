@@ -6,7 +6,7 @@ use objc2::{
     extern_protocol, msg_send,
     runtime::ProtocolObject,
 };
-use objc2_foundation::{NSRange};
+use objc2_foundation::NSRange;
 
 use crate::*;
 
@@ -20,11 +20,11 @@ use crate::*;
 /// 2. The first command buffer in the array contains a render pass that you start with option ``MTL4RenderEncoderOptionSuspending``
 /// 3. The last command buffer in the array contains the same render pass that you start with option ``MTL4RenderEncoderOptionResuming``
 /// 4. All intermediate command buffers between the first and last in the array contain the same render pass that you
-/// start with both ``MTL4RenderEncoderOptionResuming`` and ``MTL4RenderEncoderOptionSuspending`` options.
+///    start with both ``MTL4RenderEncoderOptionResuming`` and ``MTL4RenderEncoderOptionSuspending`` options.
 /// 5. The sequence of render passes, in submission order, doesn't intermix with compute, blit, acceleration structure
-/// or machine learning encoding.
+///    or machine learning encoding.
 /// 6. A command buffer shouldn't contain a render pass that you start with option ``MTL4RenderEncoderOptionSuspending`` if
-/// it already contains a render pass that you start with option ``MTL4RenderEncoderOptionResuming``.
+///    it already contains a render pass that you start with option ``MTL4RenderEncoderOptionResuming``.
 ///
 /// See also [Apple's documentation](https://developer.apple.com/documentation/metal/mtl4renderencoderoptions?language=objc)
 // NS_OPTIONS
@@ -780,8 +780,10 @@ pub trait MTL4RenderCommandEncoderExt: MTL4RenderCommandEncoder + Message {
     /// Sets an array of viewports to transform vertices from normalized device coordinates to window
     /// coordinates. Metal selects the viewport via the `[[ viewport_array_index ]]` vertex shader
     /// attribute.
-    fn set_viewports(&self, viewports: &[MTLViewport])
-    where
+    fn set_viewports(
+        &self,
+        viewports: &[MTLViewport],
+    ) where
         Self: Sized,
     {
         unsafe { msg_send![self, setViewports: viewports.as_ptr(), count: viewports.len()] }
@@ -789,8 +791,10 @@ pub trait MTL4RenderCommandEncoderExt: MTL4RenderCommandEncoder + Message {
 
     /// Sets the vertex amplification view mappings. Each entry routes one amplification ID to a
     /// specific render target / viewport. The maximum count Metal supports is `2`.
-    fn set_vertex_amplification_view_mappings(&self, view_mappings: &[MTLVertexAmplificationViewMapping])
-    where
+    fn set_vertex_amplification_view_mappings(
+        &self,
+        view_mappings: &[MTLVertexAmplificationViewMapping],
+    ) where
         Self: Sized,
     {
         unsafe {
@@ -804,8 +808,10 @@ pub trait MTL4RenderCommandEncoderExt: MTL4RenderCommandEncoder + Message {
 
     /// Sets an array of scissor rectangles for the fragment scissor test. Metal selects the
     /// rectangle via the `[[ viewport_array_index ]]` vertex shader attribute.
-    fn set_scissor_rects(&self, scissor_rects: &[MTLScissorRect])
-    where
+    fn set_scissor_rects(
+        &self,
+        scissor_rects: &[MTLScissorRect],
+    ) where
         Self: Sized,
     {
         unsafe { msg_send![self, setScissorRects: scissor_rects.as_ptr(), count: scissor_rects.len()] }

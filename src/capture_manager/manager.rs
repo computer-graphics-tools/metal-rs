@@ -1,12 +1,12 @@
 use objc2::{
-    extern_class, extern_conformance, extern_methods,
+    extern_class, extern_conformance, extern_methods, msg_send,
     rc::Retained,
     runtime::{NSObject, ProtocolObject},
 };
-use objc2_foundation::{NSError, NSObjectProtocol};
+use objc2_foundation::NSObjectProtocol;
 
 use crate::{
-    MTLCaptureScope,
+    MTLCaptureScope, MetalError,
     capture_manager::{MTLCaptureDescriptor, MTLCaptureDestination},
     command_queue::MTLCommandQueue,
     device::MTLDevice,
@@ -69,22 +69,6 @@ impl MTLCaptureManager {
             destination: MTLCaptureDestination,
         ) -> bool;
 
-        /// Start capturing until stopCapture is called.
-        ///
-        /// - Parameter descriptor: `MTLCaptureDescriptor` specifies the parameters.
-        /// - Parameter error: Optional error output to check why a capture could not be started.
-        /// - Returns: `true` if the capture was successfully started, otherwise `false`.
-        ///
-        /// Remarks: Only `MTLCommandBuffer`s created after starting and committed before stopping are captured.
-        ///
-        /// Availability: macOS 10.15+, iOS 13.0+
-        #[unsafe(method(startCaptureWithDescriptor:error:_))]
-        #[unsafe(method_family = none)]
-        pub fn start_capture_with_descriptor_error(
-            &self,
-            descriptor: &MTLCaptureDescriptor,
-        ) -> Result<(), Retained<NSError>>;
-
         /// Starts capturing for all queues of the given device.
         ///
         /// Deprecated: Use `startCaptureWithDescriptor:error:` instead.
@@ -138,4 +122,12 @@ impl MTLCaptureManager {
         #[unsafe(method_family = none)]
         pub fn is_capturing(&self) -> bool;
     );
+
+    /// Starts capturing until [`Self::stop_capture`] is called.
+    pub fn start_capture_with_descriptor(
+        &self,
+        descriptor: &MTLCaptureDescriptor,
+    ) -> Result<(), MetalError> {
+        unsafe { msg_send![self, startCaptureWithDescriptor: descriptor, error: _] }.map_err(MetalError::from_nserror)
+    }
 }

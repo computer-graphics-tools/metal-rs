@@ -9,6 +9,23 @@ pub struct MTLOrigin {
     pub z: usize,
 }
 
+impl MTLOrigin {
+    /// Creates an origin with the given coordinates.
+    ///
+    /// This is the Rust equivalent of Metal's `MTLOriginMake` inline helper.
+    pub const fn new(
+        x: usize,
+        y: usize,
+        z: usize,
+    ) -> Self {
+        Self {
+            x,
+            y,
+            z,
+        }
+    }
+}
+
 unsafe impl Encode for MTLOrigin {
     const ENCODING: Encoding = Encoding::Struct("?", &[usize::ENCODING, usize::ENCODING, usize::ENCODING]);
 }

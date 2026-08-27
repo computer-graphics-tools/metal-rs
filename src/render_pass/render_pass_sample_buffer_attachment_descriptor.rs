@@ -1,6 +1,6 @@
 use objc2::{
     extern_class, extern_conformance, extern_methods,
-    rc::Retained,
+    rc::{Allocated, Retained},
     runtime::{NSObject, ProtocolObject},
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
@@ -88,5 +88,18 @@ impl MTLRenderPassSampleBufferAttachmentDescriptor {
             &self,
             index: usize,
         );
+    );
+}
+
+/// Methods declared on superclass `NSObject`.
+impl MTLRenderPassSampleBufferAttachmentDescriptor {
+    extern_methods!(
+        #[unsafe(method(init))]
+        #[unsafe(method_family = init)]
+        pub fn init(this: Allocated<Self>) -> Retained<Self>;
+
+        #[unsafe(method(new))]
+        #[unsafe(method_family = new)]
+        pub fn new() -> Retained<Self>;
     );
 }

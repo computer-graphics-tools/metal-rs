@@ -2,15 +2,15 @@ use objc2::{
     encode::Encoding,
     extern_class, extern_conformance, extern_methods, msg_send,
     rc::{Allocated, Retained},
-    runtime::NSObject,
+    runtime::{NSObject, ProtocolObject},
 };
-use objc2_foundation::{CopyingHelper, NSCopying, NSDictionary, NSNumber, NSObjectProtocol, NSString};
+use objc2_foundation::{CopyingHelper, NSArray, NSCopying, NSDictionary, NSNumber, NSObjectProtocol, NSString};
 
 use super::{
-    MLTLanguageVersion, MTLCompileSymbolVisibility, MTLLibraryOptimizationLevel, MTLLibraryType,
-    MTLMathFloatingPointFunctions, MTLMathMode,
+    MTLCompileSymbolVisibility, MTLFloatingPointConversionRoundingMode, MTLLanguageVersion,
+    MTLLibraryOptimizationLevel, MTLLibraryType, MTLMathFloatingPointFunctions, MTLMathMode,
 };
-use crate::types::MTLSize;
+use crate::{MTLDynamicLibrary, types::MTLSize};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum MTLPreprocessorMacroValue {
@@ -50,12 +50,10 @@ impl MTLPreprocessorMacroValue {
 
     fn to_ns_object(&self) -> Retained<NSObject> {
         match self {
-            Self::String(value) => {
-                NSString::from_str(value).downcast::<NSObject>().expect("NSString must be an NSObject")
-            },
-            Self::I64(value) => NSNumber::new_i64(*value).downcast::<NSObject>().expect("NSNumber must be an NSObject"),
-            Self::U64(value) => NSNumber::new_u64(*value).downcast::<NSObject>().expect("NSNumber must be an NSObject"),
-            Self::F64(value) => NSNumber::new_f64(*value).downcast::<NSObject>().expect("NSNumber must be an NSObject"),
+            Self::String(value) => NSString::from_str(value).into_super(),
+            Self::I64(value) => NSNumber::new_i64(*value).into_super().into_super(),
+            Self::U64(value) => NSNumber::new_u64(*value).into_super().into_super(),
+            Self::F64(value) => NSNumber::new_f64(*value).into_super().into_super(),
         }
     }
 }
@@ -81,6 +79,24 @@ extern_conformance!(
 
 impl MTLCompileOptions {
     extern_methods!(
+        /// Whether the compiler may perform unsafe floating-point optimizations.
+        ///
+        /// Deprecated on macOS 15.0 and iOS 18.0. Use [`math_mode`][Self::math_mode]
+        /// instead.
+        #[deprecated(note = "use math_mode instead")]
+        #[unsafe(method(fastMathEnabled))]
+        #[unsafe(method_family = none)]
+        pub fn fast_math_enabled(&self) -> bool;
+
+        /// Setter for [`fast_math_enabled`][Self::fast_math_enabled].
+        #[deprecated(note = "use set_math_mode instead")]
+        #[unsafe(method(setFastMathEnabled:))]
+        #[unsafe(method_family = none)]
+        pub fn set_fast_math_enabled(
+            &self,
+            enabled: bool,
+        );
+
         #[unsafe(method(mathMode))]
         #[unsafe(method_family = none)]
         pub fn math_mode(&self) -> MTLMathMode;
@@ -105,13 +121,13 @@ impl MTLCompileOptions {
 
         #[unsafe(method(languageVersion))]
         #[unsafe(method_family = none)]
-        pub fn language_version(&self) -> MLTLanguageVersion;
+        pub fn language_version(&self) -> MTLLanguageVersion;
 
         #[unsafe(method(setLanguageVersion:))]
         #[unsafe(method_family = none)]
         pub fn set_language_version(
             &self,
-            v: MLTLanguageVersion,
+            v: MTLLanguageVersion,
         );
 
         #[unsafe(method(libraryType))]
@@ -201,6 +217,23 @@ impl MTLCompileOptions {
             &self,
             v: bool,
         );
+
+        /// The rounding mode for narrowing floating-point conversions.
+        ///
+        /// Availability: macOS 27.0+, iOS 27.0+
+        #[unsafe(method(floatingPointConversionRoundingMode))]
+        #[unsafe(method_family = none)]
+        pub fn floating_point_conversion_rounding_mode(&self) -> MTLFloatingPointConversionRoundingMode;
+
+        /// Setter for [`floating_point_conversion_rounding_mode`][Self::floating_point_conversion_rounding_mode].
+        ///
+        /// Availability: macOS 27.0+, iOS 27.0+
+        #[unsafe(method(setFloatingPointConversionRoundingMode:))]
+        #[unsafe(method_family = none)]
+        pub fn set_floating_point_conversion_rounding_mode(
+            &self,
+            mode: MTLFloatingPointConversionRoundingMode,
+        );
     );
 
     pub fn preprocessor_macros(&self) -> Option<Box<[(String, MTLPreprocessorMacroValue)]>> {
@@ -230,6 +263,25 @@ impl MTLCompileOptions {
             let _: () = msg_send![self, setPreprocessorMacros: macros.as_deref()];
         }
     }
+
+    /// The dynamic libraries to link against when compiling this library.
+    #[allow(clippy::type_complexity)]
+    pub fn libraries(&self) -> Option<Box<[Retained<ProtocolObject<dyn MTLDynamicLibrary>>]>> {
+        let libraries: Option<Retained<NSArray<ProtocolObject<dyn MTLDynamicLibrary>>>> =
+            unsafe { msg_send![self, libraries] };
+        libraries.map(|libraries| libraries.to_vec().into_boxed_slice())
+    }
+
+    /// Sets the dynamic libraries to link against when compiling this library.
+    pub fn set_libraries(
+        &self,
+        libraries: Option<&[&ProtocolObject<dyn MTLDynamicLibrary>]>,
+    ) {
+        let libraries = libraries.map(NSArray::from_slice);
+        unsafe {
+            let _: () = msg_send![self, setLibraries: libraries.as_deref()];
+        }
+    }
 }
 
 impl MTLCompileOptions {
@@ -244,14 +296,15 @@ impl MTLCompileOptions {
     );
 }
 
-#[allow(unused)]
 impl MTLCompileOptions {
-    fn install_name(&self) -> Option<String> {
+    /// The install name embedded in a dynamic library compilation result.
+    pub fn install_name(&self) -> Option<String> {
         let s: Option<Retained<NSString>> = unsafe { msg_send![self, installName] };
         s.map(|s| s.to_string())
     }
 
-    fn set_install_name(
+    /// Sets the install name embedded in a dynamic library compilation result.
+    pub fn set_install_name(
         &self,
         name: Option<&str>,
     ) {

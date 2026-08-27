@@ -1,6 +1,6 @@
 use objc2::{
     extern_class, extern_conformance, extern_methods, msg_send,
-    rc::Retained,
+    rc::{Allocated, Retained},
     runtime::{NSObject, ProtocolObject},
 };
 use objc2_foundation::{CopyingHelper, NSArray, NSCopying, NSObjectProtocol, NSString};
@@ -176,14 +176,15 @@ impl MTLTileRenderPipelineDescriptor {
     );
 }
 
-#[allow(unused)]
 impl MTLTileRenderPipelineDescriptor {
-    fn label(&self) -> Option<String> {
+    /// The optional descriptor label.
+    pub fn label(&self) -> Option<String> {
         let s: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
         s.map(|s| s.to_string())
     }
 
-    fn set_label(
+    /// Sets the descriptor label.
+    pub fn set_label(
         &self,
         label: Option<&str>,
     ) {
@@ -196,21 +197,25 @@ impl MTLTileRenderPipelineDescriptor {
     ///
     /// Accelerate pipeline state creation by providing archives of compiled code such that no compilation needs to happen on the fast path.
     ///
-    /// See: [`MTLBinaryArchive`]
+    /// See: [`crate::MTLBinaryArchive`]
+    #[expect(
+        clippy::type_complexity,
+        reason = "faithfully represents a nullable NSArray of MTLBinaryArchive protocol objects"
+    )]
     pub fn binary_archives(&self) -> Option<Box<[Retained<ProtocolObject<dyn BinaryArchive>>]>> {
         let array: Option<Retained<NSArray<ProtocolObject<dyn BinaryArchive>>>> =
             unsafe { msg_send![self, binaryArchives] };
         array.map(|arr| arr.to_vec().into_boxed_slice())
     }
 
-    /// Setter for [`binaryArchives`][Self::binaryArchives].
+    /// Setter for [`binary_archives`][Self::binary_archives].
     ///
     /// This is [copied][objc2_foundation::NSCopying::copy] when set.
     pub fn set_binary_archives(
         &self,
         binary_archives: Option<&[&ProtocolObject<dyn BinaryArchive>]>,
     ) {
-        let binary_archives = binary_archives.map(|archives| NSArray::from_slice(archives));
+        let binary_archives = binary_archives.map(NSArray::from_slice);
         unsafe {
             let _: () = msg_send![self, setBinaryArchives: binary_archives.as_deref()];
         }
@@ -222,14 +227,14 @@ impl MTLTileRenderPipelineDescriptor {
     /// This property can be used to override symbols from dependent libraries for experimentation or evaluating alternative implementations.
     /// It can also be used to provide dynamic libraries that are dynamically created (for example, from source) that have no stable installName that can be used to automatically load from the file system.
     ///
-    /// See: [`MTLDynamicLibrary`]
+    /// See: [`crate::MTLDynamicLibrary`]
     pub fn preloaded_libraries(&self) -> Box<[Retained<ProtocolObject<dyn DynamicLibrary>>]> {
         let array: Retained<NSArray<ProtocolObject<dyn DynamicLibrary>>> =
             unsafe { msg_send![self, preloadedLibraries] };
         array.to_vec().into_boxed_slice()
     }
 
-    /// Setter for [`preloadedLibraries`][Self::preloadedLibraries].
+    /// Setter for [`preloaded_libraries`][Self::preloaded_libraries].
     ///
     /// This is [copied][objc2_foundation::NSCopying::copy] when set.
     pub fn set_preloaded_libraries(
@@ -241,4 +246,16 @@ impl MTLTileRenderPipelineDescriptor {
             let _: () = msg_send![self, setPreloadedLibraries: &*preloaded_libraries];
         }
     }
+}
+
+impl MTLTileRenderPipelineDescriptor {
+    extern_methods!(
+        #[unsafe(method(init))]
+        #[unsafe(method_family = init)]
+        pub fn init(this: Allocated<Self>) -> Retained<Self>;
+
+        #[unsafe(method(new))]
+        #[unsafe(method_family = new)]
+        pub fn new() -> Retained<Self>;
+    );
 }

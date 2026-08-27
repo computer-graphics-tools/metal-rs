@@ -4,7 +4,7 @@ use objc2::{
     rc::{Allocated, Retained},
     runtime::NSObject,
 };
-use objc2_foundation::NSObjectProtocol;
+use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
 extern_class!(
     /// A container for tensor rank and extents per dimension.
@@ -18,6 +18,14 @@ extern_class!(
 extern_conformance!(
     unsafe impl NSObjectProtocol for MTLTensorExtents {}
 );
+
+extern_conformance!(
+    unsafe impl NSCopying for MTLTensorExtents {}
+);
+
+unsafe impl CopyingHelper for MTLTensorExtents {
+    type Result = Self;
+}
 
 impl MTLTensorExtents {
     extern_methods!(

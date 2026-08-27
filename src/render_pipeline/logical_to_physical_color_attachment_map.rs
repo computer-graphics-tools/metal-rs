@@ -1,5 +1,9 @@
-use objc2::{extern_class, extern_conformance, extern_methods, runtime::NSObject};
-use objc2_foundation::NSObjectProtocol;
+use objc2::{
+    extern_class, extern_conformance, extern_methods,
+    rc::{Allocated, Retained},
+    runtime::NSObject,
+};
+use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
 extern_class!(
     /// Logical to physical color attachment mapping helper.
@@ -7,6 +11,14 @@ extern_class!(
     #[derive(Debug, PartialEq, Eq, Hash)]
     pub struct MTLLogicalToPhysicalColorAttachmentMap;
 );
+
+extern_conformance!(
+    unsafe impl NSCopying for MTLLogicalToPhysicalColorAttachmentMap {}
+);
+
+unsafe impl CopyingHelper for MTLLogicalToPhysicalColorAttachmentMap {
+    type Result = Self;
+}
 
 extern_conformance!(
     unsafe impl NSObjectProtocol for MTLLogicalToPhysicalColorAttachmentMap {}
@@ -32,5 +44,17 @@ impl MTLLogicalToPhysicalColorAttachmentMap {
         #[unsafe(method(reset))]
         #[unsafe(method_family = none)]
         pub fn reset(&self);
+    );
+}
+
+impl MTLLogicalToPhysicalColorAttachmentMap {
+    extern_methods!(
+        #[unsafe(method(init))]
+        #[unsafe(method_family = init)]
+        pub fn init(this: Allocated<Self>) -> Retained<Self>;
+
+        #[unsafe(method(new))]
+        #[unsafe(method_family = new)]
+        pub fn new() -> Retained<Self>;
     );
 }

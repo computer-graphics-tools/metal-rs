@@ -1,6 +1,6 @@
 use objc2::{
     extern_class, extern_conformance, extern_methods,
-    rc::Retained,
+    rc::{Allocated, Retained},
     runtime::{NSObject, ProtocolObject},
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
@@ -81,6 +81,58 @@ impl MTLRenderPassAttachmentDescriptor {
             depth_plane: usize,
         );
 
+        /// The texture used for multisample resolve operations.
+        #[unsafe(method(resolveTexture))]
+        #[unsafe(method_family = none)]
+        pub fn resolve_texture(&self) -> Option<Retained<ProtocolObject<dyn MTLTexture>>>;
+
+        /// Setter for [`resolve_texture`][Self::resolve_texture].
+        #[unsafe(method(setResolveTexture:))]
+        #[unsafe(method_family = none)]
+        pub fn set_resolve_texture(
+            &self,
+            texture: Option<&ProtocolObject<dyn MTLTexture>>,
+        );
+
+        /// The mipmap level of the resolve texture. Defaults to zero.
+        #[unsafe(method(resolveLevel))]
+        #[unsafe(method_family = none)]
+        pub fn resolve_level(&self) -> usize;
+
+        /// Setter for [`resolve_level`][Self::resolve_level].
+        #[unsafe(method(setResolveLevel:))]
+        #[unsafe(method_family = none)]
+        pub fn set_resolve_level(
+            &self,
+            level: usize,
+        );
+
+        /// The slice of the resolve texture. Defaults to zero.
+        #[unsafe(method(resolveSlice))]
+        #[unsafe(method_family = none)]
+        pub fn resolve_slice(&self) -> usize;
+
+        /// Setter for [`resolve_slice`][Self::resolve_slice].
+        #[unsafe(method(setResolveSlice:))]
+        #[unsafe(method_family = none)]
+        pub fn set_resolve_slice(
+            &self,
+            slice: usize,
+        );
+
+        /// The depth plane of the resolve texture. Defaults to zero.
+        #[unsafe(method(resolveDepthPlane))]
+        #[unsafe(method_family = none)]
+        pub fn resolve_depth_plane(&self) -> usize;
+
+        /// Setter for [`resolve_depth_plane`][Self::resolve_depth_plane].
+        #[unsafe(method(setResolveDepthPlane:))]
+        #[unsafe(method_family = none)]
+        pub fn set_resolve_depth_plane(
+            &self,
+            depth_plane: usize,
+        );
+
         /// The action to be performed at the beginning of a render pass.
         #[unsafe(method(loadAction))]
         #[unsafe(method_family = none)]
@@ -108,16 +160,31 @@ impl MTLRenderPassAttachmentDescriptor {
         );
 
         /// Optional configuration for the store action performed at the end of a render pass.
+        #[deprecated(note = "store action options have no effect on Apple Silicon")]
         #[unsafe(method(storeActionOptions))]
         #[unsafe(method_family = none)]
         pub fn store_action_options(&self) -> MTLStoreActionOptions;
 
         /// Setter for [`store_action_options`][Self::store_action_options].
+        #[deprecated(note = "store action options have no effect on Apple Silicon")]
         #[unsafe(method(setStoreActionOptions:))]
         #[unsafe(method_family = none)]
         pub fn set_store_action_options(
             &self,
             options: MTLStoreActionOptions,
         );
+    );
+}
+
+/// Methods declared on superclass `NSObject`.
+impl MTLRenderPassAttachmentDescriptor {
+    extern_methods!(
+        #[unsafe(method(init))]
+        #[unsafe(method_family = init)]
+        pub fn init(this: Allocated<Self>) -> Retained<Self>;
+
+        #[unsafe(method(new))]
+        #[unsafe(method_family = new)]
+        pub fn new() -> Retained<Self>;
     );
 }

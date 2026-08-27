@@ -181,9 +181,11 @@ pub enum MTLPixelFormat {
     Stencil8 = 253,
 
     // Depth Stencil
+    #[deprecated(note = "use Depth32Float_Stencil8 instead")]
     Depth24Unorm_Stencil8 = 255,
     Depth32Float_Stencil8 = 260,
     X32_Stencil8 = 261,
+    #[deprecated(note = "use X32_Stencil8 instead")]
     X24_Stencil8 = 262,
 
     // Special

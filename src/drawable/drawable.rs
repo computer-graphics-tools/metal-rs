@@ -7,6 +7,15 @@ extern_protocol!(
     /// All "drawable" objects (such as those coming from CAMetalLayer) are expected to conform to this protocol.
     ///
     /// Availability: macOS 10.11+, iOS 8.0+
+    ///
+    /// # Safety
+    ///
+    /// Implementors must be valid Objective-C objects that conform to the
+    /// `MTLDrawable` protocol.
+    #[expect(
+        clippy::missing_safety_doc,
+        reason = "extern_protocol does not attach this safety section to its generated unsafe trait"
+    )]
     pub unsafe trait MTLDrawable: NSObjectProtocol {
         /// Present this drawable immediately.
         #[unsafe(method(present))]
@@ -14,10 +23,6 @@ extern_protocol!(
         fn present(&self);
 
         /// Present this drawable at a specific host time.
-        ///
-        /// # Safety
-        ///
-        /// The `presentation_time` must be a valid host time value.
         #[unsafe(method(presentAtTime:))]
         #[unsafe(method_family = none)]
         fn present_at_time(
@@ -27,10 +32,6 @@ extern_protocol!(
 
         /// Present this drawable while setting a minimum duration in seconds
         /// before allowing this drawable to appear on the display.
-        ///
-        /// # Safety
-        ///
-        /// The `duration` must be a non-negative duration in seconds.
         ///
         /// Availability: macOS 10.15.4+, iOS 10.3+, Mac Catalyst 13.4+
         #[unsafe(method(presentAfterMinimumDuration:))]
@@ -58,8 +59,12 @@ extern_protocol!(
     }
 );
 
-#[allow(unused)]
+/// Safe convenience methods for [`MTLDrawable`].
 pub trait MTLDrawableExt: MTLDrawable + Message {
+    /// Registers a sendable block that Metal invokes after presenting this
+    /// drawable on screen.
+    ///
+    /// Availability: macOS 10.15.4+, iOS 10.3+, Mac Catalyst 13.4+
     fn add_presented_handler(
         &self,
         handler: &MTLDrawablePresentedHandler,
@@ -75,7 +80,7 @@ where
         handler: &MTLDrawablePresentedHandler,
     ) {
         unsafe {
-            let _: () = msg_send![self, addPresentedHandler: &**handler];
+            let _: () = msg_send![self, addPresentedHandler: handler.as_block()];
         }
     }
 }

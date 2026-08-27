@@ -112,13 +112,14 @@ impl MTL4MachineLearningPipelineDescriptor {
     /// You can indicate that any tensors in the range have unspecified dimensions by providing `NSNull` at the their
     /// corresponding index location in the array.
     ///
-    /// - Important: The range's length property needs to match the number of dimensions you provide. Specifically,
+    /// Important: The range's length property needs to match the number of dimensions you provide. Specifically,
     /// `range.length` needs to match `dimensions.count`.
     ///
-    /// - Parameters:
-    /// - dimensions: An array of tensor extents.
-    /// - range: The range of inputs of the `dimensions` argument.
-    /// The range's `length` needs to match the dimensions' `count` property.
+    /// Parameters:
+    ///
+    /// - `dimensions`: The tensor extents.
+    /// - `range`: The input range to which `dimensions` applies. Its length must
+    ///   equal the number of provided extents.
     pub fn set_input_dimensions_with_range(
         &self,
         dimensions: &[&MTLTensorExtents],

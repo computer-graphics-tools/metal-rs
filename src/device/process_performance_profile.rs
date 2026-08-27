@@ -1,5 +1,5 @@
-use objc2::{ClassType, Encode, Encoding, RefEncode, extern_methods};
-use objc2_foundation::NSNotificationName;
+use objc2::{Encode, Encoding, RefEncode, msg_send};
+use objc2_foundation::{NSNotificationName, NSProcessInfo};
 
 use crate::DeviceCertification;
 
@@ -38,34 +38,34 @@ pub fn process_performance_profile_sustained() -> ProcessPerformanceProfile {
 
 /// Notification sent when the process performance profile changes.
 #[inline]
-pub fn process_info_performance_profile_did_change_notification() -> Option<&'static NSNotificationName> {
-    unsafe { NSProcessInfoPerformanceProfileDidChangeNotification }
+pub fn process_info_performance_profile_did_change_notification() -> Option<String> {
+    unsafe { NSProcessInfoPerformanceProfileDidChangeNotification }.map(ToString::to_string)
 }
 
-mod private_nsprocessinfo_device_certification {
-    pub trait Sealed {}
+/// Returns whether the current device is certified for `performance_tier`.
+pub fn is_device_certified_for(performance_tier: DeviceCertification) -> bool {
+    let process_info = NSProcessInfo::processInfo();
+    unsafe { msg_send![&*process_info, isDeviceCertifiedFor: performance_tier] }
 }
 
-/// Category "NSDeviceCertification" on `NSProcessInfo`.
-pub unsafe trait NSProcessInfoDeviceCertification:
-    ClassType + Sized + private_nsprocessinfo_device_certification::Sealed
-{
-    extern_methods!(
-        #[unsafe(method(isDeviceCertifiedFor:))]
-        #[unsafe(method_family = none)]
-        fn is_device_certified_for(
-            &self,
-            performance_tier: DeviceCertification,
-        ) -> bool;
-
-        #[unsafe(method(hasPerformanceProfile:))]
-        #[unsafe(method_family = none)]
-        fn has_performance_profile(
-            &self,
-            performance_profile: ProcessPerformanceProfile,
-        ) -> bool;
-    );
+/// Returns whether the current process supports `performance_profile`.
+pub fn has_performance_profile(performance_profile: ProcessPerformanceProfile) -> bool {
+    let process_info = NSProcessInfo::processInfo();
+    unsafe { msg_send![&*process_info, hasPerformanceProfile: performance_profile] }
 }
 
-impl private_nsprocessinfo_device_certification::Sealed for objc2_foundation::NSProcessInfo {}
-unsafe impl NSProcessInfoDeviceCertification for objc2_foundation::NSProcessInfo {}
+#[cfg(test)]
+mod tests {
+    use super::{ProcessPerformanceProfile, has_performance_profile, is_device_certified_for};
+    use crate::DeviceCertification;
+
+    #[test]
+    fn certification_query_has_a_rust_native_signature() {
+        let _: fn(DeviceCertification) -> bool = is_device_certified_for;
+    }
+
+    #[test]
+    fn performance_profile_query_has_a_rust_native_signature() {
+        let _: fn(ProcessPerformanceProfile) -> bool = has_performance_profile;
+    }
+}

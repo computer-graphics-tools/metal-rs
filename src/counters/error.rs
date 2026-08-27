@@ -2,12 +2,12 @@ use objc2::{Encode, Encoding, RefEncode};
 use objc2_foundation::NSErrorDomain;
 
 unsafe extern "C" {
-    pub static MTLCounterErrorDomain: &'static NSErrorDomain;
+    static MTLCounterErrorDomain: &'static NSErrorDomain;
 }
 
 #[inline]
-pub fn counter_error_domain() -> &'static NSErrorDomain {
-    unsafe { MTLCounterErrorDomain }
+pub fn counter_error_domain() -> String {
+    unsafe { MTLCounterErrorDomain }.to_string()
 }
 
 /// Errors when creating a counter sample buffer (from `MTLCounterSampleBufferError`).

@@ -10,21 +10,43 @@ extern_class!(
     pub struct MTLComputePipelineReflection;
 );
 
+// SAFETY: Metal declares `MTLComputePipelineReflection` as `NS_SWIFT_SENDABLE`.
+unsafe impl Send for MTLComputePipelineReflection {}
+// SAFETY: Metal declares `MTLComputePipelineReflection` as `NS_SWIFT_SENDABLE`.
+unsafe impl Sync for MTLComputePipelineReflection {}
+
 extern_conformance!(
     unsafe impl NSObjectProtocol for MTLComputePipelineReflection {}
 );
 
-#[allow(unused)]
 impl MTLComputePipelineReflection {
-    /// Bindings for this pipeline.
-    fn bindings(&self) -> Option<Box<[Retained<ProtocolObject<dyn MTLBinding>>]>> {
-        let array: Option<Retained<NSArray<ProtocolObject<dyn MTLBinding>>>> = unsafe { msg_send![self, bindings] };
-        array.map(|a| a.to_vec().into_boxed_slice())
+    /// Resource bindings reflected from this compute pipeline.
+    pub fn bindings(&self) -> Box<[Retained<ProtocolObject<dyn MTLBinding>>]> {
+        let bindings: Retained<NSArray<ProtocolObject<dyn MTLBinding>>> = unsafe { msg_send![self, bindings] };
+        bindings.to_vec().into_boxed_slice()
     }
 
-    /// Deprecated: use `bindings` instead.
-    fn arguments(&self) -> Option<Box<[Retained<MTLArgument>]>> {
-        let array: Option<Retained<NSArray<MTLArgument>>> = unsafe { msg_send![self, arguments] };
-        array.map(|a| a.to_vec().into_boxed_slice())
+    /// Deprecated argument reflection; use [`bindings`][Self::bindings].
+    #[deprecated(note = "use bindings")]
+    pub fn arguments(&self) -> Box<[Retained<MTLArgument>]> {
+        let arguments: Retained<NSArray<MTLArgument>> = unsafe { msg_send![self, arguments] };
+        arguments.to_vec().into_boxed_slice()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use objc2::{rc::Retained, runtime::ProtocolObject};
+
+    use super::MTLComputePipelineReflection;
+    use crate::{MTLArgument, MTLBinding};
+
+    #[test]
+    #[expect(deprecated, reason = "verifies the deprecated Rust-native compatibility API")]
+    fn collection_methods_have_rust_native_signatures() {
+        let _: fn(&MTLComputePipelineReflection) -> Box<[Retained<ProtocolObject<dyn MTLBinding>>]> =
+            MTLComputePipelineReflection::bindings;
+        let _: fn(&MTLComputePipelineReflection) -> Box<[Retained<MTLArgument>]> =
+            MTLComputePipelineReflection::arguments;
     }
 }

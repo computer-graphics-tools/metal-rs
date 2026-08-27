@@ -1,7 +1,9 @@
 use objc2::{Encode, Encoding, RefEncode};
 
 /// Describes location and CPU mapping of a resource (from `MTLStorageMode`).
-#[repr(u64)]
+///
+/// Availability: macOS 10.11+, iOS 9.0+
+#[repr(usize)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub enum MTLStorageMode {
     /// In this mode, CPU and device will nominally both use the same underlying memory
@@ -15,6 +17,9 @@ pub enum MTLStorageMode {
     /// In order for CPU to access up-to-date GPU results, a blit synchronization must be completed
     /// (see synchronize methods of MTLBlitCommandEncoder). Blit overhead is only incurred if GPU
     /// has modified the resource. This is the default storage mode for macOS textures.
+    ///
+    /// Availability: macOS 10.11–27.0 and Mac Catalyst 13.0–27.0; unavailable on iOS.
+    #[deprecated(note = "managed storage has no effect on Apple Silicon; use Shared")]
     Managed = 1,
 
     /// This mode allows the resource data to be kept entirely to GPU (or driver) private memory
@@ -26,11 +31,13 @@ pub enum MTLStorageMode {
     /// persist, but its configuration is controlled by the texture/buffer descriptor. Resources created
     /// with Memoryless storage don't have an IOAccelResource at any point in their lifetime. The only way
     /// to populate such a resource is to perform rendering operations on it. Blit operations are disallowed.
+    ///
+    /// Availability: macOS 11.0+, Mac Catalyst 14.0+, iOS 10.0+
     Memoryless = 3,
 }
 
 unsafe impl Encode for MTLStorageMode {
-    const ENCODING: Encoding = u64::ENCODING;
+    const ENCODING: Encoding = usize::ENCODING;
 }
 
 unsafe impl RefEncode for MTLStorageMode {

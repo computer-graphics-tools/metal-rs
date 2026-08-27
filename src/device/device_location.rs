@@ -1,6 +1,9 @@
+#![allow(deprecated)]
+
 use objc2::{Encode, Encoding, RefEncode};
 
 /// Location of the GPU on macOS (ported from `MTLDeviceLocation`).
+#[deprecated(note = "device location is not applicable on Apple Silicon")]
 #[repr(u64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub enum MTLDeviceLocation {

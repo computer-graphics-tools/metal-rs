@@ -1,38 +1,27 @@
-use std::{ops::Deref, path::Path};
+use std::path::Path;
 
-use block2::{Block, DynBlock, RcBlock};
+use block2::RcBlock;
 use objc2::{
     Message, extern_class, extern_conformance, extern_methods, extern_protocol, msg_send,
     rc::{Allocated, Retained},
     runtime::ProtocolObject,
 };
-use objc2_foundation::{CopyingHelper, NSArray, NSCopying, NSError, NSObject, NSObjectProtocol, NSString, NSURL};
+use objc2_foundation::{CopyingHelper, NSArray, NSCopying, NSError, NSObject, NSObjectProtocol, NSString};
 
-use crate::*;
+use crate::{CallbackBlock, *};
 
 pub struct MTLNewLibraryCompletionHandler(RcBlock<dyn Fn(*mut ProtocolObject<dyn MTLLibrary>, *mut NSError)>);
 
 impl MTLNewLibraryCompletionHandler {
     pub fn new<F>(handler: F) -> Self
     where
-        F: Fn(Option<Retained<ProtocolObject<dyn MTLLibrary>>>, *mut NSError) + 'static,
+        F: Fn(Option<Retained<ProtocolObject<dyn MTLLibrary>>>, Option<MetalError>) + 'static,
     {
         Self(RcBlock::new(move |library_ptr: *mut ProtocolObject<dyn MTLLibrary>, error: *mut NSError| {
-            let library = unsafe { Retained::from_raw(library_ptr) };
+            let library = unsafe { Retained::retain(library_ptr) };
+            let error = unsafe { MetalError::from_unretained(error) };
             handler(library, error);
         }))
-    }
-
-    pub fn copy(ptr: *mut DynBlock<dyn Fn(*mut ProtocolObject<dyn MTLLibrary>, *mut NSError)>) -> Self {
-        Self(unsafe { RcBlock::copy(ptr) }.unwrap())
-    }
-}
-
-impl Deref for MTLNewLibraryCompletionHandler {
-    type Target = Block<dyn Fn(*mut ProtocolObject<dyn MTLLibrary>, *mut NSError)>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 
@@ -43,24 +32,13 @@ pub struct MTLNewDynamicLibraryCompletionHandler(
 impl MTLNewDynamicLibraryCompletionHandler {
     pub fn new<F>(handler: F) -> Self
     where
-        F: Fn(Option<Retained<ProtocolObject<dyn MTLDynamicLibrary>>>, *mut NSError) + 'static,
+        F: Fn(Option<Retained<ProtocolObject<dyn MTLDynamicLibrary>>>, Option<MetalError>) + 'static,
     {
         Self(RcBlock::new(move |library_ptr: *mut ProtocolObject<dyn MTLDynamicLibrary>, error: *mut NSError| {
-            let library = unsafe { Retained::from_raw(library_ptr) };
+            let library = unsafe { Retained::retain(library_ptr) };
+            let error = unsafe { MetalError::from_unretained(error) };
             handler(library, error);
         }))
-    }
-
-    pub fn copy(ptr: *mut DynBlock<dyn Fn(*mut ProtocolObject<dyn MTLDynamicLibrary>, *mut NSError)>) -> Self {
-        Self(unsafe { RcBlock::copy(ptr) }.unwrap())
-    }
-}
-
-impl Deref for MTLNewDynamicLibraryCompletionHandler {
-    type Target = Block<dyn Fn(*mut ProtocolObject<dyn MTLDynamicLibrary>, *mut NSError)>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 
@@ -71,59 +49,22 @@ pub struct MTLNewComputePipelineStateCompletionHandler(
 impl MTLNewComputePipelineStateCompletionHandler {
     pub fn new<F>(handler: F) -> Self
     where
-        F: Fn(Option<Retained<ProtocolObject<dyn MTLComputePipelineState>>>, *mut NSError) + 'static,
+        F: Fn(Option<Retained<ProtocolObject<dyn MTLComputePipelineState>>>, Option<MetalError>) + 'static,
     {
         Self(RcBlock::new(
             move |pipeline_ptr: *mut ProtocolObject<dyn MTLComputePipelineState>, error: *mut NSError| {
-                let pipeline = unsafe { Retained::from_raw(pipeline_ptr) };
+                let pipeline = unsafe { Retained::retain(pipeline_ptr) };
+                let error = unsafe { MetalError::from_unretained(error) };
                 handler(pipeline, error);
             },
         ))
-    }
-
-    pub fn copy(ptr: *mut DynBlock<dyn Fn(*mut ProtocolObject<dyn MTLComputePipelineState>, *mut NSError)>) -> Self {
-        Self(unsafe { RcBlock::copy(ptr) }.unwrap())
-    }
-}
-
-impl Deref for MTLNewComputePipelineStateCompletionHandler {
-    type Target = Block<dyn Fn(*mut ProtocolObject<dyn MTLComputePipelineState>, *mut NSError)>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-pub struct MTLNewRenderPipelineStateCompletionHandler(
-    RcBlock<dyn Fn(*mut ProtocolObject<dyn MTLRenderPipelineState>, *mut NSError)>,
-);
-
-impl MTLNewRenderPipelineStateCompletionHandler {
-    pub fn new<F>(handler: F) -> Self
-    where
-        F: Fn(Option<Retained<ProtocolObject<dyn MTLRenderPipelineState>>>, *mut NSError) + 'static,
-    {
-        Self(RcBlock::new(move |pipeline_ptr: *mut ProtocolObject<dyn MTLRenderPipelineState>, error: *mut NSError| {
-            let pipeline = unsafe { Retained::from_raw(pipeline_ptr) };
-            handler(pipeline, error);
-        }))
-    }
-
-    pub fn copy(ptr: *mut DynBlock<dyn Fn(*mut ProtocolObject<dyn MTLRenderPipelineState>, *mut NSError)>) -> Self {
-        Self(unsafe { RcBlock::copy(ptr) }.unwrap())
-    }
-}
-
-impl Deref for MTLNewRenderPipelineStateCompletionHandler {
-    type Target = Block<dyn Fn(*mut ProtocolObject<dyn MTLRenderPipelineState>, *mut NSError)>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 
 extern_class!(
     /// Groups together properties for creating a compiler context.
+    ///
+    /// Availability: macOS 26.0+, iOS 26.0+
     ///
     /// See also [Apple's documentation](https://developer.apple.com/documentation/metal/mtl4compilerdescriptor?language=objc)
     #[unsafe(super(NSObject))]
@@ -190,7 +131,11 @@ impl MTL4CompilerDescriptor {
 }
 
 extern_class!(
-    /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtl4compilertaskoptions?language=objc)
+    /// Configuration that affects an individual compiler task.
+    ///
+    /// Availability: macOS 26.0+, iOS 26.0+
+    ///
+    /// See [Apple's documentation](https://developer.apple.com/documentation/metal/mtl4compilertaskoptions?language=objc).
     #[unsafe(super(NSObject))]
     #[derive(Debug, PartialEq, Eq, Hash)]
     pub struct MTL4CompilerTaskOptions;
@@ -209,24 +154,23 @@ extern_conformance!(
 );
 
 impl MTL4CompilerTaskOptions {
-    extern_methods!(
-        /// Specifies a set of archive instances this compilation process uses for accelerating the build process.
-        ///
-        /// In case of a match in the archive, the compiler can skip one or more compilation tasks, speeding up the build process.
-        #[unsafe(method(lookupArchives))]
-        #[unsafe(method_family = none)]
-        pub fn lookup_archives(&self) -> Option<Retained<NSArray<ProtocolObject<dyn MTL4Archive>>>>;
+    /// Archive instances this compilation process uses to accelerate the build process.
+    pub fn lookup_archives(&self) -> Option<Box<[Retained<ProtocolObject<dyn MTL4Archive>>]>> {
+        let archives: Option<Retained<NSArray<ProtocolObject<dyn MTL4Archive>>>> =
+            unsafe { msg_send![self, lookupArchives] };
+        archives.map(|archives| archives.to_vec().into_boxed_slice())
+    }
 
-        /// Setter for [`lookupArchives`][Self::lookupArchives].
-        ///
-        /// This is [copied][objc2_foundation::NSCopying::copy] when set.
-        #[unsafe(method(setLookupArchives:))]
-        #[unsafe(method_family = none)]
-        pub fn set_lookup_archives(
-            &self,
-            lookup_archives: Option<&NSArray<ProtocolObject<dyn MTL4Archive>>>,
-        );
-    );
+    /// Sets the archive instances with copy semantics.
+    pub fn set_lookup_archives(
+        &self,
+        lookup_archives: Option<&[&ProtocolObject<dyn MTL4Archive>]>,
+    ) {
+        let lookup_archives = lookup_archives.map(NSArray::from_slice);
+        unsafe {
+            let _: () = msg_send![self, setLookupArchives: lookup_archives.as_deref()];
+        }
+    }
 }
 
 /// Methods declared on superclass `NSObject`.
@@ -242,273 +186,261 @@ impl MTL4CompilerTaskOptions {
     );
 }
 
-/// Callback invoked when compilation of a binary function completes.
+/// Sendable callback invoked when compilation of a binary function completes.
+///
+/// Availability: macOS 26.0+, iOS 26.0+
 pub struct MTL4NewBinaryFunctionCompletionHandler(
     RcBlock<dyn Fn(*mut ProtocolObject<dyn MTL4BinaryFunction>, *mut NSError)>,
 );
 
 impl MTL4NewBinaryFunctionCompletionHandler {
+    /// Creates a completion handler whose captures are safe to invoke from Metal's worker threads.
+    /// Metal's borrowed callback objects are retained before invoking `handler`.
     pub fn new<F>(handler: F) -> Self
     where
-        F: Fn(Option<Retained<ProtocolObject<dyn MTL4BinaryFunction>>>, *mut NSError) + 'static,
+        F: Fn(Option<Retained<ProtocolObject<dyn MTL4BinaryFunction>>>, Option<MetalError>) + Send + Sync + 'static,
     {
         Self(RcBlock::new(move |binary_fn_ptr: *mut ProtocolObject<dyn MTL4BinaryFunction>, error: *mut NSError| {
-            let binary_fn = unsafe { Retained::from_raw(binary_fn_ptr) };
+            let binary_fn = unsafe { Retained::retain(binary_fn_ptr) };
+            let error = unsafe { MetalError::from_unretained(error) };
             handler(binary_fn, error);
         }))
     }
-
-    pub fn copy(ptr: *mut DynBlock<dyn Fn(*mut ProtocolObject<dyn MTL4BinaryFunction>, *mut NSError)>) -> Self {
-        Self(unsafe { RcBlock::copy(ptr) }.unwrap())
-    }
 }
 
-impl Deref for MTL4NewBinaryFunctionCompletionHandler {
-    type Target = Block<dyn Fn(*mut ProtocolObject<dyn MTL4BinaryFunction>, *mut NSError)>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-/// Callback invoked when compilation of a machine-learning pipeline state completes.
+/// Sendable callback invoked when compilation of a machine-learning pipeline state completes.
+///
+/// Availability: macOS 26.0+, iOS 26.0+
 pub struct MTL4NewMachineLearningPipelineStateCompletionHandler(
     RcBlock<dyn Fn(*mut ProtocolObject<dyn MTL4MachineLearningPipelineState>, *mut NSError)>,
 );
 
 impl MTL4NewMachineLearningPipelineStateCompletionHandler {
+    /// Creates a completion handler whose captures are safe to invoke from Metal's worker threads.
+    /// Metal's borrowed callback objects are retained before invoking `handler`.
     pub fn new<F>(handler: F) -> Self
     where
-        F: Fn(Option<Retained<ProtocolObject<dyn MTL4MachineLearningPipelineState>>>, *mut NSError) + 'static,
+        F: Fn(Option<Retained<ProtocolObject<dyn MTL4MachineLearningPipelineState>>>, Option<MetalError>)
+            + Send
+            + Sync
+            + 'static,
     {
         Self(RcBlock::new(
             move |pipeline_ptr: *mut ProtocolObject<dyn MTL4MachineLearningPipelineState>, error: *mut NSError| {
-                let pipeline = unsafe { Retained::from_raw(pipeline_ptr) };
+                let pipeline = unsafe { Retained::retain(pipeline_ptr) };
+                let error = unsafe { MetalError::from_unretained(error) };
                 handler(pipeline, error);
             },
         ))
-    }
-
-    pub fn copy(
-        ptr: *mut DynBlock<dyn Fn(*mut ProtocolObject<dyn MTL4MachineLearningPipelineState>, *mut NSError)>
-    ) -> Self {
-        Self(unsafe { RcBlock::copy(ptr) }.unwrap())
-    }
-}
-
-impl Deref for MTL4NewMachineLearningPipelineStateCompletionHandler {
-    type Target = Block<dyn Fn(*mut ProtocolObject<dyn MTL4MachineLearningPipelineState>, *mut NSError)>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 
 extern_protocol!(
     /// A abstraction for a pipeline state and shader function compiler.
     ///
+    /// Availability: macOS 26.0+, iOS 26.0+
+    ///
     /// See also [Apple's documentation](https://developer.apple.com/documentation/metal/mtl4compiler?language=objc)
+    ///
+    /// # Safety
+    ///
+    /// Implementors must be valid Objective-C objects that conform to the
+    /// `MTL4Compiler` protocol. Metal declares this protocol sendable.
+    #[expect(
+        clippy::missing_safety_doc,
+        reason = "extern_protocol does not attach this safety section to its generated unsafe trait"
+    )]
     pub unsafe trait MTL4Compiler: NSObjectProtocol + Send + Sync {
         /// Returns the device that this compiler belongs to.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
         fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
 
-        /// Returns the optional label you specify at creation time.
-        #[unsafe(method(label))]
-        #[unsafe(method_family = none)]
-        fn label(&self) -> Option<Retained<NSString>>;
-
         /// Returns the pipeline data set serializer into which this compiler stores data for all pipelines it creates.
         #[unsafe(method(pipelineDataSetSerializer))]
         #[unsafe(method_family = none)]
         fn pipeline_data_set_serializer(&self) -> Option<Retained<ProtocolObject<dyn MTL4PipelineDataSetSerializer>>>;
-
-        /// Creates a new Metal library synchronously.
-        ///
-        /// - Parameters:
-        /// - descriptor: A description of the library to create.
-        /// - error: An optional parameter into which Metal stores information in case of an error.
-        ///
-        /// - Returns: a Metal library instance upon success, `nil` otherwise.
-        #[unsafe(method(newLibraryWithDescriptor:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_library_with_descriptor_error(
-            &self,
-            descriptor: &MTL4LibraryDescriptor,
-        ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, Retained<NSError>>;
-
-        /// Creates a new dynamic library from a library containing Metal IR code synchronously.
-        ///
-        /// - Parameters:
-        /// - library: A library from which this compiler creates the new a dynamic library
-        /// - error: An optional parameter into which Metal stores information in case of an error.
-        ///
-        /// - Returns: A new dynamic Metal library upon success, `nil` otherwise.
-        #[unsafe(method(newDynamicLibrary:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_dynamic_library_error(
-            &self,
-            library: &ProtocolObject<dyn MTLLibrary>,
-        ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, Retained<NSError>>;
-
-        /// Creates a new compute pipeline state object synchronously.
-        ///
-        /// - Parameters:
-        /// - descriptor: A compute pipeline state descriptor describing the pipeline this compiler creates.
-        /// - compilerTaskOptions: A description of the compilation process itself, providing parameters that
-        /// influence execution of the compilation process.
-        /// - error: An optional parameter into which Metal stores information in case of an error.
-        ///
-        /// - Returns: A new compute pipeline state object upon success, `nil` otherwise.
-        #[unsafe(method(newComputePipelineStateWithDescriptor:compilerTaskOptions:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_compute_pipeline_state_with_descriptor_compiler_task_options_error(
-            &self,
-            descriptor: &MTL4ComputePipelineDescriptor,
-            compiler_task_options: Option<&MTL4CompilerTaskOptions>,
-        ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, Retained<NSError>>;
-
-        /// Creates a new compute pipeline state synchronously.
-        ///
-        /// - Parameters:
-        /// - descriptor: A compute pipeline state descriptor describing the pipeline this compiler creates.
-        /// - dynamicLinkingDescriptor: An optional parameter that provides additional configuration for linking the pipeline state object.
-        /// - compilerTaskOptions: A description of the compilation process itself, providing parameters that
-        /// influence execution of the compilation process.
-        /// - error: An optional parameter into which Metal stores information in case of an error.
-        ///
-        /// - Returns: A new compute pipeline state object upon success, `nil` otherwise.
-        #[unsafe(method(newComputePipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_compute_pipeline_state_with_descriptor_dynamic_linking_descriptor_compiler_task_options_error(
-            &self,
-            descriptor: &MTL4ComputePipelineDescriptor,
-            dynamic_linking_descriptor: Option<&MTL4PipelineStageDynamicLinkingDescriptor>,
-            compiler_task_options: Option<&MTL4CompilerTaskOptions>,
-        ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, Retained<NSError>>;
-
-        /// Creates a new render pipeline state synchronously.
-        ///
-        /// Use this method to build any render pipeline type, including render, tile, and mesh render pipeline states.
-        /// The type of the descriptor you pass indicates the pipeline type this method builds.
-        ///
-        /// Passing in a compute pipeline descriptor to the `descriptor` parameter produces an error.
-        ///
-        /// - Parameters:
-        /// - descriptor: A render, tile, or mesh pipeline state descriptor that describes the pipeline to create.
-        /// - compilerTaskOptions: A description of the compilation process itself, providing parameters that
-        /// influence execution of the compilation process.
-        /// - error: An optional parameter into which Metal stores information in case of an error.
-        ///
-        /// - Returns: A new render pipeline state object upon success, `nil` otherwise.
-        #[unsafe(method(newRenderPipelineStateWithDescriptor:compilerTaskOptions:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_render_pipeline_state_with_descriptor_compiler_task_options_error(
-            &self,
-            descriptor: &MTL4PipelineDescriptor,
-            compiler_task_options: Option<&MTL4CompilerTaskOptions>,
-        ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Retained<NSError>>;
-
-        /// Creates a new render pipeline state synchronously.
-        ///
-        /// Use this method to build any render pipeline type, including render, tile, and mesh render pipeline states.
-        /// The type of the descriptor you pass indicates the pipeline type this method builds.
-        ///
-        /// Passing in a compute pipeline descriptor to the `descriptor` parameter produces an error.
-        ///
-        /// - Parameters:
-        /// - descriptor: A render, tile, or mesh pipeline state descriptor that describes the pipeline to create.
-        /// - dynamicLinkingDescriptor: An optional parameter that provides additional configuration for linking the pipeline state object.
-        /// - compilerTaskOptions: A description of the compilation process itself, providing parameters that
-        /// influence execution of the compilation process.
-        /// - error: An optional parameter into which Metal stores information in case of an error.
-        ///
-        /// - Returns: A new render pipeline state object upon success, `nil` otherwise.
-        #[unsafe(method(newRenderPipelineStateWithDescriptor:dynamicLinkingDescriptor:compilerTaskOptions:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_render_pipeline_state_with_descriptor_dynamic_linking_descriptor_compiler_task_options_error(
-            &self,
-            descriptor: &MTL4PipelineDescriptor,
-            dynamic_linking_descriptor: Option<&MTL4RenderPipelineDynamicLinkingDescriptor>,
-            compiler_task_options: Option<&MTL4CompilerTaskOptions>,
-        ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Retained<NSError>>;
-
-        /// Creates a new render pipeline state from another, previously unspecialized, pipeline state.
-        ///
-        /// Metal specializes the pipeline state with new state values the descriptor provides, observing the following rules:
-        /// * The compiler only updates properties that were originally specified as *unspecialized*. It doesn't modify other
-        /// already-specialized properties
-        /// * The compiler sets to their default behavior any unspecialized properties that your passed-in descriptor doesn't specialize
-        ///
-        /// Additionally, there are some cases where the Metal can't specialize a pipeline:
-        /// * If the original pipeline state object doesn't have any unspecialized properties
-        /// * You can't re-specialize a previously specialized pipeline state object
-        ///
-        /// - Parameters:
-        /// - descriptor: A render pipeline state descriptor or any type: default, tile, or mesh render pipeline descriptor.
-        /// - pipeline: A render pipeline state containing unspecialized substate.
-        /// - error: An optional parameter into which Metal stores information in case of an error.
-        ///
-        /// - Returns: a fully-specialized pipeline state object.
-        #[unsafe(method(newRenderPipelineStateBySpecializationWithDescriptor:pipeline:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_render_pipeline_state_by_specialization_with_descriptor_pipeline_error(
-            &self,
-            descriptor: &MTL4PipelineDescriptor,
-            pipeline: &ProtocolObject<dyn MTLRenderPipelineState>,
-        ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Retained<NSError>>;
-
-        /// Creates a new binary visible or intersection function synchronously.
-        ///
-        /// - Parameters:
-        /// - descriptor: A binary function descriptor to use for creating the binary function.
-        /// - compilerTaskOptions: A descriptor of the compilation itself, providing parameters that
-        /// influence execution of the compilation process.
-        /// - error: An optional parameter into which Metal stores information in case of an error.
-        ///
-        /// - Returns: a new binary function upon success, `nil` otherwise.
-        #[unsafe(method(newBinaryFunctionWithDescriptor:compilerTaskOptions:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_binary_function_with_descriptor_compiler_task_options_error(
-            &self,
-            descriptor: &MTL4BinaryFunctionDescriptor,
-            compiler_task_options: Option<&MTL4CompilerTaskOptions>,
-        ) -> Result<Retained<ProtocolObject<dyn MTL4BinaryFunction>>, Retained<NSError>>;
-
-        /// Creates a new ML pipeline state with descriptor.
-        ///
-        /// - Parameters:
-        /// - descriptor: A machine learning pipeline state descriptor to use for creating the new pipeline state.
-        /// - error: An optional parameter into which Metal stores information in case of an error.
-        ///
-        /// - Returns: A machine learning pipeline state if operation is successful, otherwise `nil`.
-        #[unsafe(method(newMachineLearningPipelineStateWithDescriptor:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_machine_learning_pipeline_state_with_descriptor_error(
-            &self,
-            descriptor: &MTL4MachineLearningPipelineDescriptor,
-        ) -> Result<Retained<ProtocolObject<dyn MTL4MachineLearningPipelineState>>, Retained<NSError>>;
     }
 );
 
 pub trait MTL4CompilerExt: MTL4Compiler + Message {
-    fn new_dynamic_library_with_path(
-        &self,
-        path: &Path,
-    ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, Retained<NSError>>
+    /// Returns the optional label specified at compiler creation time.
+    fn label(&self) -> Option<String>
     where
         Self: Sized,
     {
-        let url = NSURL::from_file_path(path).expect("path must be a valid file URL path");
-        let mut error: *mut NSError = std::ptr::null_mut();
-        let library: Option<Retained<ProtocolObject<dyn MTLDynamicLibrary>>> =
-            unsafe { msg_send![self, newDynamicLibraryWithURL: &*url, error: &mut error] };
-        match (library, unsafe { Retained::retain(error) }) {
-            (Some(library), None) => Ok(library),
-            (None, Some(error)) => Err(error),
-            (library, error) => unreachable!("Metal API contract violated: {library:?} {error:?}"),
+        let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
+        label.map(|label| label.to_string())
+    }
+
+    /// Creates a Metal library synchronously.
+    fn new_library_with_descriptor_error(
+        &self,
+        descriptor: &MTL4LibraryDescriptor,
+    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe { msg_send![self, newLibraryWithDescriptor: descriptor, error: _] }.map_err(MetalError::from_nserror)
+    }
+
+    /// Creates a dynamic library from a Metal IR library synchronously.
+    fn new_dynamic_library_error(
+        &self,
+        library: &ProtocolObject<dyn MTLLibrary>,
+    ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe { msg_send![self, newDynamicLibrary: library, error: _] }.map_err(MetalError::from_nserror)
+    }
+
+    /// Creates a compute pipeline state synchronously.
+    fn new_compute_pipeline_state_with_descriptor_compiler_task_options_error(
+        &self,
+        descriptor: &MTL4ComputePipelineDescriptor,
+        compiler_task_options: Option<&MTL4CompilerTaskOptions>,
+    ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe {
+            msg_send![
+                self,
+                newComputePipelineStateWithDescriptor: descriptor,
+                compilerTaskOptions: compiler_task_options,
+                error: _
+            ]
         }
+        .map_err(MetalError::from_nserror)
+    }
+
+    /// Creates a compute pipeline state with dynamic-linking configuration synchronously.
+    fn new_compute_pipeline_state_with_descriptor_dynamic_linking_descriptor_compiler_task_options_error(
+        &self,
+        descriptor: &MTL4ComputePipelineDescriptor,
+        dynamic_linking_descriptor: Option<&MTL4PipelineStageDynamicLinkingDescriptor>,
+        compiler_task_options: Option<&MTL4CompilerTaskOptions>,
+    ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe {
+            msg_send![
+                self,
+                newComputePipelineStateWithDescriptor: descriptor,
+                dynamicLinkingDescriptor: dynamic_linking_descriptor,
+                compilerTaskOptions: compiler_task_options,
+                error: _
+            ]
+        }
+        .map_err(MetalError::from_nserror)
+    }
+
+    /// Creates a render pipeline state synchronously.
+    fn new_render_pipeline_state_with_descriptor_compiler_task_options_error(
+        &self,
+        descriptor: &MTL4PipelineDescriptor,
+        compiler_task_options: Option<&MTL4CompilerTaskOptions>,
+    ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe {
+            msg_send![
+                self,
+                newRenderPipelineStateWithDescriptor: descriptor,
+                compilerTaskOptions: compiler_task_options,
+                error: _
+            ]
+        }
+        .map_err(MetalError::from_nserror)
+    }
+
+    /// Creates a render pipeline state with dynamic-linking configuration synchronously.
+    fn new_render_pipeline_state_with_descriptor_dynamic_linking_descriptor_compiler_task_options_error(
+        &self,
+        descriptor: &MTL4PipelineDescriptor,
+        dynamic_linking_descriptor: Option<&MTL4RenderPipelineDynamicLinkingDescriptor>,
+        compiler_task_options: Option<&MTL4CompilerTaskOptions>,
+    ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe {
+            msg_send![
+                self,
+                newRenderPipelineStateWithDescriptor: descriptor,
+                dynamicLinkingDescriptor: dynamic_linking_descriptor,
+                compilerTaskOptions: compiler_task_options,
+                error: _
+            ]
+        }
+        .map_err(MetalError::from_nserror)
+    }
+
+    /// Specializes an existing render pipeline state synchronously.
+    fn new_render_pipeline_state_by_specialization_with_descriptor_pipeline_error(
+        &self,
+        descriptor: &MTL4PipelineDescriptor,
+        pipeline: &ProtocolObject<dyn MTLRenderPipelineState>,
+    ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe {
+            msg_send![
+                self,
+                newRenderPipelineStateBySpecializationWithDescriptor: descriptor,
+                pipeline: pipeline,
+                error: _
+            ]
+        }
+        .map_err(MetalError::from_nserror)
+    }
+
+    /// Creates a binary function synchronously.
+    fn new_binary_function_with_descriptor_compiler_task_options_error(
+        &self,
+        descriptor: &MTL4BinaryFunctionDescriptor,
+        compiler_task_options: Option<&MTL4CompilerTaskOptions>,
+    ) -> Result<Retained<ProtocolObject<dyn MTL4BinaryFunction>>, MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe {
+            msg_send![
+                self,
+                newBinaryFunctionWithDescriptor: descriptor,
+                compilerTaskOptions: compiler_task_options,
+                error: _
+            ]
+        }
+        .map_err(MetalError::from_nserror)
+    }
+
+    /// Creates a machine-learning pipeline state synchronously.
+    fn new_machine_learning_pipeline_state_with_descriptor_error(
+        &self,
+        descriptor: &MTL4MachineLearningPipelineDescriptor,
+    ) -> Result<Retained<ProtocolObject<dyn MTL4MachineLearningPipelineState>>, MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe { msg_send![self, newMachineLearningPipelineStateWithDescriptor: descriptor, error: _] }
+            .map_err(MetalError::from_nserror)
+    }
+
+    /// Creates a dynamic library synchronously from a file path.
+    fn new_dynamic_library_with_path(
+        &self,
+        path: &Path,
+    ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, MetalError>
+    where
+        Self: Sized,
+    {
+        let url = crate::util::file_url(path, "newDynamicLibraryWithURL:error:")?;
+        unsafe { msg_send![self, newDynamicLibraryWithURL: &*url, error: _] }.map_err(MetalError::from_nserror)
     }
 
     fn new_library_with_descriptor_completion_handler(
@@ -523,7 +455,7 @@ pub trait MTL4CompilerExt: MTL4Compiler + Message {
             msg_send![
                 self,
                 newLibraryWithDescriptor: descriptor,
-                completionHandler: &*completion_handler
+                completionHandler: &*completion_handler.0
             ]
         }
     }
@@ -540,7 +472,7 @@ pub trait MTL4CompilerExt: MTL4Compiler + Message {
             msg_send![
                 self,
                 newDynamicLibrary: library,
-                completionHandler: &*completion_handler
+                completionHandler: &*completion_handler.0
             ]
         }
     }
@@ -549,18 +481,18 @@ pub trait MTL4CompilerExt: MTL4Compiler + Message {
         &self,
         path: &Path,
         completion_handler: MTLNewDynamicLibraryCompletionHandler,
-    ) -> Retained<ProtocolObject<dyn MTL4CompilerTask>>
+    ) -> Result<Retained<ProtocolObject<dyn MTL4CompilerTask>>, MetalError>
     where
         Self: Sized,
     {
-        let url = NSURL::from_file_path(path).expect("path must be a valid file URL path");
-        unsafe {
+        let url = crate::util::file_url(path, "newDynamicLibraryWithURL:completionHandler:")?;
+        Ok(unsafe {
             msg_send![
                 self,
                 newDynamicLibraryWithURL: &*url,
-                completionHandler: &*completion_handler
+                completionHandler: &*completion_handler.0
             ]
-        }
+        })
     }
 
     fn new_compute_pipeline_state_with_descriptor_compiler_task_options_completion_handler(
@@ -577,7 +509,7 @@ pub trait MTL4CompilerExt: MTL4Compiler + Message {
                 self,
                 newComputePipelineStateWithDescriptor: descriptor,
                 compilerTaskOptions: compiler_task_options,
-                completionHandler: &*completion_handler
+                completionHandler: &*completion_handler.0
             ]
         }
     }
@@ -598,7 +530,7 @@ pub trait MTL4CompilerExt: MTL4Compiler + Message {
                 newComputePipelineStateWithDescriptor: descriptor,
                 dynamicLinkingDescriptor: dynamic_linking_descriptor,
                 compilerTaskOptions: compiler_task_options,
-                completionHandler: &*completion_handler
+                completionHandler: &*completion_handler.0
             ]
         }
     }
@@ -617,7 +549,7 @@ pub trait MTL4CompilerExt: MTL4Compiler + Message {
                 self,
                 newRenderPipelineStateWithDescriptor: descriptor,
                 compilerTaskOptions: compiler_task_options,
-                completionHandler: &*completion_handler
+                completionHandler: completion_handler.as_block()
             ]
         }
     }
@@ -638,7 +570,7 @@ pub trait MTL4CompilerExt: MTL4Compiler + Message {
                 newRenderPipelineStateWithDescriptor: descriptor,
                 dynamicLinkingDescriptor: dynamic_linking_descriptor,
                 compilerTaskOptions: compiler_task_options,
-                completionHandler: &*completion_handler
+                completionHandler: completion_handler.as_block()
             ]
         }
     }
@@ -657,7 +589,7 @@ pub trait MTL4CompilerExt: MTL4Compiler + Message {
                 self,
                 newRenderPipelineStateBySpecializationWithDescriptor: descriptor,
                 pipeline: pipeline,
-                completionHandler: &*completion_handler
+                completionHandler: completion_handler.as_block()
             ]
         }
     }
@@ -676,7 +608,7 @@ pub trait MTL4CompilerExt: MTL4Compiler + Message {
                 self,
                 newBinaryFunctionWithDescriptor: descriptor,
                 compilerTaskOptions: compiler_task_options,
-                completionHandler: &*completion_handler
+                completionHandler: &*completion_handler.0
             ]
         }
     }
@@ -693,10 +625,135 @@ pub trait MTL4CompilerExt: MTL4Compiler + Message {
             msg_send![
                 self,
                 newMachineLearningPipelineStateWithDescriptor: descriptor,
-                completionHandler: &*completion_handler
+                completionHandler: &*completion_handler.0
             ]
         }
     }
 }
 
 impl<T: MTL4Compiler + Message> MTL4CompilerExt for T {}
+
+#[cfg(test)]
+mod tests {
+    use std::{
+        path::Path,
+        sync::{Arc, Mutex},
+    };
+
+    use objc2::{rc::Retained, runtime::ProtocolObject};
+    use objc2_foundation::{NSCopying, NSError, NSObjectProtocol, NSString};
+
+    use super::{
+        MTL4Compiler, MTL4CompilerDescriptor, MTL4CompilerExt, MTL4CompilerTaskOptions,
+        MTL4NewBinaryFunctionCompletionHandler, MTL4NewMachineLearningPipelineStateCompletionHandler,
+        MTLNewComputePipelineStateCompletionHandler, MTLNewDynamicLibraryCompletionHandler,
+        MTLNewLibraryCompletionHandler,
+    };
+    use crate::{
+        MTL4Archive, MTL4BinaryFunction, MTL4ComputePipelineDescriptor, MTL4LibraryDescriptor, MTLComputePipelineState,
+        MTLDynamicLibrary, MTLLibrary, MetalError,
+    };
+
+    #[test]
+    fn compiler_types_match_header_conformances() {
+        fn assert_nscopying<T: NSCopying>() {}
+        fn assert_nsobject<T: NSObjectProtocol>() {}
+        fn assert_send_sync<T: Send + Sync>() {}
+
+        assert_nscopying::<MTL4CompilerDescriptor>();
+        assert_nscopying::<MTL4CompilerTaskOptions>();
+        assert_nsobject::<MTL4CompilerDescriptor>();
+        assert_nsobject::<MTL4CompilerTaskOptions>();
+        assert_send_sync::<ProtocolObject<dyn MTL4Compiler>>();
+    }
+
+    #[test]
+    fn collection_string_and_path_methods_have_rust_native_signatures() {
+        let _: fn(&MTL4CompilerTaskOptions) -> Option<Box<[Retained<ProtocolObject<dyn MTL4Archive>>]>> =
+            MTL4CompilerTaskOptions::lookup_archives;
+        let _: fn(&ProtocolObject<dyn MTL4Compiler>) -> Option<String> =
+            <ProtocolObject<dyn MTL4Compiler> as MTL4CompilerExt>::label;
+        let _: fn(
+            &ProtocolObject<dyn MTL4Compiler>,
+            &Path,
+        ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, MetalError> =
+            <ProtocolObject<dyn MTL4Compiler> as MTL4CompilerExt>::new_dynamic_library_with_path;
+    }
+
+    #[test]
+    fn synchronous_errors_have_rust_native_signatures() {
+        let _: fn(
+            &ProtocolObject<dyn MTL4Compiler>,
+            &MTL4LibraryDescriptor,
+        ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError> =
+            <ProtocolObject<dyn MTL4Compiler> as MTL4CompilerExt>::new_library_with_descriptor_error;
+        let _: fn(
+            &ProtocolObject<dyn MTL4Compiler>,
+            &MTL4ComputePipelineDescriptor,
+            Option<&MTL4CompilerTaskOptions>,
+        ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, MetalError> =
+            <ProtocolObject<dyn MTL4Compiler> as MTL4CompilerExt>::new_compute_pipeline_state_with_descriptor_compiler_task_options_error;
+    }
+
+    #[test]
+    fn standard_completion_handlers_deliver_rust_owned_errors() {
+        let library_handler = MTLNewLibraryCompletionHandler::new(
+            |_library: Option<Retained<ProtocolObject<dyn MTLLibrary>>>, _error: Option<MetalError>| {},
+        );
+        let dynamic_library_handler = MTLNewDynamicLibraryCompletionHandler::new(
+            |_library: Option<Retained<ProtocolObject<dyn MTLDynamicLibrary>>>, _error: Option<MetalError>| {},
+        );
+        let compute_handler = MTLNewComputePipelineStateCompletionHandler::new(
+            |_pipeline: Option<Retained<ProtocolObject<dyn MTLComputePipelineState>>>, _error: Option<MetalError>| {},
+        );
+
+        library_handler.0.call((core::ptr::null_mut(), core::ptr::null_mut()));
+        dynamic_library_handler.0.call((core::ptr::null_mut(), core::ptr::null_mut()));
+        compute_handler.0.call((core::ptr::null_mut(), core::ptr::null_mut()));
+    }
+
+    #[test]
+    fn sendable_handlers_accept_thread_safe_captures() {
+        let calls = Arc::new(Mutex::new(0));
+        let binary_calls = Arc::clone(&calls);
+        let binary_handler = MTL4NewBinaryFunctionCompletionHandler::new(move |function, error| {
+            assert!(function.is_none());
+            assert!(error.is_none());
+            *binary_calls.lock().unwrap() += 1;
+        });
+        let machine_learning_calls = Arc::clone(&calls);
+        let machine_learning_handler =
+            MTL4NewMachineLearningPipelineStateCompletionHandler::new(move |pipeline, error| {
+                assert!(pipeline.is_none());
+                assert!(error.is_none());
+                *machine_learning_calls.lock().unwrap() += 1;
+            });
+
+        binary_handler.0.call((core::ptr::null_mut(), core::ptr::null_mut()));
+        machine_learning_handler.0.call((core::ptr::null_mut(), core::ptr::null_mut()));
+
+        assert_eq!(*calls.lock().unwrap(), 2);
+    }
+
+    #[test]
+    fn borrowed_callback_error_is_retained_for_the_safe_handler() {
+        let received = Arc::new(Mutex::new(None));
+        let received_by_handler = Arc::clone(&received);
+        let handler = MTL4NewBinaryFunctionCompletionHandler::new(move |function, error| {
+            assert!(function.is_none());
+            *received_by_handler.lock().unwrap() = error;
+        });
+        let domain = NSString::from_str("mtl-rs.MTL4CompilerTests");
+        let error = unsafe { NSError::errorWithDomain_code_userInfo(&domain, 27, None) };
+
+        handler.0.call((
+            core::ptr::null_mut::<ProtocolObject<dyn MTL4BinaryFunction>>(),
+            (&*error as *const NSError).cast_mut(),
+        ));
+
+        let received = received.lock().unwrap().take().unwrap();
+        assert_eq!(received.code(), 27);
+        drop(received);
+        assert_eq!(error.code(), 27);
+    }
+}

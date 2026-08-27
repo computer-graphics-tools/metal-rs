@@ -9,6 +9,16 @@ extern_protocol!(
     /// Node used in a graph for stitching.
     ///
     /// Availability: macOS 12.0+, iOS 15.0+
+    ///
+    /// # Safety
+    ///
+    /// Implementors must be valid Objective-C objects that conform to the
+    /// `MTLFunctionStitchingNode` protocol, including its `NSCopying`
+    /// contract.
+    #[expect(
+        clippy::missing_safety_doc,
+        reason = "extern_protocol does not attach this safety section to its generated unsafe trait"
+    )]
     pub unsafe trait MTLFunctionStitchingNode: NSObjectProtocol + NSCopying {}
 );
 

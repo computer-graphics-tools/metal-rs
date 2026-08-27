@@ -1,12 +1,12 @@
 use objc2::{extern_class, extern_methods, rc::Retained, runtime::NSObject};
 
-use crate::MTLDataType;
+use crate::{MTLDataType, MTLType};
 
 extern_class!(
     /// Reflection for an array type.
     ///
     /// Availability: macOS 10.11+, iOS 8.0+
-    #[unsafe(super(NSObject))]
+    #[unsafe(super(MTLType, NSObject))]
     #[derive(Debug, PartialEq, Eq, Hash)]
     pub struct MTLArrayType;
 );

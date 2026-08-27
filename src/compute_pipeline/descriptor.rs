@@ -3,10 +3,11 @@ use objc2::{
     rc::{Allocated, Retained},
     runtime::{NSObject, ProtocolObject},
 };
-use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSString};
+use objc2_foundation::{CopyingHelper, NSArray, NSCopying, NSObjectProtocol, NSString};
 
 use crate::{
-    MTLLinkedFunctions, MTLPipelineBufferDescriptorArray, MTLStageInputOutputDescriptor, library::MTLFunction,
+    MTLBinaryArchive, MTLDynamicLibrary, MTLLinkedFunctions, MTLPipelineBufferDescriptorArray,
+    MTLStageInputOutputDescriptor, library::MTLFunction,
 };
 
 extern_class!(
@@ -40,6 +41,19 @@ impl MTLComputePipelineDescriptor {
         pub fn set_compute_function(
             &self,
             compute_function: Option<&ProtocolObject<dyn MTLFunction>>,
+        );
+
+        /// Whether every threadgroup size is a multiple of the thread execution width.
+        #[unsafe(method(threadGroupSizeIsMultipleOfThreadExecutionWidth))]
+        #[unsafe(method_family = none)]
+        pub fn thread_group_size_is_multiple_of_thread_execution_width(&self) -> bool;
+
+        /// Setter for [`thread_group_size_is_multiple_of_thread_execution_width`][Self::thread_group_size_is_multiple_of_thread_execution_width].
+        #[unsafe(method(setThreadGroupSizeIsMultipleOfThreadExecutionWidth:))]
+        #[unsafe(method_family = none)]
+        pub fn set_thread_group_size_is_multiple_of_thread_execution_width(
+            &self,
+            value: bool,
         );
 
         /// Optional property. If not set, returns zero.
@@ -96,6 +110,32 @@ impl MTLComputePipelineDescriptor {
             linked: Option<&MTLLinkedFunctions>,
         );
 
+        /// Whether this pipeline supports adding binary functions later.
+        #[unsafe(method(supportAddingBinaryFunctions))]
+        #[unsafe(method_family = none)]
+        pub fn support_adding_binary_functions(&self) -> bool;
+
+        /// Setter for [`support_adding_binary_functions`][Self::support_adding_binary_functions].
+        #[unsafe(method(setSupportAddingBinaryFunctions:))]
+        #[unsafe(method_family = none)]
+        pub fn set_support_adding_binary_functions(
+            &self,
+            supported: bool,
+        );
+
+        /// The maximum call-stack depth in stack frames from the kernel.
+        #[unsafe(method(maxCallStackDepth))]
+        #[unsafe(method_family = none)]
+        pub fn max_call_stack_depth(&self) -> usize;
+
+        /// Setter for [`max_call_stack_depth`][Self::max_call_stack_depth].
+        #[unsafe(method(setMaxCallStackDepth:))]
+        #[unsafe(method_family = none)]
+        pub fn set_max_call_stack_depth(
+            &self,
+            depth: usize,
+        );
+
         /// Restore all compute pipeline descriptor properties to their default values.
         #[unsafe(method(reset))]
         #[unsafe(method_family = none)]
@@ -141,19 +181,99 @@ impl MTLComputePipelineDescriptor {
     );
 }
 
-#[allow(unused)]
 impl MTLComputePipelineDescriptor {
-    fn label(&self) -> Option<String> {
+    /// Deprecated dynamic libraries inserted before dependent libraries.
+    #[deprecated(note = "use preloaded_libraries")]
+    pub fn insert_libraries(&self) -> Option<Box<[Retained<ProtocolObject<dyn MTLDynamicLibrary>>]>> {
+        let libraries: Option<Retained<NSArray<ProtocolObject<dyn MTLDynamicLibrary>>>> =
+            unsafe { msg_send![self, insertLibraries] };
+        libraries.map(|libraries| libraries.to_vec().into_boxed_slice())
+    }
+
+    /// Setter for [`insert_libraries`][Self::insert_libraries].
+    #[deprecated(note = "use set_preloaded_libraries")]
+    pub fn set_insert_libraries(
+        &self,
+        libraries: Option<&[&ProtocolObject<dyn MTLDynamicLibrary>]>,
+    ) {
+        let libraries = libraries.map(NSArray::from_slice);
+        unsafe {
+            let _: () = msg_send![self, setInsertLibraries: libraries.as_deref()];
+        }
+    }
+
+    /// Dynamic libraries preloaded to resolve external symbols.
+    pub fn preloaded_libraries(&self) -> Box<[Retained<ProtocolObject<dyn MTLDynamicLibrary>>]> {
+        let libraries: Retained<NSArray<ProtocolObject<dyn MTLDynamicLibrary>>> =
+            unsafe { msg_send![self, preloadedLibraries] };
+        libraries.to_vec().into_boxed_slice()
+    }
+
+    /// Setter for [`preloaded_libraries`][Self::preloaded_libraries].
+    pub fn set_preloaded_libraries(
+        &self,
+        libraries: &[&ProtocolObject<dyn MTLDynamicLibrary>],
+    ) {
+        let libraries = NSArray::from_slice(libraries);
+        unsafe {
+            let _: () = msg_send![self, setPreloadedLibraries: &*libraries];
+        }
+    }
+
+    /// Binary archives searched for compiled pipeline code.
+    pub fn binary_archives(&self) -> Option<Box<[Retained<ProtocolObject<dyn MTLBinaryArchive>>]>> {
+        let archives: Option<Retained<NSArray<ProtocolObject<dyn MTLBinaryArchive>>>> =
+            unsafe { msg_send![self, binaryArchives] };
+        archives.map(|archives| archives.to_vec().into_boxed_slice())
+    }
+
+    /// Setter for [`binary_archives`][Self::binary_archives].
+    pub fn set_binary_archives(
+        &self,
+        archives: Option<&[&ProtocolObject<dyn MTLBinaryArchive>]>,
+    ) {
+        let archives = archives.map(NSArray::from_slice);
+        unsafe {
+            let _: () = msg_send![self, setBinaryArchives: archives.as_deref()];
+        }
+    }
+
+    /// The optional descriptor label.
+    pub fn label(&self) -> Option<String> {
         let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
         label.map(|s| s.to_string())
     }
 
-    fn set_label(
+    /// Sets the descriptor label.
+    pub fn set_label(
         &self,
         label: Option<&str>,
     ) {
         unsafe {
             let _: () = msg_send![self, setLabel: label.map(NSString::from_str).as_deref()];
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use objc2::{rc::Retained, runtime::ProtocolObject};
+
+    use super::MTLComputePipelineDescriptor;
+    use crate::{MTLBinaryArchive, MTLDynamicLibrary};
+
+    #[test]
+    #[expect(deprecated, reason = "verifies the deprecated Rust-native compatibility API")]
+    fn collection_methods_have_rust_native_signatures() {
+        let _: fn(&MTLComputePipelineDescriptor) -> Option<Box<[Retained<ProtocolObject<dyn MTLDynamicLibrary>>]>> =
+            MTLComputePipelineDescriptor::insert_libraries;
+        let _: fn(&MTLComputePipelineDescriptor) -> Box<[Retained<ProtocolObject<dyn MTLDynamicLibrary>>]> =
+            MTLComputePipelineDescriptor::preloaded_libraries;
+        let _: fn(&MTLComputePipelineDescriptor) -> Option<Box<[Retained<ProtocolObject<dyn MTLBinaryArchive>>]>> =
+            MTLComputePipelineDescriptor::binary_archives;
+        let _: fn(&MTLComputePipelineDescriptor, &[&ProtocolObject<dyn MTLDynamicLibrary>]) =
+            MTLComputePipelineDescriptor::set_preloaded_libraries;
+        let _: fn(&MTLComputePipelineDescriptor, Option<&[&ProtocolObject<dyn MTLBinaryArchive>]>) =
+            MTLComputePipelineDescriptor::set_binary_archives;
     }
 }

@@ -1,12 +1,12 @@
 use std::path::Path;
 
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::{NSError, NSObjectProtocol, NSString, NSURL};
+use objc2_foundation::{NSError, NSObjectProtocol, NSString};
 
 use crate::{
-    MTL4MeshRenderPipelineDescriptor, MTLComputePipelineDescriptor, MTLDevice, MTLFunctionDescriptor, MTLLibrary,
-    MTLRenderPipelineDescriptor, function_stitching::MTLStitchedLibraryDescriptor,
-    render_pipeline::MTLTileRenderPipelineDescriptor,
+    MTLComputePipelineDescriptor, MTLDevice, MTLFunctionDescriptor, MTLLibrary, MTLMeshRenderPipelineDescriptor,
+    MTLRenderPipelineDescriptor, MetalError, function_stitching::MTLStitchedLibraryDescriptor,
+    render_pipeline::MTLTileRenderPipelineDescriptor, util::file_url,
 };
 
 // Error domain symbol is declared in `binary_archive::types`.
@@ -20,87 +20,6 @@ extern_protocol!(
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
         fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
-
-        /// Add the function(s) from a compute pipeline state to the archive.
-        ///
-        /// If the function fails, `error` will be set to describe the failure. This can be (but is not required to be) an error from the `MTLBinaryArchiveDomain` domain.
-        ///
-        /// Functions referenced multiple times are silently accepted.
-        #[unsafe(method(addComputePipelineFunctionsWithDescriptor:error:_))]
-        #[unsafe(method_family = none)]
-        fn add_compute_pipeline_functions(
-            &self,
-            descriptor: &MTLComputePipelineDescriptor,
-        ) -> Result<(), Retained<NSError>>;
-
-        /// Add the function(s) from a render pipeline state to the archive.
-        ///
-        /// If the function fails, `error` will be set to describe the failure. This can be (but is not required to be) an error from the `MTLBinaryArchiveDomain` domain.
-        ///
-        /// Functions referenced multiple times are silently accepted.
-        #[unsafe(method(addRenderPipelineFunctionsWithDescriptor:error:_))]
-        #[unsafe(method_family = none)]
-        fn add_render_pipeline_functions(
-            &self,
-            descriptor: &MTLRenderPipelineDescriptor,
-        ) -> Result<(), Retained<NSError>>;
-
-        /// Add the function(s) from a tile render pipeline state to the archive.
-        ///
-        /// If the function fails, `error` will be set to describe the failure. This can be (but is not required to be) an error from the `MTLBinaryArchiveDomain` domain.
-        ///
-        /// Functions referenced multiple times are silently accepted.
-        ///
-        /// Availability: tvOS 14.5+
-        #[unsafe(method(addTileRenderPipelineFunctionsWithDescriptor:error:_))]
-        #[unsafe(method_family = none)]
-        fn add_tile_render_pipeline_functions(
-            &self,
-            descriptor: &MTLTileRenderPipelineDescriptor,
-        ) -> Result<(), Retained<NSError>>;
-
-        /// Add the function(s) from a mesh render pipeline state to the archive.
-        ///
-        /// If the function fails, `error` will be set to describe the failure. This can be (but is not required to be) an error from the `MTLBinaryArchiveDomain` domain.
-        ///
-        /// Functions referenced multiple times are silently accepted.
-        ///
-        /// Availability: macOS 15.0+, iOS 18.0+
-        #[unsafe(method(addMeshRenderPipelineFunctionsWithDescriptor:error:_))]
-        #[unsafe(method_family = none)]
-        fn add_mesh_render_pipeline_functions(
-            &self,
-            descriptor: &MTL4MeshRenderPipelineDescriptor,
-        ) -> Result<(), Retained<NSError>>;
-
-        /// Add the function(s) from a stitched library to the archive.
-        ///
-        /// If the function fails, `error` will be set to describe the failure. This can be (but is not required to be) an error from the `MTLBinaryArchiveDomain` domain.
-        ///
-        /// Functions referenced multiple times are silently accepted.
-        ///
-        /// Availability: macOS 15.0+, iOS 18.0+
-        #[unsafe(method(addLibraryWithDescriptor:error:_))]
-        #[unsafe(method_family = none)]
-        fn add_library_with_descriptor(
-            &self,
-            descriptor: &MTLStitchedLibraryDescriptor,
-        ) -> Result<(), Retained<NSError>>;
-
-        /// Add a `visible` or `intersection` function to the archive.
-        ///
-        /// If the function fails, `error` will be set to describe the failure. This can be (but is not required to be) an error from the `MTLBinaryArchiveDomain` domain. Other possible errors can be file access or I/O related.
-        ///
-        /// Functions referenced multiple times are silently accepted.
-        ///
-        /// Availability: macOS 12.0+, iOS 15.0+
-        #[unsafe(method(addFunctionWithDescriptor:library:error:_))]
-        #[unsafe(method_family = none)]
-        fn add_function_with_descriptor_library(
-            &self,
-            descriptor: &MTLFunctionDescriptor,
-            library: &ProtocolObject<dyn MTLLibrary>,
-        ) -> Result<(), Retained<NSError>>;
     }
 );
 
@@ -115,11 +34,56 @@ pub trait MTLBinaryArchiveExt: MTLBinaryArchive + Message {
         label: Option<&str>,
     );
 
+    /// Add the function(s) from a compute pipeline state to the archive.
+    fn add_compute_pipeline_functions(
+        &self,
+        descriptor: &MTLComputePipelineDescriptor,
+    ) -> Result<(), MetalError>;
+
+    /// Add the function(s) from a render pipeline state to the archive.
+    fn add_render_pipeline_functions(
+        &self,
+        descriptor: &MTLRenderPipelineDescriptor,
+    ) -> Result<(), MetalError>;
+
+    /// Add the function(s) from a tile render pipeline state to the archive.
+    ///
+    /// Availability: tvOS 14.5+
+    fn add_tile_render_pipeline_functions(
+        &self,
+        descriptor: &MTLTileRenderPipelineDescriptor,
+    ) -> Result<(), MetalError>;
+
+    /// Add the function(s) from a mesh render pipeline state to the archive.
+    ///
+    /// Availability: macOS 15.0+, iOS 18.0+
+    fn add_mesh_render_pipeline_functions(
+        &self,
+        descriptor: &MTLMeshRenderPipelineDescriptor,
+    ) -> Result<(), MetalError>;
+
+    /// Add the function(s) from a stitched library to the archive.
+    ///
+    /// Availability: macOS 15.0+, iOS 18.0+
+    fn add_library_with_descriptor(
+        &self,
+        descriptor: &MTLStitchedLibraryDescriptor,
+    ) -> Result<(), MetalError>;
+
+    /// Add a `visible` or `intersection` function to the archive.
+    ///
+    /// Availability: macOS 12.0+, iOS 15.0+
+    fn add_function_with_descriptor_library(
+        &self,
+        descriptor: &MTLFunctionDescriptor,
+        library: &ProtocolObject<dyn MTLLibrary>,
+    ) -> Result<(), MetalError>;
+
     /// Write the contents of a `MTLBinaryArchive` to a file path.
     fn serialize_to_path(
         &self,
         path: &Path,
-    ) -> Result<(), Retained<NSError>>;
+    ) -> Result<(), MetalError>;
 }
 
 impl MTLBinaryArchiveExt for ProtocolObject<dyn MTLBinaryArchive> {
@@ -137,11 +101,85 @@ impl MTLBinaryArchiveExt for ProtocolObject<dyn MTLBinaryArchive> {
         }
     }
 
+    fn add_compute_pipeline_functions(
+        &self,
+        descriptor: &MTLComputePipelineDescriptor,
+    ) -> Result<(), MetalError> {
+        let result: Result<(), Retained<NSError>> =
+            unsafe { msg_send![self, addComputePipelineFunctionsWithDescriptor: descriptor, error: _] };
+        result.map_err(MetalError::from_nserror)
+    }
+
+    fn add_render_pipeline_functions(
+        &self,
+        descriptor: &MTLRenderPipelineDescriptor,
+    ) -> Result<(), MetalError> {
+        let result: Result<(), Retained<NSError>> =
+            unsafe { msg_send![self, addRenderPipelineFunctionsWithDescriptor: descriptor, error: _] };
+        result.map_err(MetalError::from_nserror)
+    }
+
+    fn add_tile_render_pipeline_functions(
+        &self,
+        descriptor: &MTLTileRenderPipelineDescriptor,
+    ) -> Result<(), MetalError> {
+        let result: Result<(), Retained<NSError>> =
+            unsafe { msg_send![self, addTileRenderPipelineFunctionsWithDescriptor: descriptor, error: _] };
+        result.map_err(MetalError::from_nserror)
+    }
+
+    fn add_mesh_render_pipeline_functions(
+        &self,
+        descriptor: &MTLMeshRenderPipelineDescriptor,
+    ) -> Result<(), MetalError> {
+        let result: Result<(), Retained<NSError>> =
+            unsafe { msg_send![self, addMeshRenderPipelineFunctionsWithDescriptor: descriptor, error: _] };
+        result.map_err(MetalError::from_nserror)
+    }
+
+    fn add_library_with_descriptor(
+        &self,
+        descriptor: &MTLStitchedLibraryDescriptor,
+    ) -> Result<(), MetalError> {
+        let result: Result<(), Retained<NSError>> =
+            unsafe { msg_send![self, addLibraryWithDescriptor: descriptor, error: _] };
+        result.map_err(MetalError::from_nserror)
+    }
+
+    fn add_function_with_descriptor_library(
+        &self,
+        descriptor: &MTLFunctionDescriptor,
+        library: &ProtocolObject<dyn MTLLibrary>,
+    ) -> Result<(), MetalError> {
+        let result: Result<(), Retained<NSError>> =
+            unsafe { msg_send![self, addFunctionWithDescriptor: descriptor, library: library, error: _] };
+        result.map_err(MetalError::from_nserror)
+    }
+
     fn serialize_to_path(
         &self,
         path: &Path,
-    ) -> Result<(), Retained<NSError>> {
-        let url = NSURL::from_file_path(path).expect("path must be a valid file URL path");
-        unsafe { msg_send![self, serializeToURL: &*url, error: _] }
+    ) -> Result<(), MetalError> {
+        let url = file_url(path, "serializeToURL:error:")?;
+        let result: Result<(), Retained<NSError>> = unsafe { msg_send![self, serializeToURL: &*url, error: _] };
+        result.map_err(MetalError::from_nserror)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+
+    use objc2::runtime::ProtocolObject;
+
+    use super::{MTLBinaryArchive, MTLBinaryArchiveExt};
+    use crate::{MTLComputePipelineDescriptor, MetalError};
+
+    #[test]
+    fn fallible_methods_expose_rust_owned_errors() {
+        let _: fn(&ProtocolObject<dyn MTLBinaryArchive>, &MTLComputePipelineDescriptor) -> Result<(), MetalError> =
+            <ProtocolObject<dyn MTLBinaryArchive> as MTLBinaryArchiveExt>::add_compute_pipeline_functions;
+        let _: fn(&ProtocolObject<dyn MTLBinaryArchive>, &Path) -> Result<(), MetalError> =
+            <ProtocolObject<dyn MTLBinaryArchive> as MTLBinaryArchiveExt>::serialize_to_path;
     }
 }

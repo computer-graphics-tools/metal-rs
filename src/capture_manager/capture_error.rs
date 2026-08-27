@@ -28,6 +28,6 @@ unsafe extern "C" {
 }
 
 #[inline]
-pub fn capture_error_domain() -> &'static NSErrorDomain {
-    unsafe { MTLCaptureErrorDomain }
+pub fn capture_error_domain() -> String {
+    unsafe { MTLCaptureErrorDomain }.to_string()
 }

@@ -1,10 +1,9 @@
-use std::ops::Deref;
-
 use block2::{Block, RcBlock};
 use objc2::{rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::NSError;
 
 use super::MTLLibrary;
+use crate::{CallbackBlock, MetalError};
 
 /// A completion handler invoked when an asynchronous library creation finishes.
 ///
@@ -14,19 +13,20 @@ pub struct NewLibraryCompletionHandler(RcBlock<dyn Fn(*mut ProtocolObject<dyn MT
 impl NewLibraryCompletionHandler {
     pub fn new<F>(handler: F) -> Self
     where
-        F: Fn(Option<Retained<ProtocolObject<dyn MTLLibrary>>>, *mut NSError) + 'static,
+        F: Fn(Option<Retained<ProtocolObject<dyn MTLLibrary>>>, Option<MetalError>) + 'static,
     {
         Self(RcBlock::new(move |library_ptr: *mut ProtocolObject<dyn MTLLibrary>, error: *mut NSError| {
-            let library = unsafe { Retained::from_raw(library_ptr) };
+            let library = unsafe { Retained::retain(library_ptr) };
+            let error = unsafe { MetalError::from_unretained(error) };
             handler(library, error);
         }))
     }
 }
 
-impl Deref for NewLibraryCompletionHandler {
-    type Target = Block<dyn Fn(*mut ProtocolObject<dyn MTLLibrary>, *mut NSError)>;
+impl CallbackBlock for NewLibraryCompletionHandler {
+    type Signature = dyn Fn(*mut ProtocolObject<dyn MTLLibrary>, *mut NSError);
 
-    fn deref(&self) -> &Self::Target {
+    fn as_block(&self) -> &Block<Self::Signature> {
         &self.0
     }
 }

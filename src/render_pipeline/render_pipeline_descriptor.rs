@@ -6,8 +6,10 @@ use objc2::{
 use objc2_foundation::{CopyingHelper, NSArray, NSCopying, NSObjectProtocol, NSString};
 
 use crate::{
-    MTLDynamicLibrary, MTLLinkedFunctions, MTLPipelineBufferDescriptorArray, MTLPixelFormat, MTLPrimitiveTopologyClass,
-    MTLRenderPipelineColorAttachmentDescriptorArray, MTLShaderValidation, MTLVertexDescriptor, library::MTLFunction,
+    MTLBinaryArchive, MTLDynamicLibrary, MTLLinkedFunctions, MTLPipelineBufferDescriptorArray, MTLPixelFormat,
+    MTLPrimitiveTopologyClass, MTLRenderPipelineColorAttachmentDescriptorArray, MTLShaderValidation,
+    MTLTessellationControlPointIndexType, MTLTessellationFactorFormat, MTLTessellationFactorStepFunction,
+    MTLTessellationPartitionMode, MTLVertexDescriptor, MTLWinding, library::MTLFunction,
 };
 
 extern_class!(
@@ -70,7 +72,7 @@ impl MTLRenderPipelineDescriptor {
         /// The set of functions to be linked with the pipeline and accessed from the vertex function.
         #[unsafe(method(vertexLinkedFunctions))]
         #[unsafe(method_family = none)]
-        pub fn vertex_linked_functions(&self) -> Option<Retained<MTLLinkedFunctions>>;
+        pub fn vertex_linked_functions(&self) -> Retained<MTLLinkedFunctions>;
 
         /// Setter for [`vertex_linked_functions`][Self::vertex_linked_functions].
         #[unsafe(method(setVertexLinkedFunctions:))]
@@ -83,7 +85,7 @@ impl MTLRenderPipelineDescriptor {
         /// The set of functions to be linked with the pipeline and accessed from the fragment function.
         #[unsafe(method(fragmentLinkedFunctions))]
         #[unsafe(method_family = none)]
-        pub fn fragment_linked_functions(&self) -> Option<Retained<MTLLinkedFunctions>>;
+        pub fn fragment_linked_functions(&self) -> Retained<MTLLinkedFunctions>;
 
         /// Setter for [`fragment_linked_functions`][Self::fragment_linked_functions].
         #[unsafe(method(setFragmentLinkedFunctions:))]
@@ -145,30 +147,19 @@ impl MTLRenderPipelineDescriptor {
             depth: usize,
         );
 
-        /// The set of dynamic libraries to be preloaded for the vertex stage.
-        #[unsafe(method(vertexPreloadedLibraries))]
+        /// The legacy sample count property.
+        #[deprecated = "use raster_sample_count"]
+        #[unsafe(method(sampleCount))]
         #[unsafe(method_family = none)]
-        pub fn vertex_preloaded_libraries(&self) -> Retained<NSArray<ProtocolObject<dyn MTLDynamicLibrary>>>;
+        pub fn sample_count(&self) -> usize;
 
-        /// Setter for [`vertex_preloaded_libraries`][Self::vertex_preloaded_libraries].
-        #[unsafe(method(setVertexPreloadedLibraries:))]
+        /// Setter for [`sample_count`][Self::sample_count].
+        #[deprecated = "use set_raster_sample_count"]
+        #[unsafe(method(setSampleCount:))]
         #[unsafe(method_family = none)]
-        pub fn set_vertex_preloaded_libraries(
+        pub fn set_sample_count(
             &self,
-            libs: &NSArray<ProtocolObject<dyn MTLDynamicLibrary>>,
-        );
-
-        /// The set of dynamic libraries to be preloaded for the fragment stage.
-        #[unsafe(method(fragmentPreloadedLibraries))]
-        #[unsafe(method_family = none)]
-        pub fn fragment_preloaded_libraries(&self) -> Retained<NSArray<ProtocolObject<dyn MTLDynamicLibrary>>>;
-
-        /// Setter for [`fragment_preloaded_libraries`][Self::fragment_preloaded_libraries].
-        #[unsafe(method(setFragmentPreloadedLibraries:))]
-        #[unsafe(method_family = none)]
-        pub fn set_fragment_preloaded_libraries(
-            &self,
-            libs: &NSArray<ProtocolObject<dyn MTLDynamicLibrary>>,
+            sample_count: usize,
         );
 
         /// The number of samples for each pixel.
@@ -280,6 +271,97 @@ impl MTLRenderPipelineDescriptor {
             topo: MTLPrimitiveTopologyClass,
         );
 
+        /// The tessellation partition mode.
+        #[unsafe(method(tessellationPartitionMode))]
+        #[unsafe(method_family = none)]
+        pub fn tessellation_partition_mode(&self) -> MTLTessellationPartitionMode;
+
+        /// Setter for [`tessellation_partition_mode`][Self::tessellation_partition_mode].
+        #[unsafe(method(setTessellationPartitionMode:))]
+        #[unsafe(method_family = none)]
+        pub fn set_tessellation_partition_mode(
+            &self,
+            mode: MTLTessellationPartitionMode,
+        );
+
+        /// The maximum tessellation factor.
+        #[unsafe(method(maxTessellationFactor))]
+        #[unsafe(method_family = none)]
+        pub fn max_tessellation_factor(&self) -> usize;
+
+        /// Setter for [`max_tessellation_factor`][Self::max_tessellation_factor].
+        #[unsafe(method(setMaxTessellationFactor:))]
+        #[unsafe(method_family = none)]
+        pub fn set_max_tessellation_factor(
+            &self,
+            factor: usize,
+        );
+
+        /// Whether tessellation factors have a scale value.
+        #[unsafe(method(isTessellationFactorScaleEnabled))]
+        #[unsafe(method_family = none)]
+        pub fn is_tessellation_factor_scale_enabled(&self) -> bool;
+
+        /// Setter for [`is_tessellation_factor_scale_enabled`][Self::is_tessellation_factor_scale_enabled].
+        #[unsafe(method(setTessellationFactorScaleEnabled:))]
+        #[unsafe(method_family = none)]
+        pub fn set_tessellation_factor_scale_enabled(
+            &self,
+            enabled: bool,
+        );
+
+        /// The tessellation factor format.
+        #[unsafe(method(tessellationFactorFormat))]
+        #[unsafe(method_family = none)]
+        pub fn tessellation_factor_format(&self) -> MTLTessellationFactorFormat;
+
+        /// Setter for [`tessellation_factor_format`][Self::tessellation_factor_format].
+        #[unsafe(method(setTessellationFactorFormat:))]
+        #[unsafe(method_family = none)]
+        pub fn set_tessellation_factor_format(
+            &self,
+            format: MTLTessellationFactorFormat,
+        );
+
+        /// The tessellation control-point index type.
+        #[unsafe(method(tessellationControlPointIndexType))]
+        #[unsafe(method_family = none)]
+        pub fn tessellation_control_point_index_type(&self) -> MTLTessellationControlPointIndexType;
+
+        /// Setter for [`tessellation_control_point_index_type`][Self::tessellation_control_point_index_type].
+        #[unsafe(method(setTessellationControlPointIndexType:))]
+        #[unsafe(method_family = none)]
+        pub fn set_tessellation_control_point_index_type(
+            &self,
+            index_type: MTLTessellationControlPointIndexType,
+        );
+
+        /// The tessellation factor step function.
+        #[unsafe(method(tessellationFactorStepFunction))]
+        #[unsafe(method_family = none)]
+        pub fn tessellation_factor_step_function(&self) -> MTLTessellationFactorStepFunction;
+
+        /// Setter for [`tessellation_factor_step_function`][Self::tessellation_factor_step_function].
+        #[unsafe(method(setTessellationFactorStepFunction:))]
+        #[unsafe(method_family = none)]
+        pub fn set_tessellation_factor_step_function(
+            &self,
+            step_function: MTLTessellationFactorStepFunction,
+        );
+
+        /// The winding order of tessellated triangles.
+        #[unsafe(method(tessellationOutputWindingOrder))]
+        #[unsafe(method_family = none)]
+        pub fn tessellation_output_winding_order(&self) -> MTLWinding;
+
+        /// Setter for [`tessellation_output_winding_order`][Self::tessellation_output_winding_order].
+        #[unsafe(method(setTessellationOutputWindingOrder:))]
+        #[unsafe(method_family = none)]
+        pub fn set_tessellation_output_winding_order(
+            &self,
+            winding: MTLWinding,
+        );
+
         /// The vertex descriptor.
         #[unsafe(method(vertexDescriptor))]
         #[unsafe(method_family = none)]
@@ -338,19 +420,90 @@ impl MTLRenderPipelineDescriptor {
     );
 }
 
-#[allow(unused)]
 impl MTLRenderPipelineDescriptor {
-    fn label(&self) -> Option<String> {
+    /// The set of dynamic libraries to be preloaded for the vertex stage.
+    pub fn vertex_preloaded_libraries(&self) -> Box<[Retained<ProtocolObject<dyn MTLDynamicLibrary>>]> {
+        let libraries: Retained<NSArray<ProtocolObject<dyn MTLDynamicLibrary>>> =
+            unsafe { msg_send![self, vertexPreloadedLibraries] };
+        libraries.to_vec().into_boxed_slice()
+    }
+
+    /// Setter for [`vertex_preloaded_libraries`][Self::vertex_preloaded_libraries].
+    pub fn set_vertex_preloaded_libraries(
+        &self,
+        libraries: &[&ProtocolObject<dyn MTLDynamicLibrary>],
+    ) {
+        let libraries = NSArray::from_slice(libraries);
+        unsafe {
+            let _: () = msg_send![self, setVertexPreloadedLibraries: &*libraries];
+        }
+    }
+
+    /// The set of dynamic libraries to be preloaded for the fragment stage.
+    pub fn fragment_preloaded_libraries(&self) -> Box<[Retained<ProtocolObject<dyn MTLDynamicLibrary>>]> {
+        let libraries: Retained<NSArray<ProtocolObject<dyn MTLDynamicLibrary>>> =
+            unsafe { msg_send![self, fragmentPreloadedLibraries] };
+        libraries.to_vec().into_boxed_slice()
+    }
+
+    /// Setter for [`fragment_preloaded_libraries`][Self::fragment_preloaded_libraries].
+    pub fn set_fragment_preloaded_libraries(
+        &self,
+        libraries: &[&ProtocolObject<dyn MTLDynamicLibrary>],
+    ) {
+        let libraries = NSArray::from_slice(libraries);
+        unsafe {
+            let _: () = msg_send![self, setFragmentPreloadedLibraries: &*libraries];
+        }
+    }
+
+    /// Binary archives to search for compiled pipeline code.
+    pub fn binary_archives(&self) -> Option<Box<[Retained<ProtocolObject<dyn MTLBinaryArchive>>]>> {
+        let archives: Option<Retained<NSArray<ProtocolObject<dyn MTLBinaryArchive>>>> =
+            unsafe { msg_send![self, binaryArchives] };
+        archives.map(|archives| archives.to_vec().into_boxed_slice())
+    }
+
+    /// Setter for [`binary_archives`][Self::binary_archives].
+    pub fn set_binary_archives(
+        &self,
+        archives: Option<&[&ProtocolObject<dyn MTLBinaryArchive>]>,
+    ) {
+        let archives = archives.map(NSArray::from_slice);
+        unsafe {
+            let _: () = msg_send![self, setBinaryArchives: archives.as_deref()];
+        }
+    }
+
+    /// The optional descriptor label.
+    pub fn label(&self) -> Option<String> {
         let s: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
         s.map(|s| s.to_string())
     }
 
-    fn set_label(
+    /// Sets the descriptor label.
+    pub fn set_label(
         &self,
         label: Option<&str>,
     ) {
         unsafe {
             let _: () = msg_send![self, setLabel: label.map(NSString::from_str).as_deref()];
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use objc2::{rc::Retained, runtime::ProtocolObject};
+
+    use super::MTLRenderPipelineDescriptor;
+    use crate::{MTLBinaryArchive, MTLDynamicLibrary};
+
+    #[test]
+    fn collection_methods_have_rust_native_signatures() {
+        let _: fn(&MTLRenderPipelineDescriptor) -> Box<[Retained<ProtocolObject<dyn MTLDynamicLibrary>>]> =
+            MTLRenderPipelineDescriptor::vertex_preloaded_libraries;
+        let _: fn(&MTLRenderPipelineDescriptor) -> Option<Box<[Retained<ProtocolObject<dyn MTLBinaryArchive>>]>> =
+            MTLRenderPipelineDescriptor::binary_archives;
     }
 }

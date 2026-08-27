@@ -1,5 +1,5 @@
 use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::{NSObjectProtocol, NSString};
+use objc2_foundation::NSObjectProtocol;
 
 use crate::*;
 
@@ -11,11 +11,6 @@ extern_protocol!(
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
         fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
-
-        /// Obtains this queue's optional label for debugging purposes.
-        #[unsafe(method(label))]
-        #[unsafe(method_family = none)]
-        fn label(&self) -> Option<Retained<NSString>>;
 
         /// Schedules an operation to signal a GPU event with a specific value after all GPU work
         /// prior to this point is complete.

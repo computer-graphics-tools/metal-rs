@@ -17,6 +17,11 @@ extern_class!(
     pub struct MTLArgument;
 );
 
+// SAFETY: Metal declares `MTLArgument` as `NS_SWIFT_SENDABLE`.
+unsafe impl Send for MTLArgument {}
+// SAFETY: Metal declares `MTLArgument` as `NS_SWIFT_SENDABLE`.
+unsafe impl Sync for MTLArgument {}
+
 impl MTLArgument {
     extern_methods!(
         /// Argument type.

@@ -2,6 +2,7 @@ use objc2::{Encode, Encoding, RefEncode};
 
 /// Metal feature sets
 #[allow(non_camel_case_types)]
+#[deprecated(note = "use MTLGPUFamily instead")]
 #[repr(u64)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub enum MTLFeatureSet {
@@ -45,10 +46,41 @@ pub enum MTLFeatureSet {
     tvOS_GPUFamily2_v2 = 30005,
 }
 
+#[allow(deprecated, non_upper_case_globals)]
+impl MTLFeatureSet {
+    #[deprecated(note = "use macOS_GPUFamily1_v1")]
+    pub const OSX_GPUFamily1_v1: Self = Self::macOS_GPUFamily1_v1;
+
+    #[deprecated(note = "use macOS_GPUFamily1_v2")]
+    pub const OSX_GPUFamily1_v2: Self = Self::macOS_GPUFamily1_v2;
+
+    #[deprecated(note = "use macOS_ReadWriteTextureTier2")]
+    pub const OSX_ReadWriteTextureTier2: Self = Self::macOS_ReadWriteTextureTier2;
+
+    #[deprecated(note = "use tvOS_GPUFamily1_v1")]
+    pub const TVOS_GPUFamily1_v1: Self = Self::tvOS_GPUFamily1_v1;
+}
+
+#[allow(deprecated)]
 unsafe impl Encode for MTLFeatureSet {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
+#[allow(deprecated)]
 unsafe impl RefEncode for MTLFeatureSet {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
+}
+
+#[cfg(test)]
+#[allow(deprecated)]
+mod tests {
+    use super::MTLFeatureSet;
+
+    #[test]
+    fn legacy_names_match_their_replacements() {
+        assert_eq!(MTLFeatureSet::OSX_GPUFamily1_v1, MTLFeatureSet::macOS_GPUFamily1_v1);
+        assert_eq!(MTLFeatureSet::OSX_GPUFamily1_v2, MTLFeatureSet::macOS_GPUFamily1_v2);
+        assert_eq!(MTLFeatureSet::OSX_ReadWriteTextureTier2, MTLFeatureSet::macOS_ReadWriteTextureTier2);
+        assert_eq!(MTLFeatureSet::TVOS_GPUFamily1_v1, MTLFeatureSet::tvOS_GPUFamily1_v1);
+    }
 }

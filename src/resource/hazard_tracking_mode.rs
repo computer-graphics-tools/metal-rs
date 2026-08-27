@@ -1,7 +1,9 @@
 use objc2::{Encode, Encoding, RefEncode};
 
 /// Describes how hazard tracking is performed (from `MTLHazardTrackingMode`).
-#[repr(u64)]
+///
+/// Availability: macOS 10.15+, iOS 13.0+
+#[repr(usize)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub enum MTLHazardTrackingMode {
     /// The default hazard tracking mode for the context. Refer to the usage of the field for semantics.
@@ -13,7 +15,7 @@ pub enum MTLHazardTrackingMode {
 }
 
 unsafe impl Encode for MTLHazardTrackingMode {
-    const ENCODING: Encoding = u64::ENCODING;
+    const ENCODING: Encoding = usize::ENCODING;
 }
 
 unsafe impl RefEncode for MTLHazardTrackingMode {

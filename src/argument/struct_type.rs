@@ -1,13 +1,13 @@
 use objc2::{extern_class, extern_methods, msg_send, rc::Retained, runtime::NSObject};
 use objc2_foundation::{NSArray, NSString};
 
-use crate::argument::MTLStructMember;
+use crate::argument::{MTLStructMember, MTLType};
 
 extern_class!(
     /// Reflection for a struct type used in argument/pipeline reflection.
     ///
     /// Availability: macOS 10.11+, iOS 8.0+
-    #[unsafe(super(NSObject))]
+    #[unsafe(super(MTLType, NSObject))]
     #[derive(Debug, PartialEq, Eq, Hash)]
     pub struct MTLStructType;
 );

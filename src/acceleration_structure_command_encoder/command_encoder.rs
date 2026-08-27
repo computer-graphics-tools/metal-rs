@@ -1,9 +1,8 @@
 use objc2::{Message, extern_protocol, msg_send, runtime::ProtocolObject};
 
-use crate::util::ref_slice_as_ptr;
 use crate::{
     MTLAccelerationStructure, MTLBuffer, MTLCommandEncoder, MTLCounterSampleBuffer, MTLDataType, MTLFence, MTLHeap,
-    MTLResource, MTLResourceUsage,
+    MTLResource, MTLResourceUsage, util::ref_slice_as_ptr,
 };
 
 extern_protocol!(
@@ -298,8 +297,10 @@ pub trait MTLAccelerationStructureCommandEncoderExt: MTLAccelerationStructureCom
     /// by the encoder through an argument buffer. For tracked heaps, this protects against data
     /// hazards. This may cause all color attachments allocated from the heaps to become
     /// decompressed; prefer `use_resource`/`use_resources` for color attachments with minimal usage.
-    fn use_heaps(&self, heaps: &[&ProtocolObject<dyn MTLHeap>])
-    where
+    fn use_heaps(
+        &self,
+        heaps: &[&ProtocolObject<dyn MTLHeap>],
+    ) where
         Self: Sized,
     {
         let ptr = ref_slice_as_ptr(heaps);

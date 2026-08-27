@@ -18,6 +18,9 @@ unsafe impl RefEncode for MTLSize {
 }
 
 impl MTLSize {
+    /// Creates a size with the given dimensions.
+    ///
+    /// This is the Rust equivalent of Metal's `MTLSizeMake` inline helper.
     pub const fn new(
         width: usize,
         height: usize,

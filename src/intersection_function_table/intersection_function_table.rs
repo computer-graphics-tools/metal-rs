@@ -3,14 +3,21 @@ use core::ops::Range;
 use objc2::{Message, extern_protocol, msg_send, runtime::ProtocolObject};
 use objc2_foundation::NSRange;
 
-use crate::util::opt_ref_slice_as_ptr;
 use super::MTLIntersectionFunctionSignature;
-use crate::{MTLBuffer, MTLFunctionHandle, MTLResource, MTLVisibleFunctionTable, types::MTLResourceID};
+use crate::{
+    MTLBuffer, MTLFunctionHandle, MTLResource, MTLVisibleFunctionTable, types::MTLResourceID,
+    util::opt_ref_slice_as_ptr,
+};
 
 extern_protocol!(
     /// Intersection function table
     ///
     /// Availability: macOS 11.0+, iOS 14.0+, tvOS 16.0+
+    ///
+    /// # Safety
+    ///
+    /// Implementors must be Objective-C objects that conform to the
+    /// `MTLIntersectionFunctionTable` protocol.
     pub unsafe trait MTLIntersectionFunctionTable: MTLResource {
         #[unsafe(method(setBuffer:offset:atIndex:))]
         #[unsafe(method_family = none)]
@@ -72,9 +79,10 @@ pub trait MTLIntersectionFunctionTableExt: MTLIntersectionFunctionTable + Messag
     ) where
         Self: Sized,
     {
-        assert_eq!(buffers.len(), offsets.len());
+        assert_eq!(buffers.len(), offsets.len(), "buffer and offset slices must have equal lengths");
+        let range = checked_range(range, buffers.len());
         let ptr = opt_ref_slice_as_ptr(buffers);
-        unsafe { msg_send![self, setBuffers: ptr, offsets: offsets.as_ptr(), withRange: NSRange::from(range)] }
+        unsafe { msg_send![self, setBuffers: ptr, offsets: offsets.as_ptr(), withRange: range] }
     }
 
     /// Set an array of functions at the given index range.
@@ -85,8 +93,9 @@ pub trait MTLIntersectionFunctionTableExt: MTLIntersectionFunctionTable + Messag
     ) where
         Self: Sized,
     {
+        let range = checked_range(range, functions.len());
         let ptr = opt_ref_slice_as_ptr(functions);
-        unsafe { msg_send![self, setFunctions: ptr, withRange: NSRange::from(range)] }
+        unsafe { msg_send![self, setFunctions: ptr, withRange: range] }
     }
 
     /// Set an array of visible function tables at the given buffer index range.
@@ -97,8 +106,9 @@ pub trait MTLIntersectionFunctionTableExt: MTLIntersectionFunctionTable + Messag
     ) where
         Self: Sized,
     {
+        let range = checked_range(range, tables.len());
         let ptr = opt_ref_slice_as_ptr(tables);
-        unsafe { msg_send![self, setVisibleFunctionTables: ptr, withBufferRange: NSRange::from(range)] }
+        unsafe { msg_send![self, setVisibleFunctionTables: ptr, withBufferRange: range] }
     }
 
     /// Set the opaque triangle intersection function for an index range.
@@ -109,11 +119,12 @@ pub trait MTLIntersectionFunctionTableExt: MTLIntersectionFunctionTable + Messag
     ) where
         Self: Sized,
     {
+        let range = NSRange::from(range);
         unsafe {
             msg_send![
                 self,
                 setOpaqueTriangleIntersectionFunctionWithSignature: signature,
-                withRange: NSRange::from(range)
+                withRange: range
             ]
         }
     }
@@ -126,14 +137,40 @@ pub trait MTLIntersectionFunctionTableExt: MTLIntersectionFunctionTable + Messag
     ) where
         Self: Sized,
     {
+        let range = NSRange::from(range);
         unsafe {
             msg_send![
                 self,
                 setOpaqueCurveIntersectionFunctionWithSignature: signature,
-                withRange: NSRange::from(range)
+                withRange: range
             ]
         }
     }
 }
 
 impl<T: MTLIntersectionFunctionTable + Message> MTLIntersectionFunctionTableExt for T {}
+
+fn checked_range(
+    range: Range<usize>,
+    expected_len: usize,
+) -> NSRange {
+    let range = NSRange::from(range);
+    assert_eq!(range.length, expected_len, "range length must match slice length");
+    range
+}
+
+#[cfg(test)]
+mod tests {
+    use super::checked_range;
+
+    #[test]
+    fn checked_range_accepts_a_matching_slice_length() {
+        assert_eq!(checked_range(4..7, 3), objc2_foundation::NSRange::new(4, 3));
+    }
+
+    #[test]
+    #[should_panic(expected = "range length must match slice length")]
+    fn checked_range_rejects_a_mismatched_slice_length() {
+        let _ = checked_range(4..7, 2);
+    }
+}

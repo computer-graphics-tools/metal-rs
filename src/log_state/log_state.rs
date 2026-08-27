@@ -28,7 +28,7 @@ where
         handler: &MTLLogHandler,
     ) {
         unsafe {
-            let _: () = msg_send![self, addLogHandler: &**handler];
+            let _: () = msg_send![self, addLogHandler: handler.as_block()];
         }
     }
 }

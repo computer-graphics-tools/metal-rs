@@ -1,4 +1,8 @@
-use objc2::{Encode, Encoding, RefEncode, extern_class, extern_conformance, extern_methods, runtime::NSObject};
+use objc2::{
+    Encode, Encoding, RefEncode, extern_class, extern_conformance, extern_methods,
+    rc::{Allocated, Retained},
+    runtime::NSObject,
+};
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
 use super::MTLRenderPassAttachmentDescriptor;
@@ -6,17 +10,20 @@ use super::MTLRenderPassAttachmentDescriptor;
 /// Controls the MSAA depth resolve operation.
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum MultisampleDepthResolveFilter {
+pub enum MTLMultisampleDepthResolveFilter {
     Sample0 = 0,
     Min = 1,
     Max = 2,
 }
 
-unsafe impl Encode for MultisampleDepthResolveFilter {
+#[deprecated(note = "use MTLMultisampleDepthResolveFilter")]
+pub type MultisampleDepthResolveFilter = MTLMultisampleDepthResolveFilter;
+
+unsafe impl Encode for MTLMultisampleDepthResolveFilter {
     const ENCODING: Encoding = u64::ENCODING;
 }
 
-unsafe impl RefEncode for MultisampleDepthResolveFilter {
+unsafe impl RefEncode for MTLMultisampleDepthResolveFilter {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
 
@@ -57,14 +64,27 @@ impl MTLRenderPassDepthAttachmentDescriptor {
         /// The filter to be used for depth multisample resolve. Defaults to Sample0.
         #[unsafe(method(depthResolveFilter))]
         #[unsafe(method_family = none)]
-        pub fn depth_resolve_filter(&self) -> MultisampleDepthResolveFilter;
+        pub fn depth_resolve_filter(&self) -> MTLMultisampleDepthResolveFilter;
 
         /// Setter for [`depth_resolve_filter`][Self::depth_resolve_filter].
         #[unsafe(method(setDepthResolveFilter:))]
         #[unsafe(method_family = none)]
         pub fn set_depth_resolve_filter(
             &self,
-            filter: MultisampleDepthResolveFilter,
+            filter: MTLMultisampleDepthResolveFilter,
         );
+    );
+}
+
+/// Methods declared on superclass `NSObject`.
+impl MTLRenderPassDepthAttachmentDescriptor {
+    extern_methods!(
+        #[unsafe(method(init))]
+        #[unsafe(method_family = init)]
+        pub fn init(this: Allocated<Self>) -> Retained<Self>;
+
+        #[unsafe(method(new))]
+        #[unsafe(method_family = new)]
+        pub fn new() -> Retained<Self>;
     );
 }

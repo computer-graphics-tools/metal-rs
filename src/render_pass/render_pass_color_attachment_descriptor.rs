@@ -1,12 +1,11 @@
 use objc2::{
     extern_class, extern_conformance, extern_methods,
-    rc::Retained,
-    runtime::{NSObject, ProtocolObject},
+    rc::{Allocated, Retained},
+    runtime::NSObject,
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
 use super::{MTLClearColor, MTLRenderPassAttachmentDescriptor};
-use crate::MTLTexture;
 
 extern_class!(
     /// Color attachment descriptor for a render pass.
@@ -29,19 +28,6 @@ extern_conformance!(
 
 impl MTLRenderPassColorAttachmentDescriptor {
     extern_methods!(
-        /// The texture used for this color attachment.
-        #[unsafe(method(texture))]
-        #[unsafe(method_family = none)]
-        pub fn texture(&self) -> Option<Retained<ProtocolObject<dyn MTLTexture>>>;
-
-        /// Setter for [`texture`][Self::texture].
-        #[unsafe(method(setTexture:))]
-        #[unsafe(method_family = none)]
-        pub fn set_texture(
-            &self,
-            texture: Option<&ProtocolObject<dyn MTLTexture>>,
-        );
-
         /// The clear color to be used if the load action is Clear.
         #[unsafe(method(clearColor))]
         #[unsafe(method_family = none)]
@@ -57,9 +43,15 @@ impl MTLRenderPassColorAttachmentDescriptor {
     );
 }
 
-impl Default for MTLRenderPassColorAttachmentDescriptor {
-    fn default() -> Self {
-        // Not constructible directly in Rust; provided for API symmetry only.
-        panic!("Use Objective-C allocation to create instances");
-    }
+/// Methods declared on superclass `NSObject`.
+impl MTLRenderPassColorAttachmentDescriptor {
+    extern_methods!(
+        #[unsafe(method(init))]
+        #[unsafe(method_family = init)]
+        pub fn init(this: Allocated<Self>) -> Retained<Self>;
+
+        #[unsafe(method(new))]
+        #[unsafe(method_family = new)]
+        pub fn new() -> Retained<Self>;
+    );
 }

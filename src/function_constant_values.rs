@@ -34,7 +34,9 @@ impl MTLFunctionConstantValues {
     extern_methods!(
         /// Set a single constant value by index.
         ///
-        /// Safety: `value` must be a valid pointer to a value of the specified `type`.
+        /// For the duration of this call, `value` must point to a properly
+        /// aligned, readable value whose representation matches `type`.
+        /// `index` must also be a valid function-constant index.
         #[unsafe(method(setConstantValue:type:atIndex:))]
         #[unsafe(method_family = none)]
         pub fn set_constant_value_type_at_index(
@@ -62,29 +64,36 @@ impl MTLFunctionConstantValues {
         #[unsafe(method_family = new)]
         pub fn new() -> Retained<Self>;
     );
+}
 
+impl MTLFunctionConstantValues {
     /// Set a range of constant values by index range.
     ///
-    /// Safety: `values` must be a valid pointer to an array of values of the specified `type` large enough to cover `range`.
+    /// For the duration of this call, `values` must point to at least
+    /// `range.len()` properly aligned, contiguous, readable values whose
+    /// representations match `type`. The range must contain valid
+    /// function-constant indices.
     pub fn set_constant_values_type_with_range(
         &self,
         values: NonNull<c_void>,
         r#type: MTLDataType,
         range: Range<usize>,
     ) {
+        let range = NSRange::from(range);
         unsafe {
             msg_send![
                 self,
                 setConstantValues: values,
                 type: r#type,
-                withRange: NSRange::from(range),
+                withRange: range,
             ]
         }
     }
 
     /// Set a single constant value by name.
     ///
-    /// Safety: `value` must be a valid pointer to a value of the specified `type`.
+    /// For the duration of this call, `value` must point to a properly
+    /// aligned, readable value whose representation matches `type`.
     pub fn set_constant_value_type_with_name(
         &self,
         value: NonNull<c_void>,
@@ -99,5 +108,35 @@ impl MTLFunctionConstantValues {
                 withName: &*NSString::from_str(name),
             ]
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use core::{ffi::c_void, ops::Range, ptr::NonNull};
+
+    use objc2_foundation::{NSCopying, NSObjectProtocol};
+
+    use super::MTLFunctionConstantValues;
+    use crate::MTLDataType;
+
+    #[test]
+    fn class_conformances_match_the_header() {
+        fn assert_nscopying<T: NSCopying>() {}
+        fn assert_nsobject<T: NSObjectProtocol>() {}
+
+        assert_nscopying::<MTLFunctionConstantValues>();
+        assert_nsobject::<MTLFunctionConstantValues>();
+    }
+
+    #[test]
+    fn selector_signatures_remain_safe() {
+        let _: fn(&MTLFunctionConstantValues, NonNull<c_void>, MTLDataType, usize) =
+            MTLFunctionConstantValues::set_constant_value_type_at_index;
+        let _: fn(&MTLFunctionConstantValues, NonNull<c_void>, MTLDataType, Range<usize>) =
+            MTLFunctionConstantValues::set_constant_values_type_with_range;
+        let _: fn(&MTLFunctionConstantValues, NonNull<c_void>, MTLDataType, &str) =
+            MTLFunctionConstantValues::set_constant_value_type_with_name;
+        let _: fn(&MTLFunctionConstantValues) = MTLFunctionConstantValues::reset;
     }
 }

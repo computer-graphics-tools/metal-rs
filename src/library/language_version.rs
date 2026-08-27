@@ -2,7 +2,9 @@ use objc2::{Encode, Encoding, RefEncode};
 
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum MLTLanguageVersion {
+pub enum MTLLanguageVersion {
+    #[deprecated(note = "use a newer language standard")]
+    Version1_0 = 1 << 16,
     Version1_1 = (1 << 16) + 1,
     Version1_2 = (1 << 16) + 2,
     Version2_0 = 2 << 16,
@@ -14,11 +16,29 @@ pub enum MLTLanguageVersion {
     Version3_1 = (3 << 16) + 1,
     Version3_2 = (3 << 16) + 2,
     Version4_0 = (4 << 16),
+    Version4_1 = (4 << 16) + 1,
 }
 
-unsafe impl Encode for MLTLanguageVersion {
+/// The Metal shading-language version used to compile a library.
+///
+/// Compatibility alias for the crate's original misspelling of
+/// [`MTLLanguageVersion`].
+pub type MLTLanguageVersion = MTLLanguageVersion;
+
+unsafe impl Encode for MTLLanguageVersion {
     const ENCODING: Encoding = u64::ENCODING;
 }
-unsafe impl RefEncode for MLTLanguageVersion {
+unsafe impl RefEncode for MTLLanguageVersion {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::MTLLanguageVersion;
+
+    #[test]
+    fn xcode_27_language_versions_match_header_values() {
+        assert_eq!(MTLLanguageVersion::Version4_0 as u64, 4 << 16);
+        assert_eq!(MTLLanguageVersion::Version4_1 as u64, (4 << 16) + 1);
+    }
 }

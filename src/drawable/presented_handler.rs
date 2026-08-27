@@ -1,9 +1,11 @@
-use core::{ops::Deref, ptr::NonNull};
+use core::ptr::NonNull;
 
 use block2::{Block, RcBlock};
 use objc2::runtime::ProtocolObject;
 
 use crate::MTLDrawable;
+
+type DrawablePresentedBlock = dyn Fn(NonNull<ProtocolObject<dyn MTLDrawable>>);
 
 /// The presented callback function protocol.
 ///
@@ -14,24 +16,22 @@ use crate::MTLDrawable;
 /// If you want to measure how much frame you can achieve, use GPUStartTime in
 /// the first command buffer of your frame rendering and GPUEndTime of your last
 /// frame rendering to calculate the frame interval.
-pub struct MTLDrawablePresentedHandler(RcBlock<dyn Fn(NonNull<ProtocolObject<dyn MTLDrawable>>)>);
+pub struct MTLDrawablePresentedHandler(RcBlock<DrawablePresentedBlock>);
 
 impl MTLDrawablePresentedHandler {
+    /// Creates a presented callback whose captured state can safely be sent
+    /// to and shared with Metal's callback thread.
     pub fn new<F>(handler: F) -> Self
     where
-        F: Fn(&ProtocolObject<dyn MTLDrawable>) + 'static,
+        F: Fn(&ProtocolObject<dyn MTLDrawable>) + Send + Sync + 'static,
     {
         Self(RcBlock::new(move |drawable_nn: NonNull<ProtocolObject<dyn MTLDrawable>>| {
             let drawable = unsafe { drawable_nn.as_ref() };
             handler(drawable);
         }))
     }
-}
 
-impl Deref for MTLDrawablePresentedHandler {
-    type Target = Block<dyn Fn(NonNull<ProtocolObject<dyn MTLDrawable>>)>;
-
-    fn deref(&self) -> &Self::Target {
+    pub(super) fn as_block(&self) -> &Block<DrawablePresentedBlock> {
         &self.0
     }
 }

@@ -3,9 +3,11 @@ use objc2_foundation::{NSError, NSObjectProtocol, NSString};
 
 use crate::{
     MTLAccelerationStructureCommandEncoder, MTLAccelerationStructurePassDescriptor, MTLBlitCommandEncoder,
-    MTLBlitPassDescriptor, MTLCommandBufferHandler, MTLCommandBufferStatus, MTLCommandQueue, MTLComputeCommandEncoder,
-    MTLComputePassDescriptor, MTLDevice, MTLDispatchType, MTLDrawable, MTLEvent, MTLLogContainer,
-    MTLRenderCommandEncoder, MTLRenderPassDescriptor, MTLResourceStateCommandEncoder, MTLResourceStatePassDescriptor,
+    MTLBlitPassDescriptor, MTLCommandBufferErrorOption, MTLCommandBufferHandler, MTLCommandBufferStatus,
+    MTLCommandQueue, MTLComputeCommandEncoder, MTLComputePassDescriptor, MTLDevice, MTLDispatchType, MTLDrawable,
+    MTLEvent, MTLLogContainer, MTLParallelRenderCommandEncoder, MTLRenderCommandEncoder, MTLRenderPassDescriptor,
+    MTLResidencySet, MTLResourceStateCommandEncoder, MTLResourceStatePassDescriptor, MetalError,
+    util::ref_slice_as_ptr,
 };
 
 extern_protocol!(
@@ -13,9 +15,14 @@ extern_protocol!(
     ///
     /// Availability: macOS 10.11+, iOS 8.0+
     ///
-    /// Thread safety: command buffers are thread-safe — `commit`, `waitUntilCompleted`,
-    /// status queries, and completion handlers may be called from any thread
-    /// (unlike command *encoders*, which are confined to a single thread).
+    /// Thread safety: command buffers are thread-safe. Commit, completion,
+    /// status, and wait operations may be used from different threads; command
+    /// encoders remain single-threaded.
+    ///
+    /// # Safety
+    ///
+    /// Implementors must be Objective-C objects that conform to the
+    /// `MTLCommandBuffer` protocol and uphold its thread-safety contract.
     pub unsafe trait MTLCommandBuffer: NSObjectProtocol + Send + Sync {
         /// The device this resource was created against.
         #[unsafe(method(device))]
@@ -31,6 +38,13 @@ extern_protocol!(
         #[unsafe(method(retainedReferences))]
         #[unsafe(method_family = none)]
         fn retained_references(&self) -> bool;
+
+        /// The options that configure command-buffer error reporting.
+        ///
+        /// Availability: macOS 11.0+, iOS 14.0+
+        #[unsafe(method(errorOptions))]
+        #[unsafe(method_family = none)]
+        fn error_options(&self) -> MTLCommandBufferErrorOption;
 
         /// Append this command buffer to the end of its MTLCommandQueue.
         #[unsafe(method(enqueue))]
@@ -52,11 +66,6 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         fn wait_until_completed(&self);
 
-        /// If an error occurred during execution, the NSError may contain more details about the problem.
-        #[unsafe(method(error))]
-        #[unsafe(method_family = none)]
-        fn error(&self) -> Option<Retained<NSError>>;
-
         /// Status reports the current stage in the lifetime of MTLCommandBuffer,
         /// as it proceeds to enqueued, committed, scheduled, and completed.
         #[unsafe(method(status))]
@@ -77,6 +86,26 @@ extern_protocol!(
         fn present_drawable(
             &self,
             drawable: &ProtocolObject<dyn MTLDrawable>,
+        );
+
+        /// Presents a drawable at a specific host time.
+        #[unsafe(method(presentDrawable:atTime:))]
+        #[unsafe(method_family = none)]
+        fn present_drawable_at_time(
+            &self,
+            drawable: &ProtocolObject<dyn MTLDrawable>,
+            presentation_time: f64,
+        );
+
+        /// Presents a drawable after the previous frame has remained visible for at least `duration` seconds.
+        ///
+        /// Availability: macOS 10.15.4+, iOS 10.3+
+        #[unsafe(method(presentDrawable:afterMinimumDuration:))]
+        #[unsafe(method_family = none)]
+        fn present_drawable_after_minimum_duration(
+            &self,
+            drawable: &ProtocolObject<dyn MTLDrawable>,
+            duration: f64,
         );
 
         /// Encodes a command that pauses execution of this command buffer until the specified event reaches a given value.
@@ -114,6 +143,14 @@ extern_protocol!(
             &self,
             render_pass_descriptor: &MTLRenderPassDescriptor,
         ) -> Option<Retained<ProtocolObject<dyn MTLRenderCommandEncoder>>>;
+
+        /// Returns a parallel render command encoder for the render pass.
+        #[unsafe(method(parallelRenderCommandEncoderWithDescriptor:))]
+        #[unsafe(method_family = none)]
+        fn parallel_render_command_encoder_with_descriptor(
+            &self,
+            render_pass_descriptor: &MTLRenderPassDescriptor,
+        ) -> Option<Retained<ProtocolObject<dyn MTLParallelRenderCommandEncoder>>>;
 
         /// Returns a compute command encoder to encode into this command buffer.
         #[unsafe(method(computeCommandEncoder))]
@@ -176,12 +213,25 @@ extern_protocol!(
         fn acceleration_structure_command_encoder_with_descriptor(
             &self,
             descriptor: &MTLAccelerationStructurePassDescriptor,
-        ) -> Option<Retained<ProtocolObject<dyn MTLAccelerationStructureCommandEncoder>>>;
+        ) -> Retained<ProtocolObject<dyn MTLAccelerationStructureCommandEncoder>>;
+
+        /// Marks a residency set as part of this command buffer's execution.
+        ///
+        /// Availability: macOS 15.0+, iOS 18.0+
+        #[unsafe(method(useResidencySet:))]
+        #[unsafe(method_family = none)]
+        fn use_residency_set(
+            &self,
+            residency_set: &ProtocolObject<dyn MTLResidencySet>,
+        );
     }
 );
 
 #[allow(unused)]
 pub trait MTLCommandBufferExt: MTLCommandBuffer + Message {
+    /// The execution error, if the command buffer failed.
+    fn error(&self) -> Option<MetalError>;
+
     /// A string to help identify this object.
     fn label(&self) -> Option<String>;
     /// Sets a string to help identify this object.
@@ -206,6 +256,13 @@ pub trait MTLCommandBufferExt: MTLCommandBuffer + Message {
     );
     /// Pop the latest named string off of the stack.
     fn pop_debug_group(&self);
+    /// Marks residency sets as part of this command buffer's execution.
+    ///
+    /// Availability: macOS 15.0+, iOS 18.0+
+    fn use_residency_sets(
+        &self,
+        residency_sets: &[&ProtocolObject<dyn MTLResidencySet>],
+    );
     /// The host time, in seconds, when the CPU began scheduling this command buffer for execution.
     ///
     /// Returns `None` if the command buffer has not been scheduled yet.
@@ -229,6 +286,11 @@ pub trait MTLCommandBufferExt: MTLCommandBuffer + Message {
 }
 
 impl MTLCommandBufferExt for ProtocolObject<dyn MTLCommandBuffer> {
+    fn error(&self) -> Option<MetalError> {
+        let error: Option<Retained<NSError>> = unsafe { msg_send![self, error] };
+        error.map(MetalError::from_nserror)
+    }
+
     fn label(&self) -> Option<String> {
         let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
         label.map(|s| s.to_string())
@@ -248,7 +310,7 @@ impl MTLCommandBufferExt for ProtocolObject<dyn MTLCommandBuffer> {
         handler: &MTLCommandBufferHandler,
     ) {
         unsafe {
-            let _: () = msg_send![self, addScheduledHandler: &**handler];
+            let _: () = msg_send![self, addScheduledHandler: handler.as_block()];
         }
     }
 
@@ -257,7 +319,7 @@ impl MTLCommandBufferExt for ProtocolObject<dyn MTLCommandBuffer> {
         handler: &MTLCommandBufferHandler,
     ) {
         unsafe {
-            let _: () = msg_send![self, addCompletedHandler: &**handler];
+            let _: () = msg_send![self, addCompletedHandler: handler.as_block()];
         }
     }
 
@@ -273,6 +335,17 @@ impl MTLCommandBufferExt for ProtocolObject<dyn MTLCommandBuffer> {
     fn pop_debug_group(&self) {
         unsafe {
             let _: () = msg_send![self, popDebugGroup];
+        }
+    }
+
+    fn use_residency_sets(
+        &self,
+        residency_sets: &[&ProtocolObject<dyn MTLResidencySet>],
+    ) {
+        let count = residency_sets.len();
+        let residency_sets = ref_slice_as_ptr(residency_sets);
+        unsafe {
+            let _: () = msg_send![self, useResidencySets: residency_sets, count: count];
         }
     }
 
@@ -300,5 +373,17 @@ impl MTLCommandBufferExt for ProtocolObject<dyn MTLCommandBuffer> {
 
     fn gpu_end_time(&self) -> f64 {
         unsafe { msg_send![self, GPUEndTime] }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::MTLCommandBuffer;
+
+    fn assert_send_sync<T: ?Sized + Send + Sync>() {}
+
+    #[test]
+    fn command_buffer_is_send_and_sync() {
+        assert_send_sync::<dyn MTLCommandBuffer>();
     }
 }

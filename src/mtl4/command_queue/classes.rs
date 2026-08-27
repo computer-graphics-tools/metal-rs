@@ -20,19 +20,16 @@ extern_conformance!(
 );
 
 impl MTL4CommitOptions {
-    extern_methods!(
-        /// Registers a commit feedback handler that Metal calls with feedback data when available.
-        ///
-        /// # Safety
-        ///
-        /// `block` must be a valid pointer.
-        #[unsafe(method(addFeedbackHandler:))]
-        #[unsafe(method_family = none)]
-        pub fn add_feedback_handler(
-            &self,
-            block: MTL4CommitFeedbackHandler,
-        );
-    );
+    /// Registers a commit feedback handler that Metal calls with feedback data
+    /// when available.
+    pub fn add_feedback_handler(
+        &self,
+        handler: &MTL4CommitFeedbackHandler,
+    ) {
+        unsafe {
+            let _: () = msg_send![self, addFeedbackHandler: handler.as_block()];
+        }
+    }
 }
 
 /// Methods declared on superclass `NSObject`.

@@ -4,9 +4,11 @@ use objc2::{Message, extern_protocol, msg_send, runtime::ProtocolObject};
 use objc2_foundation::NSRange;
 
 use super::MTLBlitOption;
+#[cfg(any(target_os = "macos", target_abi = "macabi"))]
+use crate::MTLResource;
 use crate::{
-    MTLBuffer, MTLCommandEncoder, MTLCounterSampleBuffer, MTLFence, MTLIndirectCommandBuffer, MTLResource, MTLTensor,
-    MTLTexture,
+    MTLBuffer, MTLCommandEncoder, MTLCounterSampleBuffer, MTLFence, MTLIndirectCommandBuffer, MTLTensor,
+    MTLTensorPlaneType, MTLTexture,
     types::{MTLOrigin, MTLRegion, MTLSize},
 };
 
@@ -18,6 +20,8 @@ extern_protocol!(
         /// When the device writes to a resource with a storage mode of MTLResourceStorageModeManaged, those writes may be cached (for example, in VRAM or on chip renderer cache),
         /// making any CPU access (either MTLBuffer.contents or -[MTLTexture getBytes:...] and -[MTLTexture replaceRegion:]) produce undefined results.  To allow the CPU to see what the device
         /// has written, a CommandBuffer containing this synchronization must be executed.  After completion of the CommandBuffer, the CPU can access the contents of the resource safely.
+        #[cfg(any(target_os = "macos", target_abi = "macabi"))]
+        #[deprecated(note = "managed storage has no effect on Apple Silicon; use shared storage instead")]
         #[unsafe(method(synchronizeResource:))]
         #[unsafe(method_family = none)]
         fn synchronize_resource(
@@ -28,6 +32,8 @@ extern_protocol!(
         /// Flush any copy of this image from the device's caches, and invalidate CPU caches if needed.
         ///
         /// See the discussion of -synchronizeResource.   -synchronizeTexture:slice:mipmapLevel performs the same role, except it may flush only a subset of the texture storage, rather than the entire texture.
+        #[cfg(any(target_os = "macos", target_abi = "macabi"))]
+        #[deprecated(note = "managed storage has no effect on Apple Silicon; use shared storage instead")]
         #[unsafe(method(synchronizeTexture:slice:level:))]
         #[unsafe(method_family = none)]
         fn synchronize_texture_slice_level(
@@ -200,8 +206,10 @@ extern_protocol!(
             fence: &ProtocolObject<dyn MTLFence>,
         );
 
-        /// Copies tile access counters within specified region into provided buffer
+        /// Copies tile access counters within specified region into provided buffer.
+        #[cfg(any(target_os = "macos", target_abi = "macabi"))]
         #[optional]
+        #[deprecated(note = "access counters are no longer supported in Metal")]
         #[unsafe(method(getTextureAccessCounters:region:mipLevel:slice:resetCounters:countersBuffer:countersBufferOffset:))]
         #[unsafe(method_family = none)]
         fn get_texture_access_counters(
@@ -215,8 +223,37 @@ extern_protocol!(
             counters_buffer_offset: usize,
         );
 
-        /// Resets tile access counters within specified region
+        #[cfg(not(any(target_os = "macos", target_abi = "macabi")))]
+        #[deprecated(note = "access counters are no longer supported in Metal")]
+        #[unsafe(method(getTextureAccessCounters:region:mipLevel:slice:resetCounters:countersBuffer:countersBufferOffset:))]
+        #[unsafe(method_family = none)]
+        fn get_texture_access_counters(
+            &self,
+            texture: &ProtocolObject<dyn MTLTexture>,
+            region: MTLRegion,
+            mip_level: usize,
+            slice: usize,
+            reset_counters: bool,
+            counters_buffer: &ProtocolObject<dyn MTLBuffer>,
+            counters_buffer_offset: usize,
+        );
+
+        /// Resets tile access counters within specified region.
+        #[cfg(any(target_os = "macos", target_abi = "macabi"))]
         #[optional]
+        #[deprecated(note = "access counters are no longer supported in Metal")]
+        #[unsafe(method(resetTextureAccessCounters:region:mipLevel:slice:))]
+        #[unsafe(method_family = none)]
+        fn reset_texture_access_counters(
+            &self,
+            texture: &ProtocolObject<dyn MTLTexture>,
+            region: MTLRegion,
+            mip_level: usize,
+            slice: usize,
+        );
+
+        #[cfg(not(any(target_os = "macos", target_abi = "macabi")))]
+        #[deprecated(note = "access counters are no longer supported in Metal")]
         #[unsafe(method(resetTextureAccessCounters:region:mipLevel:slice:))]
         #[unsafe(method_family = none)]
         fn reset_texture_access_counters(
@@ -286,14 +323,6 @@ extern_protocol!(
             barrier: bool,
         );
 
-        /// @param sampleBuffer The sample buffer to resolve.
-        /// @param range The range of indices to resolve.
-        /// @param destinationBuffer The buffer to resolve values into.
-        /// @param destinationOffset The offset to begin writing values out to.  This must be a multiple of
-        /// the minimum constant buffer alignment.
-        /// @abstract Resolve the counters from the raw buffer to a processed buffer.
-        /// @discussion Samples that encountered an error during resolve will be set to
-        /// MTLCounterErrorValue.
         /// Encodes a command to copy data from a slice of one tensor into a slice of another tensor.
         ///
         /// This command applies reshapes if `sourceTensor` and `destinationTensor` are not aliasable.
@@ -315,11 +344,35 @@ extern_protocol!(
             destination_origin: &crate::tensor::MTLTensorExtents,
             destination_dimensions: &crate::tensor::MTLTensorExtents,
         );
+
+        /// Copies a slice of one tensor plane into a slice of another tensor
+        /// plane.
+        ///
+        /// Origins and dimensions for auxiliary planes use that plane's block
+        /// coordinates. The first dimension of each origin and dimension must
+        /// be byte aligned.
+        #[unsafe(method(copyFromTensor:sourceOrigin:sourceDimensions:sourcePlane:toTensor:destinationOrigin:destinationDimensions:destinationPlane:))]
+        #[unsafe(method_family = none)]
+        fn copy_between_tensor_planes(
+            &self,
+            source_tensor: &ProtocolObject<dyn MTLTensor>,
+            source_origin: &crate::tensor::MTLTensorExtents,
+            source_dimensions: &crate::tensor::MTLTensorExtents,
+            source_plane: MTLTensorPlaneType,
+            destination_tensor: &ProtocolObject<dyn MTLTensor>,
+            destination_origin: &crate::tensor::MTLTensorExtents,
+            destination_dimensions: &crate::tensor::MTLTensorExtents,
+            destination_plane: MTLTensorPlaneType,
+        );
     }
 );
 
 pub trait MTLBlitCommandEncoderExt: MTLBlitCommandEncoder + Message {
     /// Fill a buffer with a fixed value in each byte.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `range.start` exceeds `range.end`.
     fn fill_buffer_range_value(
         &self,
         buffer: &ProtocolObject<dyn MTLBuffer>,
@@ -328,12 +381,17 @@ pub trait MTLBlitCommandEncoderExt: MTLBlitCommandEncoder + Message {
     ) where
         Self: Sized,
     {
+        let range = NSRange::from(range);
         unsafe {
-            let _: () = msg_send![self, fillBuffer: buffer, range: NSRange::from(range), value: value];
+            let _: () = msg_send![self, fillBuffer: buffer, range: range, value: value];
         }
     }
 
     /// Reset commands in an indirect command buffer using the GPU.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `range.start` exceeds `range.end`.
     fn reset_commands_in_buffer(
         &self,
         buffer: &ProtocolObject<dyn MTLIndirectCommandBuffer>,
@@ -341,16 +399,21 @@ pub trait MTLBlitCommandEncoderExt: MTLBlitCommandEncoder + Message {
     ) where
         Self: Sized,
     {
+        let range = NSRange::from(range);
         unsafe {
             let _: () = msg_send![
                 self,
                 resetCommandsInBuffer: buffer,
-                withRange: NSRange::from(range)
+                withRange: range
             ];
         }
     }
 
     /// Copy a region of commands from one indirect command buffer into another.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `source_range.start` exceeds `source_range.end`.
     fn copy_indirect_command_buffer(
         &self,
         source: &ProtocolObject<dyn MTLIndirectCommandBuffer>,
@@ -360,11 +423,12 @@ pub trait MTLBlitCommandEncoderExt: MTLBlitCommandEncoder + Message {
     ) where
         Self: Sized,
     {
+        let source_range = NSRange::from(source_range);
         unsafe {
             let _: () = msg_send![
                 self,
                 copyIndirectCommandBuffer: source,
-                sourceRange: NSRange::from(source_range),
+                sourceRange: source_range,
                 destination: destination,
                 destinationIndex: destination_index
             ];
@@ -372,6 +436,10 @@ pub trait MTLBlitCommandEncoderExt: MTLBlitCommandEncoder + Message {
     }
 
     /// Attempt to improve the performance of a range of commands within an indirect command buffer.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `range.start` exceeds `range.end`.
     fn optimize_indirect_command_buffer(
         &self,
         indirect_command_buffer: &ProtocolObject<dyn MTLIndirectCommandBuffer>,
@@ -379,16 +447,25 @@ pub trait MTLBlitCommandEncoderExt: MTLBlitCommandEncoder + Message {
     ) where
         Self: Sized,
     {
+        let range = NSRange::from(range);
         unsafe {
             let _: () = msg_send![
                 self,
                 optimizeIndirectCommandBuffer: indirect_command_buffer,
-                withRange: NSRange::from(range)
+                withRange: range
             ];
         }
     }
 
-    /// Resolve counters from a sample buffer to a destination buffer.
+    /// Resolves raw counter samples into a destination buffer.
+    ///
+    /// Samples that encountered an error are set to `MTLCounterErrorValue`.
+    /// `destination_offset` must be a multiple of the minimum constant-buffer
+    /// alignment.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `range.start` exceeds `range.end`.
     fn resolve_counters(
         &self,
         sample_buffer: &ProtocolObject<dyn MTLCounterSampleBuffer>,
@@ -398,11 +475,12 @@ pub trait MTLBlitCommandEncoderExt: MTLBlitCommandEncoder + Message {
     ) where
         Self: Sized,
     {
+        let range = NSRange::from(range);
         unsafe {
             let _: () = msg_send![
                 self,
                 resolveCounters: sample_buffer,
-                inRange: NSRange::from(range),
+                inRange: range,
                 destinationBuffer: destination_buffer,
                 destinationOffset: destination_offset
             ];

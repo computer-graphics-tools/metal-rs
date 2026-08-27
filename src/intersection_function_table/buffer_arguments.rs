@@ -20,3 +20,16 @@ unsafe impl Encode for MTLIntersectionFunctionBufferArguments {
 unsafe impl RefEncode for MTLIntersectionFunctionBufferArguments {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
 }
+
+#[cfg(test)]
+mod tests {
+    use core::mem::{align_of, size_of};
+
+    use super::MTLIntersectionFunctionBufferArguments;
+
+    #[test]
+    fn buffer_arguments_match_the_metal_abi() {
+        assert_eq!(size_of::<MTLIntersectionFunctionBufferArguments>(), 24);
+        assert_eq!(align_of::<MTLIntersectionFunctionBufferArguments>(), 8);
+    }
+}

@@ -39,6 +39,8 @@ impl MTLStitchedLibraryDescriptor {
         pub fn options(&self) -> MTLStitchedLibraryOptions;
 
         /// Setter for [`options`][Self::options].
+        ///
+        /// Availability: macOS 15.0+, iOS 18.0+
         #[unsafe(method(setOptions:))]
         #[unsafe(method_family = none)]
         pub fn set_options(

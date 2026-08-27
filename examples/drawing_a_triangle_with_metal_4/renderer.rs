@@ -65,9 +65,7 @@ impl TriangleRenderer {
             let _: () = msg_send![&*metal_layer, setPixelFormat: MTLPixelFormat::BGRA8Unorm];
         }
 
-        let shader_library = device
-            .new_library_with_source(SHADER_SOURCE, None)
-            .map_err(|error| error.localizedDescription().to_string())?;
+        let shader_library = device.new_library_with_source(SHADER_SOURCE, None).map_err(|error| error.to_string())?;
         let vertex_function = shader_library.new_function_with_name("vertex_shader").ok_or("Missing vertex_shader")?;
         let fragment_function =
             shader_library.new_function_with_name("fragment_shader").ok_or("Missing fragment_shader")?;
@@ -81,7 +79,7 @@ impl TriangleRenderer {
             .set_pixel_format(MTLPixelFormat::BGRA8Unorm);
         let render_pipeline_state = device
             .new_render_pipeline_state_with_descriptor(&pipeline_descriptor)
-            .map_err(|error| error.localizedDescription().to_string())?;
+            .map_err(|error| error.to_string())?;
 
         let vertex_buffers: Box<[_]> = (0..MAX_FRAMES_IN_FLIGHT)
             .map(|_| {

@@ -35,11 +35,9 @@ impl MTLSharedTextureHandle {
         #[unsafe(method_family = none)]
         pub fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
     );
-}
 
-#[allow(unused)]
-impl MTLSharedTextureHandle {
-    fn label(&self) -> Option<String> {
+    /// A copy of the original texture's label, if it has one.
+    pub fn label(&self) -> Option<String> {
         let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
         label.map(|label| label.to_string())
     }

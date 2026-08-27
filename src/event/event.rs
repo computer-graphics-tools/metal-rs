@@ -17,11 +17,26 @@ extern_protocol!(
 pub trait MTLEventExt: MTLEvent + Message {
     /// Optional label.
     fn label(&self) -> Option<String>;
+
+    /// Sets the optional debug label.
+    fn set_label(
+        &self,
+        label: Option<&str>,
+    );
 }
 
-impl MTLEventExt for ProtocolObject<dyn MTLEvent> {
+impl<T: MTLEvent + Message + ?Sized> MTLEventExt for T {
     fn label(&self) -> Option<String> {
         let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
         label.map(|s| s.to_string())
+    }
+
+    fn set_label(
+        &self,
+        label: Option<&str>,
+    ) {
+        unsafe {
+            let _: () = msg_send![self, setLabel: label.map(NSString::from_str).as_deref()];
+        }
     }
 }

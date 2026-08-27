@@ -32,16 +32,15 @@ extern_conformance!(
     unsafe impl NSObjectProtocol for MTLFunctionStitchingFunctionNode {}
 );
 
-#[allow(unused)]
 impl MTLFunctionStitchingFunctionNode {
     /// The name of the function to call.
-    fn name(&self) -> String {
+    pub fn name(&self) -> String {
         let s: Retained<NSString> = unsafe { msg_send![self, name] };
         s.to_string()
     }
 
     /// Setter for [`name`][Self::name].
-    fn set_name(
+    pub fn set_name(
         &self,
         name: &str,
     ) {
@@ -50,7 +49,7 @@ impl MTLFunctionStitchingFunctionNode {
         }
     }
 
-    fn arguments(&self) -> Box<[Retained<ProtocolObject<dyn MTLFunctionStitchingNode>>]> {
+    pub fn arguments(&self) -> Box<[Retained<ProtocolObject<dyn MTLFunctionStitchingNode>>]> {
         let array: Retained<NSArray<ProtocolObject<dyn MTLFunctionStitchingNode>>> =
             unsafe { msg_send![self, arguments] };
         array.to_vec().into_boxed_slice()
@@ -67,7 +66,7 @@ impl MTLFunctionStitchingFunctionNode {
         }
     }
 
-    fn control_dependencies(&self) -> Box<[Retained<MTLFunctionStitchingFunctionNode>]> {
+    pub fn control_dependencies(&self) -> Box<[Retained<MTLFunctionStitchingFunctionNode>]> {
         let array: Retained<NSArray<MTLFunctionStitchingFunctionNode>> =
             unsafe { msg_send![self, controlDependencies] };
         array.to_vec().into_boxed_slice()
@@ -84,6 +83,27 @@ impl MTLFunctionStitchingFunctionNode {
         }
     }
 
+    /// Initializes a function node with its call and dependency graph.
+    pub fn init_with_name_arguments_control_dependencies(
+        this: Allocated<Self>,
+        name: &str,
+        arguments: &[&ProtocolObject<dyn MTLFunctionStitchingNode>],
+        control_dependencies: &[&MTLFunctionStitchingFunctionNode],
+    ) -> Retained<Self> {
+        let name = NSString::from_str(name);
+        let arguments = NSArray::from_slice(arguments);
+        let control_dependencies = NSArray::from_slice(control_dependencies);
+        unsafe {
+            msg_send![
+                this,
+                initWithName: &*name,
+                arguments: &*arguments,
+                controlDependencies: &*control_dependencies,
+            ]
+        }
+    }
+
+    /// Creates a function node with its call and dependency graph.
     pub fn new(
         name: &str,
         arguments: &[&ProtocolObject<dyn MTLFunctionStitchingNode>],
@@ -91,13 +111,6 @@ impl MTLFunctionStitchingFunctionNode {
     ) -> Retained<Self> {
         let class = Self::class();
         let allocated: Allocated<Self> = unsafe { msg_send![class, alloc] };
-        unsafe {
-            msg_send![
-                allocated,
-                initWithName: &*NSString::from_str(name),
-                arguments: &*NSArray::from_slice(arguments),
-                controlDependencies: &*NSArray::from_slice(control_dependencies),
-            ]
-        }
+        Self::init_with_name_arguments_control_dependencies(allocated, name, arguments, control_dependencies)
     }
 }

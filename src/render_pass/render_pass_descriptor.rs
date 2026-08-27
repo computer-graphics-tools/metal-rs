@@ -1,5 +1,5 @@
 use objc2::{
-    extern_class, extern_conformance, extern_methods,
+    extern_class, extern_conformance, extern_methods, msg_send,
     rc::{Allocated, Retained},
     runtime::{NSObject, ProtocolObject},
 };
@@ -173,26 +173,6 @@ impl MTLRenderPassDescriptor {
             height: usize,
         );
 
-        /// Configure custom sample positions for MSAA.
-        /// Safety: `positions` must be a valid pointer or null.
-        #[unsafe(method(setSamplePositions:count:))]
-        #[unsafe(method_family = none)]
-        pub fn set_sample_positions(
-            &self,
-            positions: *const MTLSamplePosition,
-            count: usize,
-        );
-
-        /// Retrieve previously configured custom sample positions.
-        /// Safety: `positions` must be a valid pointer or null.
-        #[unsafe(method(getSamplePositions:count:))]
-        #[unsafe(method_family = none)]
-        pub fn get_sample_positions(
-            &self,
-            positions: *mut MTLSamplePosition,
-            count: usize,
-        ) -> usize;
-
         /// The variable rasterization rate map for this pass.
         #[unsafe(method(rasterizationRateMap))]
         #[unsafe(method_family = none)]
@@ -223,7 +203,46 @@ impl MTLRenderPassDescriptor {
             &self,
             v: MTLVisibilityResultType,
         );
+
+        /// Whether this render pass supports color attachment mapping.
+        #[unsafe(method(supportColorAttachmentMapping))]
+        #[unsafe(method_family = none)]
+        pub fn support_color_attachment_mapping(&self) -> bool;
+
+        /// Setter for [`support_color_attachment_mapping`][Self::support_color_attachment_mapping].
+        #[unsafe(method(setSupportColorAttachmentMapping:))]
+        #[unsafe(method_family = none)]
+        pub fn set_support_color_attachment_mapping(
+            &self,
+            enabled: bool,
+        );
     );
+}
+
+impl MTLRenderPassDescriptor {
+    /// Configures custom sample positions for multisample rendering.
+    ///
+    /// Pass an empty slice to disable custom sample positions. The slice length
+    /// must otherwise be a sample count supported by the device.
+    pub fn set_sample_positions(
+        &self,
+        positions: &[MTLSamplePosition],
+    ) {
+        unsafe {
+            let _: () = msg_send![self, setSamplePositions: positions.as_ptr(), count: positions.len()];
+        }
+    }
+
+    /// Reads configured custom sample positions into `positions`.
+    ///
+    /// Metal only writes to the slice when it is large enough. The return value
+    /// is the number of configured positions and may exceed `positions.len()`.
+    pub fn get_sample_positions(
+        &self,
+        positions: &mut [MTLSamplePosition],
+    ) -> usize {
+        unsafe { msg_send![self, getSamplePositions: positions.as_mut_ptr(), count: positions.len()] }
+    }
 }
 
 impl MTLRenderPassDescriptor {

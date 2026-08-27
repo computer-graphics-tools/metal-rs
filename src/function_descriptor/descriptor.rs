@@ -114,7 +114,7 @@ impl MTLFunctionDescriptor {
     }
 
     /// Binary archives to be searched for precompiled functions during the compilation of this function.
-    fn binary_archives(&self) -> Option<Box<[Retained<ProtocolObject<dyn MTLBinaryArchive>>]>> {
+    pub fn binary_archives(&self) -> Option<Box<[Retained<ProtocolObject<dyn MTLBinaryArchive>>]>> {
         let array: Option<Retained<NSArray<ProtocolObject<dyn MTLBinaryArchive>>>> =
             unsafe { msg_send![self, binaryArchives] };
         array.map(|a| a.to_vec().into_boxed_slice())
@@ -125,7 +125,7 @@ impl MTLFunctionDescriptor {
         &self,
         archives: Option<&[&ProtocolObject<dyn MTLBinaryArchive>]>,
     ) {
-        let archives = archives.map(|archives| NSArray::from_slice(archives));
+        let archives = archives.map(NSArray::from_slice);
         unsafe {
             let _: () = msg_send![self, setBinaryArchives: archives.as_deref()];
         }

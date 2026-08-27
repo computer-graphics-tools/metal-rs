@@ -276,17 +276,22 @@ impl MTL4RenderPassDescriptor {
 impl MTL4RenderPassDescriptor {
     /// Configures the custom sample positions for MSAA rendering. Pass an empty slice to
     /// disable custom sample positions. The slice length must be a valid sample count.
-    pub fn set_sample_positions(&self, positions: &[MTLSamplePosition]) {
+    pub fn set_sample_positions(
+        &self,
+        positions: &[MTLSamplePosition],
+    ) {
         unsafe {
-            let _: () =
-                msg_send![self, setSamplePositions: positions.as_ptr(), count: positions.len()];
+            let _: () = msg_send![self, setSamplePositions: positions.as_ptr(), count: positions.len()];
         }
     }
 
     /// Reads the previously-configured custom sample positions into `positions`. Metal only
     /// fills the slice if it is large enough to hold every position. Returns the total number
     /// of positions Metal currently has configured (which may exceed `positions.len()`).
-    pub fn get_sample_positions(&self, positions: &mut [MTLSamplePosition]) -> usize {
+    pub fn get_sample_positions(
+        &self,
+        positions: &mut [MTLSamplePosition],
+    ) -> usize {
         unsafe { msg_send![self, getSamplePositions: positions.as_mut_ptr(), count: positions.len()] }
     }
 }

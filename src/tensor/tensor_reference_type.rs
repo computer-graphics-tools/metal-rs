@@ -1,12 +1,13 @@
-use objc2::{extern_class, extern_methods, rc::Retained, runtime::NSObject};
+use objc2::{extern_class, extern_methods, msg_send, rc::Retained, runtime::NSObject};
+use objc2_foundation::NSArray;
 
-use crate::{MTLBindingAccess, MTLDataType, MTLTensorDataType, MTLTensorExtents};
+use crate::{MTLBindingAccess, MTLDataType, MTLTensorAuxiliaryPlaneType, MTLTensorDataType, MTLTensorExtents, MTLType};
 
 extern_class!(
     /// An object that represents a tensor in the shading language in a struct or array.
     ///
     /// Availability: macOS 26.0+, iOS 26.0+
-    #[unsafe(super(NSObject))]
+    #[unsafe(super(MTLType, NSObject))]
     #[derive(Debug, PartialEq, Eq, Hash)]
     pub struct MTLTensorReferenceType;
 );
@@ -36,4 +37,26 @@ impl MTLTensorReferenceType {
         #[unsafe(method_family = none)]
         pub fn access(&self) -> MTLBindingAccess;
     );
+
+    /// The auxiliary planes that this tensor reference requires.
+    ///
+    /// Availability: macOS 27.0+, iOS 27.0+
+    pub fn auxiliary_planes(&self) -> Box<[Retained<MTLTensorAuxiliaryPlaneType>]> {
+        let planes: Retained<NSArray<MTLTensorAuxiliaryPlaneType>> = unsafe { msg_send![self, auxiliaryPlanes] };
+        planes.to_vec().into_boxed_slice()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use objc2::rc::Retained;
+
+    use super::MTLTensorReferenceType;
+    use crate::MTLTensorAuxiliaryPlaneType;
+
+    #[test]
+    fn collection_method_has_rust_native_signature() {
+        let _: fn(&MTLTensorReferenceType) -> Box<[Retained<MTLTensorAuxiliaryPlaneType>]> =
+            MTLTensorReferenceType::auxiliary_planes;
+    }
 }

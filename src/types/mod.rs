@@ -11,4 +11,7 @@ pub use sample_position::MTLSamplePosition;
 pub use size::MTLSize;
 
 /// A floating point coordinate in an abstract 2D space.
-pub type Coordinate2D = MTLSamplePosition;
+pub type MTLCoordinate2D = MTLSamplePosition;
+
+/// Backwards-compatible alias for [`MTLCoordinate2D`].
+pub type Coordinate2D = MTLCoordinate2D;

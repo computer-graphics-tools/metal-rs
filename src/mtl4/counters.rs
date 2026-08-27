@@ -190,17 +190,18 @@ pub trait MTL4CounterHeapExt: MTL4CounterHeap + Message {
     /// retrieve the data correctly. You can alternatively resolve the heap data in the GPU timeline by calling
     /// ``MTL4CommandBuffer/resolveCounterHeap:withRange:intoBuffer:waitFence:updateFence:``.
     ///
-    /// - Note: When resolving counters in the CPU timeline, signaling an instance of ``MTLSharedEvent`` after any workloads
+    /// Note: When resolving counters in the CPU timeline, signaling an instance of ``MTLSharedEvent`` after any workloads
     /// write counters (and waiting on that signal on the CPU) is sufficient to ensure synchronization.
     ///
-    /// - Parameter range: The range in the heap to resolve.
-    /// - Returns a newly allocated autoreleased NSData containing tightly packed resolved heap counter values.
+    /// The `range` parameter selects the heap entries to resolve.
+    /// Returns tightly packed resolved counter values.
     fn resolve_counter_range(
         &self,
         range: Range<usize>,
-    ) -> Option<Retained<NSData>> {
+    ) -> Option<Box<[u8]>> {
         let ns_range = NSRange::from(range);
-        unsafe { msg_send![self, resolveCounterRange: ns_range] }
+        let data: Option<Retained<NSData>> = unsafe { msg_send![self, resolveCounterRange: ns_range] };
+        data.map(|data| data.to_vec().into_boxed_slice())
     }
 
     /// Invalidates a range of entries in this counter heap.

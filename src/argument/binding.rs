@@ -1,13 +1,15 @@
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::{NSObjectProtocol, NSString};
+use objc2_foundation::{NSArray, NSObjectProtocol, NSString};
 
-use crate::{MTLDataType, MTLTensorDataType, MTLTensorExtents, MTLTextureType};
+use crate::{MTLDataType, MTLTensorAuxiliaryPlaneType, MTLTensorDataType, MTLTensorExtents, MTLTextureType};
 
 extern_protocol!(
     /// Describes a resource binding.
     ///
+    /// Metal declares this protocol as `NS_SWIFT_SENDABLE`.
+    ///
     /// Availability: macOS 13.0+, iOS 16.0+
-    pub unsafe trait MTLBinding: NSObjectProtocol {
+    pub unsafe trait MTLBinding: NSObjectProtocol + Send + Sync {
         /// Type of the binding.
         #[unsafe(method(type))]
         #[unsafe(method_family = none)]
@@ -151,3 +153,32 @@ extern_protocol!(
         fn dimensions(&self) -> Option<Retained<MTLTensorExtents>>;
     }
 );
+
+/// Rust-native accessors for tensor bindings.
+pub trait MTLTensorBindingExt: MTLTensorBinding + Message {
+    /// The tensor's auxiliary plane requirements.
+    ///
+    /// Availability: macOS 27.0+, iOS 27.0+
+    fn auxiliary_planes(&self) -> Box<[Retained<MTLTensorAuxiliaryPlaneType>]>;
+}
+
+impl MTLTensorBindingExt for ProtocolObject<dyn MTLTensorBinding> {
+    fn auxiliary_planes(&self) -> Box<[Retained<MTLTensorAuxiliaryPlaneType>]> {
+        let planes: Retained<NSArray<MTLTensorAuxiliaryPlaneType>> = unsafe { msg_send![self, auxiliaryPlanes] };
+        planes.to_vec().into_boxed_slice()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use objc2::{rc::Retained, runtime::ProtocolObject};
+
+    use super::{MTLTensorBinding, MTLTensorBindingExt};
+    use crate::MTLTensorAuxiliaryPlaneType;
+
+    #[test]
+    fn tensor_collection_method_has_rust_native_signature() {
+        let _: fn(&ProtocolObject<dyn MTLTensorBinding>) -> Box<[Retained<MTLTensorAuxiliaryPlaneType>]> =
+            <ProtocolObject<dyn MTLTensorBinding> as MTLTensorBindingExt>::auxiliary_planes;
+    }
+}

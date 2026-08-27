@@ -3,8 +3,7 @@ use core::ops::Range;
 use objc2::{Message, extern_protocol, msg_send, runtime::ProtocolObject};
 use objc2_foundation::NSRange;
 
-use crate::util::opt_ref_slice_as_ptr;
-use crate::{MTLFunctionHandle, MTLResource, MTLResourceID};
+use crate::{MTLFunctionHandle, MTLResource, MTLResourceID, util::opt_ref_slice_as_ptr};
 
 extern_protocol!(
     /// Apple's documentation: `https://developer.apple.com/documentation/metal/mtlvisiblefunctiontable?language=objc`

@@ -1,4 +1,16 @@
 use objc2::{Encode, Encoding, RefEncode};
+use objc2_foundation::NSErrorDomain;
+
+unsafe extern "C" {
+    /// The error domain for errors that occur while creating a tensor.
+    static MTLTensorDomain: &'static NSErrorDomain;
+}
+
+/// Returns the error domain for errors that occur while creating a tensor.
+#[inline]
+pub fn tensor_error_domain() -> String {
+    unsafe { MTLTensorDomain }.to_string()
+}
 
 /// The error codes that Metal can raise when you create a tensor (from `MTLTensorError`).
 #[repr(i64)]

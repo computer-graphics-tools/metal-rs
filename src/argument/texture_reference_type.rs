@@ -1,12 +1,12 @@
 use objc2::{extern_class, extern_methods, runtime::NSObject};
 
-use crate::MTLDataType;
+use crate::{MTLDataType, MTLType};
 
 extern_class!(
     /// Reflection for a texture reference type.
     ///
     /// Availability: macOS 10.13+, iOS 11.0+
-    #[unsafe(super(NSObject))]
+    #[unsafe(super(MTLType, NSObject))]
     #[derive(Debug, PartialEq, Eq, Hash)]
     pub struct MTLTextureReferenceType;
 );

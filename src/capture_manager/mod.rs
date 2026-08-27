@@ -5,5 +5,5 @@ mod manager;
 
 pub use capture_destination::MTLCaptureDestination;
 pub use capture_error::{MTLCaptureError, capture_error_domain};
-pub use descriptor::MTLCaptureDescriptor;
+pub use descriptor::{MTLCaptureDescriptor, MTLCaptureTarget, UnknownMTLCaptureTarget};
 pub use manager::MTLCaptureManager;

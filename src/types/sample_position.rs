@@ -8,6 +8,22 @@ pub struct MTLSamplePosition {
     pub y: f32,
 }
 
+impl MTLSamplePosition {
+    /// Creates a sample position or two-dimensional coordinate.
+    ///
+    /// This is the Rust equivalent of Metal's `MTLSamplePositionMake` and
+    /// `MTLCoordinate2DMake` inline helpers.
+    pub const fn new(
+        x: f32,
+        y: f32,
+    ) -> Self {
+        Self {
+            x,
+            y,
+        }
+    }
+}
+
 unsafe impl Encode for MTLSamplePosition {
     const ENCODING: Encoding = Encoding::Struct("?", &[f32::ENCODING, f32::ENCODING]);
 }

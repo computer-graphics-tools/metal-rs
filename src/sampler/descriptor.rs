@@ -10,6 +10,7 @@ use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol, NSString};
 use super::{
     MTLSamplerAddressMode, MTLSamplerBorderColor, MTLSamplerMinMagFilter, MTLSamplerMipFilter, MTLSamplerReductionMode,
 };
+use crate::MTLCompareFunction;
 
 extern_class!(
     /// A mutable descriptor used to configure a sampler.
@@ -184,6 +185,19 @@ impl MTLSamplerDescriptor {
         pub fn set_lod_bias(
             &self,
             v: c_float,
+        );
+
+        /// The comparison function used when sampling shadow maps.
+        #[unsafe(method(compareFunction))]
+        #[unsafe(method_family = none)]
+        pub fn compare_function(&self) -> MTLCompareFunction;
+
+        /// Sets the comparison function used when sampling shadow maps.
+        #[unsafe(method(setCompareFunction:))]
+        #[unsafe(method_family = none)]
+        pub fn set_compare_function(
+            &self,
+            compare_function: MTLCompareFunction,
         );
 
         #[unsafe(method(supportArgumentBuffers))]

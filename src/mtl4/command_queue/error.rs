@@ -1,5 +1,5 @@
 use objc2::encode::{Encode, Encoding, RefEncode};
-use objc2_foundation::{NSErrorDomain};
+use objc2_foundation::NSErrorDomain;
 
 /// Enumeration of kinds of errors that committing an array of command buffers instances can produce.
 ///
@@ -23,6 +23,7 @@ impl MTL4CommandQueueError {
     pub const OUT_OF_MEMORY: Self = Self(3);
     /// Indicates the physical removal of the GPU before the command buffer completed.
     #[doc(alias = "MTL4CommandQueueErrorDeviceRemoved")]
+    #[deprecated(note = "this error cannot occur on Apple Silicon")]
     pub const DEVICE_REMOVED: Self = Self(4);
     /// Indicates that the system revokes GPU access because it’s responsible for too many timeouts or hangs.
     #[doc(alias = "MTL4CommandQueueErrorAccessRevoked")]
@@ -42,5 +43,10 @@ unsafe impl RefEncode for MTL4CommandQueueError {
 
 unsafe extern "C" {
     /// [Apple's documentation](https://developer.apple.com/documentation/metal/mtl4commandqueueerrordomain?language=objc)
-    pub static MTL4CommandQueueErrorDomain: &'static NSErrorDomain;
+    static MTL4CommandQueueErrorDomain: &'static NSErrorDomain;
+}
+
+/// Returns the error domain for Metal 4 command-queue failures.
+pub fn mtl4_command_queue_error_domain() -> String {
+    unsafe { MTL4CommandQueueErrorDomain }.to_string()
 }

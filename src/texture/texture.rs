@@ -4,9 +4,12 @@ use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolO
 use objc2_foundation::NSRange;
 use objc2_io_surface::IOSurfaceRef;
 
+#[cfg(target_os = "macos")]
+use crate::MTLDevice;
 use crate::{
-    MTLBuffer, MTLDevice, MTLPixelFormat, MTLRegion, MTLResource, MTLResourceID, MTLSharedTextureHandle,
+    MTLBuffer, MTLPixelFormat, MTLRegion, MTLResource, MTLResourceID, MTLSharedTextureHandle,
     MTLTextureCompressionType, MTLTextureSparseTier, MTLTextureSwizzleChannels, MTLTextureType, MTLTextureUsage,
+    MTLTextureViewDescriptor,
 };
 
 extern_protocol!(
@@ -133,18 +136,36 @@ extern_protocol!(
 
         /// For sparse textures this property returns index of first mipmap that is packed in tail.
         /// Mapping this mipmap level will map all subsequent mipmap levels.
+        #[cfg(target_os = "macos")]
         #[optional]
         #[unsafe(method(firstMipmapInTail))]
         #[unsafe(method_family = none)]
         fn first_mipmap_in_tail(&self) -> usize;
 
+        #[cfg(not(target_os = "macos"))]
+        #[unsafe(method(firstMipmapInTail))]
+        #[unsafe(method_family = none)]
+        fn first_mipmap_in_tail(&self) -> usize;
+
         /// Amount of memory in bytes required to map sparse texture tail.
+        #[cfg(target_os = "macos")]
         #[optional]
         #[unsafe(method(tailSizeInBytes))]
         #[unsafe(method_family = none)]
         fn tail_size_in_bytes(&self) -> usize;
 
+        #[cfg(not(target_os = "macos"))]
+        #[unsafe(method(tailSizeInBytes))]
+        #[unsafe(method_family = none)]
+        fn tail_size_in_bytes(&self) -> usize;
+
+        #[cfg(target_os = "macos")]
         #[optional]
+        #[unsafe(method(isSparse))]
+        #[unsafe(method_family = none)]
+        fn is_sparse(&self) -> bool;
+
+        #[cfg(not(target_os = "macos"))]
         #[unsafe(method(isSparse))]
         #[unsafe(method_family = none)]
         fn is_sparse(&self) -> bool;
@@ -170,9 +191,10 @@ extern_protocol!(
 
         /// Convenience for getBytes:bytesPerRow:bytesPerImage:fromRegion:mipmapLevel:slice: that doesn't require slice related arguments
         ///
-        /// # Safety
-        ///
-        /// `pixel_bytes` must be a valid pointer.
+        /// `pixel_bytes` must be writable for the full destination layout
+        /// described by `region` and `bytes_per_row`, and remain valid for the
+        /// duration of the call. The region and mip level must belong to this
+        /// texture, and the row stride must satisfy the pixel format's rules.
         #[unsafe(method(getBytes:bytesPerRow:fromRegion:mipmapLevel:))]
         #[unsafe(method_family = none)]
         fn get_bytes(
@@ -185,9 +207,10 @@ extern_protocol!(
 
         /// Copies a block of pixels from a texture slice into the application's memory.
         ///
-        /// # Safety
-        ///
-        /// `pixel_bytes` must be a valid pointer.
+        /// `pixel_bytes` must be writable for the full destination layout
+        /// described by the region and strides, and remain valid for the
+        /// duration of the call. The region, mip level, slice, and strides must
+        /// satisfy this texture's type and pixel format.
         #[unsafe(method(getBytes:bytesPerRow:bytesPerImage:fromRegion:mipmapLevel:slice:))]
         #[unsafe(method_family = none)]
         fn get_bytes_bytes_with_bytes_per_image_slice(
@@ -202,9 +225,10 @@ extern_protocol!(
 
         /// Convenience for replaceRegion:mipmapLevel:slice:withBytes:bytesPerRow:bytesPerImage: that doesn't require slice related arguments
         ///
-        /// # Safety
-        ///
-        /// `pixel_bytes` must be a valid pointer.
+        /// `pixel_bytes` must be readable for the full source layout described
+        /// by `region` and `bytes_per_row`, and remain valid for the duration
+        /// of the call. The region and mip level must belong to this texture,
+        /// and the row stride must satisfy the pixel format's rules.
         #[unsafe(method(replaceRegion:mipmapLevel:withBytes:bytesPerRow:))]
         #[unsafe(method_family = none)]
         fn replace_region(
@@ -217,9 +241,10 @@ extern_protocol!(
 
         /// Copy a block of pixel data from the caller's pointer into a texture slice.
         ///
-        /// # Safety
-        ///
-        /// `pixel_bytes` must be a valid pointer.
+        /// `pixel_bytes` must be readable for the full source layout described
+        /// by the region and strides, and remain valid for the duration of the
+        /// call. The region, mip level, slice, and strides must satisfy this
+        /// texture's type and pixel format.
         #[unsafe(method(replaceRegion:mipmapLevel:slice:withBytes:bytesPerRow:bytesPerImage:))]
         #[unsafe(method_family = none)]
         fn replace_region_with_slice_bytes_per_image(
@@ -245,13 +270,27 @@ extern_protocol!(
         #[unsafe(method_family = new)]
         fn new_shared_texture_handle(&self) -> Option<Retained<MTLSharedTextureHandle>>;
 
+        /// Creates a texture view using the compatible properties in `descriptor`.
+        ///
+        /// Availability: macOS 26.0+, iOS 26.0+
+        #[unsafe(method(newTextureViewWithDescriptor:))]
+        #[unsafe(method_family = new)]
+        fn new_texture_view_with_descriptor(
+            &self,
+            descriptor: &MTLTextureViewDescriptor,
+        ) -> Option<Retained<ProtocolObject<dyn MTLTexture>>>;
+
         /// For Metal texture objects that are remote views, this returns the texture associated with the storage on the originating device.
+        #[cfg(target_os = "macos")]
+        #[deprecated(note = "not applicable on Apple Silicon")]
         #[unsafe(method(remoteStorageTexture))]
         #[unsafe(method_family = none)]
         fn remote_storage_texture(&self) -> Option<Retained<ProtocolObject<dyn MTLTexture>>>;
 
         /// On Metal devices that support peer to peer transfers, this method is used to create a remote texture view on another device
         /// within the peer group.  The receiver must use MTLStorageModePrivate or be backed by an IOSurface.
+        #[cfg(target_os = "macos")]
+        #[deprecated(note = "not applicable on Apple Silicon")]
         #[unsafe(method(newRemoteTextureViewForDevice:))]
         #[unsafe(method_family = new)]
         fn new_remote_texture_view_for_device(
@@ -301,13 +340,15 @@ impl TextureExt for ProtocolObject<dyn MTLTexture> {
         level_range: Range<usize>,
         slice_range: Range<usize>,
     ) -> Option<Retained<ProtocolObject<dyn MTLTexture>>> {
+        let level_range = NSRange::from(level_range);
+        let slice_range = NSRange::from(slice_range);
         unsafe {
             msg_send![
                 self,
                 newTextureViewWithPixelFormat: pixel_format,
                 textureType: texture_type,
-                levels: Into::<NSRange>::into(level_range),
-                slices: Into::<NSRange>::into(slice_range),
+                levels: level_range,
+                slices: slice_range,
             ]
         }
     }
@@ -320,13 +361,15 @@ impl TextureExt for ProtocolObject<dyn MTLTexture> {
         slice_range: Range<usize>,
         swizzle: MTLTextureSwizzleChannels,
     ) -> Option<Retained<ProtocolObject<dyn MTLTexture>>> {
+        let level_range = NSRange::from(level_range);
+        let slice_range = NSRange::from(slice_range);
         unsafe {
             msg_send![
                 self,
                 newTextureViewWithPixelFormat: pixel_format,
                 textureType: texture_type,
-                levels: Into::<NSRange>::into(level_range),
-                slices: Into::<NSRange>::into(slice_range),
+                levels: level_range,
+                slices: slice_range,
                 swizzle: swizzle,
             ]
         }

@@ -29,7 +29,11 @@ unsafe impl RefEncode for MTLTextureSwizzleChannels {
 }
 
 impl MTLTextureSwizzleChannels {
-    pub fn new(
+    /// Creates a channel mapping.
+    ///
+    /// This is the Rust equivalent of Metal's
+    /// `MTLTextureSwizzleChannelsMake` inline helper.
+    pub const fn new(
         red: MTLTextureSwizzle,
         green: MTLTextureSwizzle,
         blue: MTLTextureSwizzle,
@@ -42,15 +46,14 @@ impl MTLTextureSwizzleChannels {
             alpha,
         }
     }
+
+    /// Metal's default red, green, blue, alpha channel mapping.
+    pub const DEFAULT: Self =
+        Self::new(MTLTextureSwizzle::Red, MTLTextureSwizzle::Green, MTLTextureSwizzle::Blue, MTLTextureSwizzle::Alpha);
 }
 
 impl Default for MTLTextureSwizzleChannels {
     fn default() -> Self {
-        Self {
-            red: MTLTextureSwizzle::Red,
-            green: MTLTextureSwizzle::Green,
-            blue: MTLTextureSwizzle::Blue,
-            alpha: MTLTextureSwizzle::Alpha,
-        }
+        Self::DEFAULT
     }
 }

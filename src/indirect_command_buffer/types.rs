@@ -47,10 +47,46 @@ pub struct MTLIndirectCommandBufferExecutionRange {
     pub length: u32,
 }
 
+impl MTLIndirectCommandBufferExecutionRange {
+    /// Creates an indirect command buffer execution range.
+    ///
+    /// This is the Rust equivalent of Metal's
+    /// `MTLIndirectCommandBufferExecutionRangeMake` inline helper.
+    pub const fn new(
+        location: u32,
+        length: u32,
+    ) -> Self {
+        Self {
+            location,
+            length,
+        }
+    }
+}
+
 unsafe impl Encode for MTLIndirectCommandBufferExecutionRange {
     const ENCODING: Encoding = Encoding::Struct("?", &[u32::ENCODING, u32::ENCODING]);
 }
 
 unsafe impl RefEncode for MTLIndirectCommandBufferExecutionRange {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
+}
+
+#[cfg(test)]
+mod tests {
+    use core::mem::{align_of, size_of};
+
+    use super::*;
+
+    #[test]
+    fn execution_range_matches_metal_layout() {
+        assert_eq!(
+            MTLIndirectCommandBufferExecutionRange::new(3, 7),
+            MTLIndirectCommandBufferExecutionRange {
+                location: 3,
+                length: 7,
+            }
+        );
+        assert_eq!(size_of::<MTLIndirectCommandBufferExecutionRange>(), 2 * size_of::<u32>());
+        assert_eq!(align_of::<MTLIndirectCommandBufferExecutionRange>(), align_of::<u32>());
+    }
 }

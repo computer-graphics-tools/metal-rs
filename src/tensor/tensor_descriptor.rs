@@ -5,7 +5,7 @@ use objc2::{
 };
 use objc2_foundation::{CopyingHelper, NSCopying, NSObjectProtocol};
 
-use super::{MTLTensorDataType, MTLTensorExtents, MTLTensorUsage};
+use super::{MTLTensorAuxiliaryPlaneDescriptorMap, MTLTensorDataType, MTLTensorExtents, MTLTensorUsage};
 use crate::{MTLCPUCacheMode, MTLHazardTrackingMode, MTLResourceOptions, MTLStorageMode};
 
 extern_class!(
@@ -93,6 +93,22 @@ impl MTLTensorDescriptor {
         pub fn set_usage(
             &self,
             usage: MTLTensorUsage,
+        );
+
+        /// The auxiliary-plane configurations for tensors created with this descriptor.
+        ///
+        /// `None` creates a single-plane tensor. Multi-plane tensors do not support machine
+        /// learning usage, data-plane element types larger than one byte, or rank-zero extents.
+        #[unsafe(method(auxiliaryPlanes))]
+        #[unsafe(method_family = none)]
+        pub fn auxiliary_planes(&self) -> Option<Retained<MTLTensorAuxiliaryPlaneDescriptorMap>>;
+
+        /// Setter for [`auxiliary_planes`][Self::auxiliary_planes].
+        #[unsafe(method(setAuxiliaryPlanes:))]
+        #[unsafe(method_family = none)]
+        pub fn set_auxiliary_planes(
+            &self,
+            auxiliary_planes: Option<&MTLTensorAuxiliaryPlaneDescriptorMap>,
         );
 
         /// A packed set of the `storageMode`, `cpuCacheMode` and `hazardTrackingMode` properties.

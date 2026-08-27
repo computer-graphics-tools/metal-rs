@@ -22,17 +22,24 @@ extern_protocol!(
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
         fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
-
-        /// Queries the optional debug label of this resource view pool.
-        #[unsafe(method(label))]
-        #[unsafe(method_family = none)]
-        fn label(&self) -> Option<Retained<NSString>>;
     }
 );
 
 #[allow(unused)]
 pub trait MTLResourceViewPoolExt: MTLResourceViewPool + Message {
+    /// Queries the optional debug label of this resource-view pool.
+    fn label(&self) -> Option<String>
+    where
+        Self: Sized,
+    {
+        let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
+        label.map(|label| label.to_string())
+    }
+
     /// Copies a range of resource views from a source view pool to a destination location in this view pool.
+    ///
+    /// `source_range` needs to be within `source_pool`, and the destination
+    /// range beginning at `destination_index` needs to be within `self`.
     fn copy_resource_views_from_pool(
         &self,
         source_pool: &ProtocolObject<dyn MTLResourceViewPool>,
@@ -42,11 +49,12 @@ pub trait MTLResourceViewPoolExt: MTLResourceViewPool + Message {
     where
         Self: Sized,
     {
+        let source_range = NSRange::from(source_range);
         unsafe {
             msg_send![
                 self,
                 copyResourceViewsFromPool: source_pool,
-                sourceRange: NSRange::from(source_range),
+                sourceRange: source_range,
                 destinationIndex: destination_index
             ]
         }

@@ -1,8 +1,10 @@
 mod render_command_encoder;
 mod types;
 
-pub use render_command_encoder::MTLRenderCommandEncoder;
+pub use render_command_encoder::{MTLRenderCommandEncoder, MTLRenderCommandEncoderExt};
 pub use types::{
-    MTLCullMode, MTLDepthClipMode, MTLPrimitiveType, MTLScissorRect, MTLTriangleFillMode,
-    MTLVertexAmplificationViewMapping, MTLViewport, MTLVisibilityResultMode, MTLWinding,
+    MTLCullMode, MTLDepthClipMode, MTLDrawIndexedPrimitivesIndirectArguments, MTLDrawPatchIndirectArguments,
+    MTLDrawPrimitivesIndirectArguments, MTLPrimitiveType, MTLQuadTessellationFactorsHalf, MTLRenderStages,
+    MTLScissorRect, MTLTriangleFillMode, MTLTriangleTessellationFactorsHalf, MTLVertexAmplificationViewMapping,
+    MTLViewport, MTLVisibilityResultMode, MTLWinding,
 };

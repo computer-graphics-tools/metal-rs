@@ -1,7 +1,7 @@
 use core::ffi::c_float;
 
 use objc2::{
-    extern_class, extern_conformance, extern_methods,
+    extern_class, extern_conformance, extern_methods, msg_send,
     rc::{Allocated, Retained},
     runtime::NSObject,
 };
@@ -32,20 +32,6 @@ extern_conformance!(
 
 impl MTLPrimitiveAccelerationStructureDescriptor {
     extern_methods!(
-        /// Array of geometry descriptors. If motionKeyframeCount is greater than one all geometryDescriptors
-        /// must be motion versions and have motionKeyframeCount of primitive buffers.
-        #[unsafe(method(geometryDescriptors))]
-        #[unsafe(method_family = none)]
-        pub fn geometry_descriptors(&self) -> Option<Retained<NSArray<MTLAccelerationStructureGeometryDescriptor>>>;
-
-        /// Setter for [`geometryDescriptors`][Self::geometryDescriptors].
-        #[unsafe(method(setGeometryDescriptors:))]
-        #[unsafe(method_family = none)]
-        pub fn set_geometry_descriptors(
-            &self,
-            geometry_descriptors: Option<&NSArray<MTLAccelerationStructureGeometryDescriptor>>,
-        );
-
         /// Motion border mode describing what happens if acceleration structure is sampled before
         /// motionStartTime. If not set defaults to MTLMotionBorderModeClamp.
         #[unsafe(method(motionStartBorderMode))]
@@ -117,6 +103,27 @@ impl MTLPrimitiveAccelerationStructureDescriptor {
         #[unsafe(method_family = none)]
         pub fn descriptor() -> Retained<Self>;
     );
+
+    /// Geometry descriptors used to build this acceleration structure.
+    ///
+    /// When `motion_keyframe_count` is greater than one, every descriptor must
+    /// describe motion geometry with the same number of primitive-buffer keyframes.
+    pub fn geometry_descriptors(&self) -> Option<Box<[Retained<MTLAccelerationStructureGeometryDescriptor>]>> {
+        let descriptors: Option<Retained<NSArray<MTLAccelerationStructureGeometryDescriptor>>> =
+            unsafe { msg_send![self, geometryDescriptors] };
+        descriptors.map(|descriptors| descriptors.to_vec().into_boxed_slice())
+    }
+
+    /// Sets the geometry descriptors used to build this acceleration structure.
+    pub fn set_geometry_descriptors(
+        &self,
+        geometry_descriptors: Option<&[&MTLAccelerationStructureGeometryDescriptor]>,
+    ) {
+        let descriptors = geometry_descriptors.map(NSArray::from_slice);
+        unsafe {
+            let _: () = msg_send![self, setGeometryDescriptors: descriptors.as_deref()];
+        }
+    }
 }
 
 /// Methods declared on superclass `NSObject`.

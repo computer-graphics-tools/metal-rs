@@ -29,7 +29,7 @@ extern_protocol!(
         /// - Returns: a bitmask representing shader stages that commands currently present in this command encoder operate on.
         #[unsafe(method(stages))]
         #[unsafe(method_family = none)]
-        fn stages(&self) -> MTLRenderStages;
+        fn stages(&self) -> MTLStages;
 
         /// Configures this encoder with a compute pipeline state that applies to your subsequent dispatch commands.
         ///
@@ -520,6 +520,24 @@ extern_protocol!(
             destination_dimensions: &MTLTensorExtents,
         );
 
+        /// Encodes a command to copy a slice of one tensor plane into a slice of another tensor plane.
+        ///
+        /// Availability: macOS 27.0+, iOS 27.0+
+        #[unsafe(method(copyFromTensor:sourceOrigin:sourceDimensions:sourcePlane:toTensor:destinationOrigin:destinationDimensions:destinationPlane:))]
+        #[unsafe(method_family = none)]
+        #[allow(clippy::too_many_arguments)]
+        fn copy_from_tensor_source_origin_source_dimensions_source_plane_to_tensor_destination_origin_destination_dimensions_destination_plane(
+            &self,
+            source_tensor: &ProtocolObject<dyn MTLTensor>,
+            source_origin: &MTLTensorExtents,
+            source_dimensions: &MTLTensorExtents,
+            source_plane: MTLTensorPlaneType,
+            destination_tensor: &ProtocolObject<dyn MTLTensor>,
+            destination_origin: &MTLTensorExtents,
+            destination_dimensions: &MTLTensorExtents,
+            destination_plane: MTLTensorPlaneType,
+        );
+
         /// Encodes a command that generates mipmaps for a texture instance from the base mipmap level up to the highest
         /// mipmap level.
         ///
@@ -849,9 +867,10 @@ extern_protocol!(
 pub trait MTL4ComputeCommandEncoderExt: MTL4ComputeCommandEncoder + Message {
     /// Encodes a command to execute a series of commands from an indirect command buffer.
     ///
-    /// - Parameters:
-    /// - indirectCommandBuffer: ``MTLIndirectCommandBuffer`` instance containing the commands to execute.
-    /// - executionRange:        The range of commands to execute.
+    /// Parameters:
+    ///
+    /// - `indirectCommandBuffer`: The indirect command buffer containing the commands to execute.
+    /// - `executionRange`: The range of commands to execute.
     fn execute_commands_in_buffer_with_range(
         &self,
         indirect_command_buffer: &ProtocolObject<dyn MTLIndirectCommandBuffer>,
@@ -869,11 +888,11 @@ pub trait MTL4ComputeCommandEncoderExt: MTL4ComputeCommandEncoder + Message {
 
     /// Encodes a command that fills a buffer with a constant value for each byte.
     ///
-    /// - Parameters:
-    /// - buffer: A ``MTLBuffer`` instance for which this command assigns each byte in a range to a value.
-    /// - range:  A range of bytes within `buffer` the command assigns value to. When calling this method, pass in a
-    /// range with a length greater than `0`.
-    /// - value:  The value to write to each byte.
+    /// Parameters:
+    ///
+    /// - `buffer`: The buffer whose bytes this command fills.
+    /// - `range`: A nonempty byte range within `buffer`.
+    /// - `value`: The value to write to each byte.
     fn fill_buffer_range_value(
         &self,
         buffer: &ProtocolObject<dyn MTLBuffer>,
@@ -888,9 +907,10 @@ pub trait MTL4ComputeCommandEncoderExt: MTL4ComputeCommandEncoder + Message {
 
     /// Encodes a command that resets a range of commands in an indirect command buffer.
     ///
-    /// - Parameters:
-    /// - buffer: An ``MTLIndirectCommandBuffer`` the command resets.
-    /// - range: A range of commands within `buffer`.
+    /// Parameters:
+    ///
+    /// - `buffer`: The indirect command buffer whose commands this command resets.
+    /// - `range`: A range of commands within `buffer`.
     fn reset_commands_in_buffer_with_range(
         &self,
         buffer: &ProtocolObject<dyn MTLIndirectCommandBuffer>,
@@ -904,14 +924,13 @@ pub trait MTL4ComputeCommandEncoderExt: MTL4ComputeCommandEncoder + Message {
 
     /// Encodes a command that copies commands from an indirect command buffer into another.
     ///
-    /// - Parameters:
-    /// - source:           An ``MTLIndirectCommandBuffer`` instance from where the command copies.
-    /// - sourceRange:      The range of commands in `source` to copy.
-    /// The copy operation requires that the source range starts at a valid execution point.
-    /// - destination:      Another ``MTLIndirectCommandBuffer`` instance into which the command copies.
-    /// - destinationIndex: An index in `destination` into where the command copies content to. The copy operation requires
-    /// that the destination index is a valid execution point with enough space left in `destination`
-    /// to accommodate `sourceRange.count` commands.
+    /// Parameters:
+    ///
+    /// - `source`: The indirect command buffer from which the command copies.
+    /// - `sourceRange`: A range beginning at a valid execution point in `source`.
+    /// - `destination`: The indirect command buffer into which the command copies.
+    /// - `destinationIndex`: A valid execution point with enough remaining space
+    ///   for every command in `sourceRange`.
     fn copy_indirect_command_buffer_source_range_destination_destination_index(
         &self,
         source: &ProtocolObject<dyn MTLIndirectCommandBuffer>,

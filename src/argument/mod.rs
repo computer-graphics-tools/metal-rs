@@ -9,6 +9,7 @@ mod index_type;
 mod pointer_type;
 mod struct_member;
 mod struct_type;
+mod tensor_auxiliary_plane_type;
 mod texture_reference_type;
 mod type_reflection;
 
@@ -17,8 +18,8 @@ pub use argument_descriptor::MTLArgumentDescriptor;
 pub use argument_type::MTLArgumentType;
 pub use array_type::MTLArrayType;
 pub use binding::{
-    MTLBinding, MTLBindingExt, MTLBufferBinding, MTLObjectPayloadBinding, MTLTensorBinding, MTLTextureBinding,
-    MTLThreadgroupBinding,
+    MTLBinding, MTLBindingExt, MTLBufferBinding, MTLObjectPayloadBinding, MTLTensorBinding, MTLTensorBindingExt,
+    MTLTextureBinding, MTLThreadgroupBinding,
 };
 pub use binding_access::{MTLArgumentAccess, MTLBindingAccess};
 pub use binding_type::MTLBindingType;
@@ -26,5 +27,36 @@ pub use index_type::MTLIndexType;
 pub use pointer_type::MTLPointerType;
 pub use struct_member::MTLStructMember;
 pub use struct_type::MTLStructType;
+pub use tensor_auxiliary_plane_type::MTLTensorAuxiliaryPlaneType;
 pub use texture_reference_type::MTLTextureReferenceType;
 pub use type_reflection::MTLType;
+
+#[cfg(test)]
+mod tests {
+    use std::ops::Deref;
+
+    use objc2::runtime::ProtocolObject;
+
+    use super::{
+        MTLArgument, MTLArrayType, MTLBinding, MTLPointerType, MTLStructType, MTLTextureReferenceType, MTLType,
+    };
+    use crate::MTLTensorReferenceType;
+
+    fn assert_send_sync<T: Send + Sync>() {}
+    fn assert_mtl_type_superclass<T: Deref<Target = MTLType>>() {}
+
+    #[test]
+    fn sendable_argument_types_are_send_and_sync() {
+        assert_send_sync::<MTLArgument>();
+        assert_send_sync::<ProtocolObject<dyn MTLBinding>>();
+    }
+
+    #[test]
+    fn reflection_types_inherit_mtl_type() {
+        assert_mtl_type_superclass::<MTLStructType>();
+        assert_mtl_type_superclass::<MTLArrayType>();
+        assert_mtl_type_superclass::<MTLPointerType>();
+        assert_mtl_type_superclass::<MTLTextureReferenceType>();
+        assert_mtl_type_superclass::<MTLTensorReferenceType>();
+    }
+}

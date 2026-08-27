@@ -1,14 +1,24 @@
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::{NSObjectProtocol, NSString};
+use objc2_foundation::{NSArray, NSString};
 
 use crate::{
-    MTLDevice, MTLFunctionHandle, MTLIntersectionFunctionTableDescriptor, MTLResourceID, MTLSize,
-    MTLVisibleFunctionTable, MTLVisibleFunctionTableDescriptor,
+    MTL4BinaryFunction, MTLAllocation, MTLDevice, MTLFunction, MTLFunctionHandle, MTLIntersectionFunctionTable,
+    MTLIntersectionFunctionTableDescriptor, MTLResourceID, MTLShaderValidation, MTLSize, MTLVisibleFunctionTable,
+    MTLVisibleFunctionTableDescriptor, MetalError,
 };
 
 extern_protocol!(
     /// A handle to compiled code for a compute function.
-    pub unsafe trait MTLComputePipelineState: NSObjectProtocol + Send + Sync {
+    ///
+    /// # Safety
+    ///
+    /// Implementors must be valid Objective-C objects that conform to the
+    /// `MTLComputePipelineState` protocol.
+    #[expect(
+        clippy::missing_safety_doc,
+        reason = "extern_protocol does not attach this safety section to its generated unsafe trait"
+    )]
+    pub unsafe trait MTLComputePipelineState: MTLAllocation {
         /// The device this resource was created against.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
@@ -54,14 +64,14 @@ extern_protocol!(
         fn new_intersection_function_table_with_descriptor(
             &self,
             descriptor: &MTLIntersectionFunctionTableDescriptor,
-        ) -> Option<Retained<ProtocolObject<dyn crate::MTLIntersectionFunctionTable>>>;
+        ) -> Option<Retained<ProtocolObject<dyn MTLIntersectionFunctionTable>>>;
 
-        /// Returns a handle to the named function in this pipeline, for use with function tables.
-        #[unsafe(method(functionHandleWithName:))]
+        /// Returns a handle for a binary function linked into this pipeline.
+        #[unsafe(method(functionHandleWithBinaryFunction:))]
         #[unsafe(method_family = none)]
-        fn function_handle_with_name(
+        fn function_handle_with_binary_function(
             &self,
-            name: &NSString,
+            function: &ProtocolObject<dyn MTL4BinaryFunction>,
         ) -> Option<Retained<ProtocolObject<dyn MTLFunctionHandle>>>;
 
         /// Returns the length, in bytes, of imageblock memory for the given dimensions.
@@ -71,17 +81,124 @@ extern_protocol!(
             &self,
             imageblock_dimensions: MTLSize,
         ) -> usize;
+
+        /// Whether this pipeline state can be used through an indirect command buffer.
+        #[unsafe(method(supportIndirectCommandBuffers))]
+        #[unsafe(method_family = none)]
+        fn support_indirect_command_buffers(&self) -> bool;
+
+        /// Returns a handle for a function linked into this pipeline.
+        #[unsafe(method(functionHandleWithFunction:))]
+        #[unsafe(method_family = none)]
+        fn function_handle_with_function(
+            &self,
+            function: &ProtocolObject<dyn MTLFunction>,
+        ) -> Option<Retained<ProtocolObject<dyn MTLFunctionHandle>>>;
+
+        /// The shader-validation mode used to create this pipeline.
+        #[unsafe(method(shaderValidation))]
+        #[unsafe(method_family = none)]
+        fn shader_validation(&self) -> MTLShaderValidation;
+
+        /// The required size of every compute threadgroup.
+        #[unsafe(method(requiredThreadsPerThreadgroup))]
+        #[unsafe(method_family = none)]
+        fn required_threads_per_threadgroup(&self) -> MTLSize;
     }
 );
 
-#[allow(unused)]
 pub trait MTLComputePipelineStateExt: MTLComputePipelineState + Message {
     fn label(&self) -> Option<String>;
+
+    /// Returns a handle to the named function in this pipeline, for use with function tables.
+    fn function_handle_with_name(
+        &self,
+        name: &str,
+    ) -> Option<Retained<ProtocolObject<dyn MTLFunctionHandle>>>;
+
+    /// Creates a pipeline state by adding MTL4 binary functions.
+    fn new_compute_pipeline_state_with_binary_functions(
+        &self,
+        additional_binary_functions: &[&ProtocolObject<dyn MTL4BinaryFunction>],
+    ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, MetalError>;
+
+    /// Creates a pipeline state by adding legacy binary functions.
+    fn new_compute_pipeline_state_with_additional_binary_functions(
+        &self,
+        functions: &[&ProtocolObject<dyn MTLFunction>],
+    ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, MetalError>;
 }
 
 impl MTLComputePipelineStateExt for ProtocolObject<dyn MTLComputePipelineState> {
     fn label(&self) -> Option<String> {
         let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
         label.map(|s| s.to_string())
+    }
+
+    fn function_handle_with_name(
+        &self,
+        name: &str,
+    ) -> Option<Retained<ProtocolObject<dyn MTLFunctionHandle>>> {
+        let name = NSString::from_str(name);
+        unsafe { msg_send![self, functionHandleWithName: &*name] }
+    }
+
+    fn new_compute_pipeline_state_with_binary_functions(
+        &self,
+        additional_binary_functions: &[&ProtocolObject<dyn MTL4BinaryFunction>],
+    ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, MetalError> {
+        let additional_binary_functions = NSArray::from_slice(additional_binary_functions);
+        unsafe {
+            msg_send![
+                self,
+                newComputePipelineStateWithBinaryFunctions: &*additional_binary_functions,
+                error: _
+            ]
+        }
+        .map_err(MetalError::from_nserror)
+    }
+
+    fn new_compute_pipeline_state_with_additional_binary_functions(
+        &self,
+        functions: &[&ProtocolObject<dyn MTLFunction>],
+    ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, MetalError> {
+        let functions = NSArray::from_slice(functions);
+        unsafe {
+            msg_send![
+                self,
+                newComputePipelineStateWithAdditionalBinaryFunctions: &*functions,
+                error: _
+            ]
+        }
+        .map_err(MetalError::from_nserror)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use objc2::{rc::Retained, runtime::ProtocolObject};
+
+    use super::{MTLComputePipelineState, MTLComputePipelineStateExt};
+    use crate::{MTL4BinaryFunction, MTLFunction, MTLFunctionHandle, MetalError};
+
+    #[test]
+    fn collection_and_string_methods_have_rust_native_signatures() {
+        let _: fn(
+            &ProtocolObject<dyn MTLComputePipelineState>,
+            &str,
+        ) -> Option<Retained<ProtocolObject<dyn MTLFunctionHandle>>> =
+            <ProtocolObject<dyn MTLComputePipelineState> as MTLComputePipelineStateExt>::function_handle_with_name;
+        let _: fn(
+            &ProtocolObject<dyn MTLComputePipelineState>,
+            &[&ProtocolObject<dyn MTL4BinaryFunction>],
+        ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, MetalError> =
+            <ProtocolObject<dyn MTLComputePipelineState> as MTLComputePipelineStateExt>::
+                new_compute_pipeline_state_with_binary_functions;
+        let _: fn(
+            &ProtocolObject<dyn MTLComputePipelineState>,
+            &[&ProtocolObject<dyn MTLFunction>],
+        ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, MetalError> =
+            <ProtocolObject<dyn MTLComputePipelineState> as MTLComputePipelineStateExt>::
+                new_compute_pipeline_state_with_additional_binary_functions;
     }
 }

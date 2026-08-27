@@ -1,6 +1,6 @@
 use objc2::{
     encode::{Encode, Encoding, RefEncode},
-    extern_class, extern_conformance, extern_methods,
+    extern_class, extern_conformance, extern_methods, msg_send,
     rc::{Allocated, Retained},
     runtime::ProtocolObject,
 };
@@ -307,96 +307,107 @@ extern_conformance!(
 
 impl MTL4RenderPipelineBinaryFunctionsDescriptor {
     extern_methods!(
-        /// Provides an array of binary functions representing additional binary vertex shader functions.
-        #[unsafe(method(vertexAdditionalBinaryFunctions))]
-        #[unsafe(method_family = none)]
-        pub fn vertex_additional_binary_functions(
-            &self
-        ) -> Option<Retained<NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>>;
-
-        /// Setter for [`vertexAdditionalBinaryFunctions`][Self::vertexAdditionalBinaryFunctions].
-        ///
-        /// This is [copied][objc2_foundation::NSCopying::copy] when set.
-        #[unsafe(method(setVertexAdditionalBinaryFunctions:))]
-        #[unsafe(method_family = none)]
-        pub fn set_vertex_additional_binary_functions(
-            &self,
-            vertex_additional_binary_functions: Option<&NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>,
-        );
-
-        /// Provides an array of binary functions representing additional binary fragment shader functions.
-        #[unsafe(method(fragmentAdditionalBinaryFunctions))]
-        #[unsafe(method_family = none)]
-        pub fn fragment_additional_binary_functions(
-            &self
-        ) -> Option<Retained<NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>>;
-
-        /// Setter for [`fragmentAdditionalBinaryFunctions`][Self::fragmentAdditionalBinaryFunctions].
-        ///
-        /// This is [copied][objc2_foundation::NSCopying::copy] when set.
-        #[unsafe(method(setFragmentAdditionalBinaryFunctions:))]
-        #[unsafe(method_family = none)]
-        pub fn set_fragment_additional_binary_functions(
-            &self,
-            fragment_additional_binary_functions: Option<&NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>,
-        );
-
-        /// Provides an array of binary functions representing additional binary tile shader functions.
-        #[unsafe(method(tileAdditionalBinaryFunctions))]
-        #[unsafe(method_family = none)]
-        pub fn tile_additional_binary_functions(
-            &self
-        ) -> Option<Retained<NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>>;
-
-        /// Setter for [`tileAdditionalBinaryFunctions`][Self::tileAdditionalBinaryFunctions].
-        ///
-        /// This is [copied][objc2_foundation::NSCopying::copy] when set.
-        #[unsafe(method(setTileAdditionalBinaryFunctions:))]
-        #[unsafe(method_family = none)]
-        pub fn set_tile_additional_binary_functions(
-            &self,
-            tile_additional_binary_functions: Option<&NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>,
-        );
-
-        /// Provides an array of binary functions representing additional binary object shader functions.
-        #[unsafe(method(objectAdditionalBinaryFunctions))]
-        #[unsafe(method_family = none)]
-        pub fn object_additional_binary_functions(
-            &self
-        ) -> Option<Retained<NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>>;
-
-        /// Setter for [`objectAdditionalBinaryFunctions`][Self::objectAdditionalBinaryFunctions].
-        ///
-        /// This is [copied][objc2_foundation::NSCopying::copy] when set.
-        #[unsafe(method(setObjectAdditionalBinaryFunctions:))]
-        #[unsafe(method_family = none)]
-        pub fn set_object_additional_binary_functions(
-            &self,
-            object_additional_binary_functions: Option<&NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>,
-        );
-
-        /// Provides an array of binary functions representing additional binary mesh shader functions.
-        #[unsafe(method(meshAdditionalBinaryFunctions))]
-        #[unsafe(method_family = none)]
-        pub fn mesh_additional_binary_functions(
-            &self
-        ) -> Option<Retained<NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>>;
-
-        /// Setter for [`meshAdditionalBinaryFunctions`][Self::meshAdditionalBinaryFunctions].
-        ///
-        /// This is [copied][objc2_foundation::NSCopying::copy] when set.
-        #[unsafe(method(setMeshAdditionalBinaryFunctions:))]
-        #[unsafe(method_family = none)]
-        pub fn set_mesh_additional_binary_functions(
-            &self,
-            mesh_additional_binary_functions: Option<&NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>,
-        );
-
         /// Resets this descriptor to its default state.
         #[unsafe(method(reset))]
         #[unsafe(method_family = none)]
         pub fn reset(&self);
     );
+
+    /// Provides additional binary vertex shader functions.
+    pub fn vertex_additional_binary_functions(
+        &self
+    ) -> Option<Box<[Retained<ProtocolObject<dyn MTL4BinaryFunction>>]>> {
+        let functions: Option<Retained<NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>> =
+            unsafe { msg_send![self, vertexAdditionalBinaryFunctions] };
+        functions.map(|functions| functions.to_vec().into_boxed_slice())
+    }
+
+    /// Sets additional binary vertex shader functions with copy semantics.
+    pub fn set_vertex_additional_binary_functions(
+        &self,
+        functions: Option<&[&ProtocolObject<dyn MTL4BinaryFunction>]>,
+    ) {
+        let functions = functions.map(NSArray::from_slice);
+        unsafe {
+            let _: () = msg_send![self, setVertexAdditionalBinaryFunctions: functions.as_deref()];
+        }
+    }
+
+    /// Provides additional binary fragment shader functions.
+    pub fn fragment_additional_binary_functions(
+        &self
+    ) -> Option<Box<[Retained<ProtocolObject<dyn MTL4BinaryFunction>>]>> {
+        let functions: Option<Retained<NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>> =
+            unsafe { msg_send![self, fragmentAdditionalBinaryFunctions] };
+        functions.map(|functions| functions.to_vec().into_boxed_slice())
+    }
+
+    /// Sets additional binary fragment shader functions with copy semantics.
+    pub fn set_fragment_additional_binary_functions(
+        &self,
+        functions: Option<&[&ProtocolObject<dyn MTL4BinaryFunction>]>,
+    ) {
+        let functions = functions.map(NSArray::from_slice);
+        unsafe {
+            let _: () = msg_send![self, setFragmentAdditionalBinaryFunctions: functions.as_deref()];
+        }
+    }
+
+    /// Provides additional binary tile shader functions.
+    pub fn tile_additional_binary_functions(&self) -> Option<Box<[Retained<ProtocolObject<dyn MTL4BinaryFunction>>]>> {
+        let functions: Option<Retained<NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>> =
+            unsafe { msg_send![self, tileAdditionalBinaryFunctions] };
+        functions.map(|functions| functions.to_vec().into_boxed_slice())
+    }
+
+    /// Sets additional binary tile shader functions with copy semantics.
+    pub fn set_tile_additional_binary_functions(
+        &self,
+        functions: Option<&[&ProtocolObject<dyn MTL4BinaryFunction>]>,
+    ) {
+        let functions = functions.map(NSArray::from_slice);
+        unsafe {
+            let _: () = msg_send![self, setTileAdditionalBinaryFunctions: functions.as_deref()];
+        }
+    }
+
+    /// Provides additional binary object shader functions.
+    pub fn object_additional_binary_functions(
+        &self
+    ) -> Option<Box<[Retained<ProtocolObject<dyn MTL4BinaryFunction>>]>> {
+        let functions: Option<Retained<NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>> =
+            unsafe { msg_send![self, objectAdditionalBinaryFunctions] };
+        functions.map(|functions| functions.to_vec().into_boxed_slice())
+    }
+
+    /// Sets additional binary object shader functions with copy semantics.
+    pub fn set_object_additional_binary_functions(
+        &self,
+        functions: Option<&[&ProtocolObject<dyn MTL4BinaryFunction>]>,
+    ) {
+        let functions = functions.map(NSArray::from_slice);
+        unsafe {
+            let _: () = msg_send![self, setObjectAdditionalBinaryFunctions: functions.as_deref()];
+        }
+    }
+
+    /// Provides additional binary mesh shader functions.
+    pub fn mesh_additional_binary_functions(&self) -> Option<Box<[Retained<ProtocolObject<dyn MTL4BinaryFunction>>]>> {
+        let functions: Option<Retained<NSArray<ProtocolObject<dyn MTL4BinaryFunction>>>> =
+            unsafe { msg_send![self, meshAdditionalBinaryFunctions] };
+        functions.map(|functions| functions.to_vec().into_boxed_slice())
+    }
+
+    /// Sets additional binary mesh shader functions with copy semantics.
+    pub fn set_mesh_additional_binary_functions(
+        &self,
+        functions: Option<&[&ProtocolObject<dyn MTL4BinaryFunction>]>,
+    ) {
+        let functions = functions.map(NSArray::from_slice);
+        unsafe {
+            let _: () = msg_send![self, setMeshAdditionalBinaryFunctions: functions.as_deref()];
+        }
+    }
 }
 
 /// Methods declared on superclass `NSObject`.
@@ -692,4 +703,25 @@ impl MTL4RenderPipelineDescriptor {
         #[unsafe(method_family = new)]
         pub fn new() -> Retained<Self>;
     );
+}
+
+#[cfg(test)]
+mod tests {
+    use objc2::{rc::Retained, runtime::ProtocolObject};
+
+    use super::{MTL4BinaryFunction, MTL4RenderPipelineBinaryFunctionsDescriptor};
+
+    #[test]
+    fn binary_function_collections_have_rust_native_signatures() {
+        let _: fn(
+            &MTL4RenderPipelineBinaryFunctionsDescriptor,
+        ) -> Option<Box<[Retained<ProtocolObject<dyn MTL4BinaryFunction>>]>> =
+            MTL4RenderPipelineBinaryFunctionsDescriptor::vertex_additional_binary_functions;
+        let _: fn(
+            &MTL4RenderPipelineBinaryFunctionsDescriptor,
+        ) -> Option<Box<[Retained<ProtocolObject<dyn MTL4BinaryFunction>>]>> =
+            MTL4RenderPipelineBinaryFunctionsDescriptor::mesh_additional_binary_functions;
+        let _: fn(&MTL4RenderPipelineBinaryFunctionsDescriptor, Option<&[&ProtocolObject<dyn MTL4BinaryFunction>]>) =
+            MTL4RenderPipelineBinaryFunctionsDescriptor::set_vertex_additional_binary_functions;
+    }
 }

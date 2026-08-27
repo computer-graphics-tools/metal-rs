@@ -21,7 +21,7 @@ unsafe extern "C" {
     static MTLIOErrorDomain: &'static NSErrorDomain;
 }
 
-/// Returns the NSError domain for I/O errors emitted by Metal.
-pub fn io_error_domain() -> &'static NSErrorDomain {
-    unsafe { MTLIOErrorDomain }
+/// Returns the error domain for I/O errors emitted by Metal.
+pub fn io_error_domain() -> String {
+    unsafe { MTLIOErrorDomain }.to_string()
 }

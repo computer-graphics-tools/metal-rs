@@ -1,7 +1,9 @@
 use objc2::{Encode, Encoding, RefEncode};
 
 /// Options for `set_purgeable_state` call (from `MTLPurgeableState`).
-#[repr(u64)]
+///
+/// Availability: macOS 10.11+, iOS 8.0+
+#[repr(usize)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub enum MTLPurgeableState {
     /// The purgeability state is not changed.
@@ -15,7 +17,7 @@ pub enum MTLPurgeableState {
 }
 
 unsafe impl Encode for MTLPurgeableState {
-    const ENCODING: Encoding = u64::ENCODING;
+    const ENCODING: Encoding = usize::ENCODING;
 }
 
 unsafe impl RefEncode for MTLPurgeableState {

@@ -1,8 +1,7 @@
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSArray, NSObjectProtocol, NSString};
 
-use crate::util::ref_slice_as_ptr;
-use crate::{MTLAllocation, MTLDevice};
+use crate::{MTLAllocation, MTLDevice, util::ref_slice_as_ptr};
 
 extern_protocol!(
     /// A residency set is responsible for managing resource and heap residency and is referenced
@@ -85,8 +84,10 @@ pub trait MTLResidencySetExt: MTLResidencySet + Message {
     fn all_allocations(&self) -> Box<[Retained<ProtocolObject<dyn MTLAllocation>>]>;
 
     /// Adds allocations to the set, leaving them uncommitted until commit is called.
-    fn add_allocations(&self, allocations: &[&ProtocolObject<dyn MTLAllocation>])
-    where
+    fn add_allocations(
+        &self,
+        allocations: &[&ProtocolObject<dyn MTLAllocation>],
+    ) where
         Self: Sized,
     {
         let ptr = ref_slice_as_ptr(allocations);
@@ -94,8 +95,10 @@ pub trait MTLResidencySetExt: MTLResidencySet + Message {
     }
 
     /// Marks allocations to be removed from the set on the next commit call.
-    fn remove_allocations(&self, allocations: &[&ProtocolObject<dyn MTLAllocation>])
-    where
+    fn remove_allocations(
+        &self,
+        allocations: &[&ProtocolObject<dyn MTLAllocation>],
+    ) where
         Self: Sized,
     {
         let ptr = ref_slice_as_ptr(allocations);

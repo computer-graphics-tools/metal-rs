@@ -4,8 +4,8 @@ use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolO
 use objc2_foundation::{NSError, NSObjectProtocol, NSString};
 
 use crate::{
-    MTLBuffer, MTLIOCommandBufferCompletedHandler, MTLIOFileHandle, MTLIOStatus, MTLOrigin, MTLSharedEvent, MTLSize,
-    MTLTexture,
+    MTLBuffer, MTLIOCommandBufferHandler, MTLIOFileHandle, MTLIOStatus, MTLOrigin, MTLSharedEvent, MTLSize, MTLTexture,
+    MetalError,
 };
 
 extern_protocol!(
@@ -15,7 +15,12 @@ extern_protocol!(
     pub unsafe trait MTLIOCommandBuffer: NSObjectProtocol {
         /// Encodes a command that loads from a handle and offset into a memory location.
         ///
-        /// Safety: `pointer` must be valid for writes of `size` bytes.
+        /// The source range must lie within `source_handle`.
+        ///
+        /// `pointer` must remain valid for writes of `size` bytes until this
+        /// command buffer completes. The pointed-to memory must not be accessed
+        /// in a way that conflicts with Metal's asynchronous write during that
+        /// interval.
         #[unsafe(method(loadBytes:size:sourceHandle:sourceHandleOffset:))]
         #[unsafe(method_family = none)]
         fn load_bytes_size_source_handle_source_handle_offset(
@@ -27,6 +32,9 @@ extern_protocol!(
         );
 
         /// Encodes a command that loads from a handle and offset into a buffer and an offset.
+        ///
+        /// The source and destination byte ranges must satisfy Metal's
+        /// validation requirements.
         #[unsafe(method(loadBuffer:offset:size:sourceHandle:sourceHandleOffset:))]
         #[unsafe(method_family = none)]
         fn load_buffer_offset_size_source_handle_source_handle_offset(
@@ -39,6 +47,9 @@ extern_protocol!(
         );
 
         /// Encodes a command that loads a region from a handle into a texture.
+        ///
+        /// The source byte range and destination texture region, slice, and
+        /// mip level must satisfy Metal's validation requirements.
         #[unsafe(method(loadTexture:slice:level:size:sourceBytesPerRow:sourceBytesPerImage:destinationOrigin:sourceHandle:sourceHandleOffset:))]
         #[unsafe(method_family = none)]
         fn load_texture_slice_level_size_source_bytes_per_row_source_bytes_per_image_destination_origin_source_handle_source_handle_offset(
@@ -55,6 +66,9 @@ extern_protocol!(
         );
 
         /// Encodes a command that writes the status of this command buffer upon completion to a buffer at a given offset.
+        ///
+        /// `offset` must identify sufficient writable storage in `buffer` for
+        /// the status value.
         #[unsafe(method(copyStatusToBuffer:offset:))]
         #[unsafe(method_family = none)]
         fn copy_status_to_buffer_offset(
@@ -93,11 +107,6 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         fn status(&self) -> MTLIOStatus;
 
-        /// If an error occurred during execution, the NSError may contain more details.
-        #[unsafe(method(error))]
-        #[unsafe(method_family = none)]
-        fn error(&self) -> Option<Retained<NSError>>;
-
         /// Append this command buffer to the end of its command queue.
         #[unsafe(method(enqueue))]
         #[unsafe(method_family = none)]
@@ -125,6 +134,9 @@ extern_protocol!(
 
 #[allow(unused)]
 pub trait MTLIOCommandBufferExt: MTLIOCommandBuffer + Message {
+    /// The execution error, if the command buffer failed.
+    fn error(&self) -> Option<MetalError>;
+
     /// Push a new named string onto a stack of string labels.
     fn push_debug_group(
         &self,
@@ -142,11 +154,16 @@ pub trait MTLIOCommandBufferExt: MTLIOCommandBuffer + Message {
     /// Availability: macOS 13.0+, iOS 16.0+
     fn add_completed_handler(
         &self,
-        handler: &MTLIOCommandBufferCompletedHandler,
+        handler: &MTLIOCommandBufferHandler,
     );
 }
 
 impl MTLIOCommandBufferExt for ProtocolObject<dyn MTLIOCommandBuffer> {
+    fn error(&self) -> Option<MetalError> {
+        let error: Option<Retained<NSError>> = unsafe { msg_send![self, error] };
+        error.map(MetalError::from_nserror)
+    }
+
     fn push_debug_group(
         &self,
         name: &str,
@@ -172,10 +189,10 @@ impl MTLIOCommandBufferExt for ProtocolObject<dyn MTLIOCommandBuffer> {
 
     fn add_completed_handler(
         &self,
-        handler: &MTLIOCommandBufferCompletedHandler,
+        handler: &MTLIOCommandBufferHandler,
     ) {
         unsafe {
-            let _: () = msg_send![self, addCompletedHandler: &**handler];
+            let _: () = msg_send![self, addCompletedHandler: handler.as_block()];
         }
     }
 }

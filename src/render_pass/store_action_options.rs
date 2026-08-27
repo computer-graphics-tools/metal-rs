@@ -1,6 +1,9 @@
 use objc2::{Encode, Encoding, RefEncode};
 
 /// Options for store action (from `MTLStoreActionOptions`).
+///
+/// Metal deprecates this type because store-action options have no effect on
+/// Apple silicon.
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct MTLStoreActionOptions(pub u64);

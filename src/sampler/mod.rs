@@ -12,4 +12,4 @@ pub use descriptor::MTLSamplerDescriptor;
 pub use min_mag_filter::MTLSamplerMinMagFilter;
 pub use mip_filter::MTLSamplerMipFilter;
 pub use reduction_mode::MTLSamplerReductionMode;
-pub use state::MTLSamplerState;
+pub use state::{MTLSamplerState, MTLSamplerStateExt};

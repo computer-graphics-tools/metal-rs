@@ -1,3 +1,11 @@
+use block2::Block;
+
+trait CallbackBlock {
+    type Signature: ?Sized;
+
+    fn as_block(&self) -> &Block<Self::Signature>;
+}
+
 mod acceleration_structure;
 mod acceleration_structure_command_encoder;
 mod acceleration_structure_types;
@@ -23,6 +31,7 @@ mod device;
 mod device_certification;
 mod drawable;
 mod dynamic_library;
+mod error;
 mod event;
 mod fence;
 mod function_constant_values;
@@ -58,7 +67,7 @@ mod stage_input_output_descriptor;
 mod tensor;
 mod texture;
 mod types;
-pub(crate) mod util;
+mod util;
 mod vertex_descriptor;
 mod visible_function_table;
 
@@ -72,7 +81,6 @@ pub use argument_encoder::*;
 pub use binary_archive::*;
 pub use blit_command_encoder::*;
 pub use blit_pass::*;
-pub use block2;
 pub use buffer::*;
 pub use capture_manager::*;
 pub use capture_scope::*;
@@ -89,6 +97,7 @@ pub use device::*;
 pub use device_certification::*;
 pub use drawable::*;
 pub use dynamic_library::*;
+pub use error::*;
 pub use event::*;
 pub use fence::*;
 pub use function_constant_values::*;

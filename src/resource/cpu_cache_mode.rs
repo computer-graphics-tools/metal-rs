@@ -1,7 +1,9 @@
 use objc2::{Encode, Encoding, RefEncode};
 
 /// Describes what CPU cache mode is used for the CPU's mapping of a resource (from `MTLCPUCacheMode`).
-#[repr(u64)]
+///
+/// Availability: macOS 10.11+, iOS 8.0+
+#[repr(usize)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub enum MTLCPUCacheMode {
     /// The default cache mode for the system.
@@ -12,7 +14,7 @@ pub enum MTLCPUCacheMode {
 }
 
 unsafe impl Encode for MTLCPUCacheMode {
-    const ENCODING: Encoding = u64::ENCODING;
+    const ENCODING: Encoding = usize::ENCODING;
 }
 
 unsafe impl RefEncode for MTLCPUCacheMode {

@@ -1,7 +1,9 @@
 use objc2::{Encode, Encoding, RefEncode};
 
 /// Enumerates the different support levels for sparse buffers (from `MTLBufferSparseTier`).
-#[repr(i64)]
+///
+/// Availability: macOS 26.0+, iOS 26.0+
+#[repr(isize)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub enum MTLBufferSparseTier {
     /// Indicates that the buffer is not sparse.
@@ -21,7 +23,7 @@ pub enum MTLBufferSparseTier {
 }
 
 unsafe impl Encode for MTLBufferSparseTier {
-    const ENCODING: Encoding = i64::ENCODING;
+    const ENCODING: Encoding = isize::ENCODING;
 }
 
 unsafe impl RefEncode for MTLBufferSparseTier {

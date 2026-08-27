@@ -1,7 +1,7 @@
 use core::{ffi::c_float, ptr::NonNull};
 
 use objc2::{
-    extern_class, extern_conformance, extern_methods,
+    ClassType, extern_class, extern_conformance, extern_methods, msg_send,
     rc::{Allocated, Retained},
     runtime::NSObject,
 };
@@ -31,10 +31,6 @@ extern_conformance!(
 
 impl MTLRasterizationRateLayerDescriptor {
     extern_methods!(
-        #[unsafe(method(init))]
-        #[unsafe(method_family = init)]
-        pub fn init(this: Allocated<Self>) -> Retained<Self>;
-
         /// Initialize a descriptor for a layer with the given number of quality samples on the horizontal and vertical axis.
         #[unsafe(method(initWithSampleCount:))]
         #[unsafe(method_family = init)]
@@ -43,8 +39,11 @@ impl MTLRasterizationRateLayerDescriptor {
             sample_count: MTLSize,
         ) -> Retained<Self>;
 
-        /// Initialize a descriptor for a layer with the given number of quality samples and initial values.
-        /// Safety: `horizontal` and `vertical` must be valid pointers with appropriate lengths.
+        /// Initializes a descriptor with sample values from raw arrays.
+        ///
+        /// `horizontal` must point to at least `sample_count.width` readable
+        /// `float` values, and `vertical` must point to at least
+        /// `sample_count.height` readable `float` values.
         #[unsafe(method(initWithSampleCount:horizontal:vertical:))]
         #[unsafe(method_family = init)]
         pub fn init_with_sample_count_horizontal_vertical(
@@ -53,6 +52,11 @@ impl MTLRasterizationRateLayerDescriptor {
             horizontal: NonNull<c_float>,
             vertical: NonNull<c_float>,
         ) -> Retained<Self>;
+
+        /// The number of quality samples used on the horizontal and vertical axes.
+        #[unsafe(method(sampleCount))]
+        #[unsafe(method_family = none)]
+        pub fn sample_count(&self) -> MTLSize;
 
         /// The maximum number of quality samples this descriptor can use for the horizontal and vertical axes.
         #[unsafe(method(maxSampleCount))]
@@ -87,4 +91,24 @@ impl MTLRasterizationRateLayerDescriptor {
             sample_count: MTLSize,
         );
     );
+}
+
+impl MTLRasterizationRateLayerDescriptor {
+    /// Creates a layer descriptor and copies the provided sample arrays.
+    ///
+    /// `horizontal.len()` must equal `sample_count.width`, and
+    /// `vertical.len()` must equal `sample_count.height`.
+    pub fn new_with_sample_count_horizontal_vertical(
+        sample_count: MTLSize,
+        horizontal: &[f32],
+        vertical: &[f32],
+    ) -> Retained<Self> {
+        assert_eq!(horizontal.len(), sample_count.width, "horizontal sample count does not match sample_count.width");
+        assert_eq!(vertical.len(), sample_count.height, "vertical sample count does not match sample_count.height");
+
+        let horizontal = NonNull::from(horizontal).cast::<c_float>();
+        let vertical = NonNull::from(vertical).cast::<c_float>();
+        let allocated: Allocated<Self> = unsafe { msg_send![Self::class(), alloc] };
+        Self::init_with_sample_count_horizontal_vertical(allocated, sample_count, horizontal, vertical)
+    }
 }

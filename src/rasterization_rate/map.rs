@@ -1,14 +1,19 @@
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSString};
 
-use crate::{
-    MTLBuffer, MTLDevice,
-    device::MTLSizeAndAlign,
-    types::{Coordinate2D, MTLSize},
-};
+use crate::{MTLBuffer, MTLCoordinate2D, MTLDevice, device::MTLSizeAndAlign, types::MTLSize};
 
 extern_protocol!(
     /// Compiled read-only object that determines how variable rasterization rate is applied when rendering.
+    ///
+    /// # Safety
+    ///
+    /// Implementors must be valid Objective-C objects that conform to the
+    /// `MTLRasterizationRateMap` protocol.
+    #[expect(
+        clippy::missing_safety_doc,
+        reason = "extern_protocol does not attach this safety section to its generated unsafe trait"
+    )]
     pub unsafe trait MTLRasterizationRateMap: NSObjectProtocol + Send + Sync {
         /// The device on which the rasterization rate map was created
         #[unsafe(method(device))]
@@ -44,35 +49,44 @@ extern_protocol!(
             offset: usize,
         );
 
+        /// Returns the physical render-target dimensions for a layer.
+        #[unsafe(method(physicalSizeForLayer:))]
+        #[unsafe(method_family = none)]
+        fn physical_size_for_layer(
+            &self,
+            layer_index: usize,
+        ) -> MTLSize;
+
         /// Computes screen to physical coordinates mapping for the given layer.
         #[unsafe(method(mapScreenToPhysicalCoordinates:forLayer:))]
         #[unsafe(method_family = none)]
         fn map_screen_to_physical_coordinates_for_layer(
             &self,
-            screen_coordinates: Coordinate2D,
+            screen_coordinates: MTLCoordinate2D,
             layer_index: usize,
-        ) -> Coordinate2D;
+        ) -> MTLCoordinate2D;
 
         /// Computes physical to screen coordinates mapping for the given layer.
         #[unsafe(method(mapPhysicalToScreenCoordinates:forLayer:))]
         #[unsafe(method_family = none)]
         fn map_physical_to_screen_coordinates_for_layer(
             &self,
-            physical_coordinates: Coordinate2D,
+            physical_coordinates: MTLCoordinate2D,
             layer_index: usize,
-        ) -> Coordinate2D;
+        ) -> MTLCoordinate2D;
     }
 );
 
-#[allow(unused)]
+/// Rust-native accessors for a rasterization-rate map.
 pub trait MTLRasterizationRateMapExt: MTLRasterizationRateMap + Message {
-    /// A string to help identify this object.
-    fn label(&self) -> Option<String>;
-}
-
-impl MTLRasterizationRateMapExt for ProtocolObject<dyn MTLRasterizationRateMap> {
-    fn label(&self) -> Option<String> {
-        let s: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
-        s.map(|s| s.to_string())
+    /// A string that identifies this rasterization-rate map.
+    fn label(&self) -> Option<String>
+    where
+        Self: Sized,
+    {
+        let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
+        label.map(|label| label.to_string())
     }
 }
+
+impl<T: MTLRasterizationRateMap + Message> MTLRasterizationRateMapExt for T {}

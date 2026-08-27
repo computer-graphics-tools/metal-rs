@@ -3,8 +3,10 @@ use std::{ops::Range, os::raw::c_void, ptr::NonNull};
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSError, NSRange, NSString};
 
+#[cfg(target_os = "macos")]
+use crate::MTLDevice;
 use crate::{
-    MTLBufferSparseTier, MTLDevice, MTLResource, MTLTensor, MTLTexture, MTLTextureDescriptor,
+    MTLBufferSparseTier, MTLResource, MTLTensor, MTLTexture, MTLTextureDescriptor, MetalError,
     tensor::MTLTensorDescriptor,
 };
 
@@ -29,6 +31,11 @@ extern_protocol!(
         fn length(&self) -> usize;
 
         /// Returns the data pointer of this buffer's shared copy.
+        ///
+        /// The buffer owns this pointer; callers must not deallocate it. The
+        /// pointer is usable only while the buffer remains alive and its
+        /// storage mode permits CPU access. Dereferencing it requires the
+        /// caller to uphold Metal's CPU/GPU synchronization rules.
         #[unsafe(method(contents))]
         #[unsafe(method_family = none)]
         fn contents(&self) -> NonNull<c_void>;
@@ -49,12 +56,16 @@ extern_protocol!(
         fn remove_all_debug_markers(&self);
 
         /// For Metal buffer objects that are remote views, this returns the buffer associated with the storage on the originating device.
+        #[cfg(target_os = "macos")]
+        #[deprecated(note = "remote buffer views do not apply to Apple silicon")]
         #[unsafe(method(remoteStorageBuffer))]
         #[unsafe(method_family = none)]
         fn remote_storage_buffer(&self) -> Option<Retained<ProtocolObject<dyn MTLBuffer>>>;
 
         /// On Metal devices that support peer to peer transfers, this method is used to create a remote buffer view on another device
         /// within the peer group.  The receiver must use MTLStorageModePrivate or be backed by an IOSurface.
+        #[cfg(target_os = "macos")]
+        #[deprecated(note = "remote buffer views do not apply to Apple silicon")]
         #[unsafe(method(newRemoteBufferViewForDevice:))]
         #[unsafe(method_family = new)]
         fn new_remote_buffer_view_for_device(
@@ -71,31 +82,21 @@ extern_protocol!(
         #[unsafe(method(sparseBufferTier))]
         #[unsafe(method_family = none)]
         fn sparse_buffer_tier(&self) -> MTLBufferSparseTier;
-
-        /// Creates a tensor that shares storage with this buffer.
-        ///
-        /// - Parameters:
-        ///   - descriptor: A description of the properties for the new tensor.
-        ///   - offset: Offset into the buffer at which the data of the tensor begins.
-        ///   - error: If an error occurs during creation, Metal populates this parameter to provide you information about it.
-        ///
-        /// If the descriptor specifies `TensorUsage::MACHINE_LEARNING` usage, you need to observe the following restrictions:
-        /// * pass in `0` for the `offset` parameter
-        /// * set the element stride the descriptor to `1`
-        /// * ensure that number of bytes per row is a multiple of `64`
-        /// * for dimensions greater than `2`, make sure `strides[dim] = strides[dim -1] * dimensions[dim - 1]`
-        #[unsafe(method(newTensorWithDescriptor:offset:error:))]
-        #[unsafe(method_family = new)]
-        fn new_tensor_with_descriptor_offset_error(
-            &self,
-            descriptor: &MTLTensorDescriptor,
-            offset: usize,
-            error: *mut *mut NSError,
-        ) -> Option<Retained<ProtocolObject<dyn MTLTensor>>>;
     }
 );
 
 pub trait BufferExt: MTLBuffer + Message {
+    /// Creates a single-plane tensor that shares storage with this buffer.
+    ///
+    /// Metal validates `descriptor`. `offset` must be zero for
+    /// machine-learning tensors, 128-byte aligned for formatted tensor data,
+    /// and otherwise aligned to the data type's size.
+    fn new_tensor_with_descriptor_offset(
+        &self,
+        descriptor: &MTLTensorDescriptor,
+        offset: usize,
+    ) -> Result<Retained<ProtocolObject<dyn MTLTensor>>, MetalError>;
+
     /// Inform the device of the range of a buffer that the CPU has modified, allowing the implementation to invalidate
     /// its caches of the buffer's content.
     ///
@@ -108,6 +109,12 @@ pub trait BufferExt: MTLBuffer + Message {
     /// It is not valid to invoke this method on buffers of other storage modes.
     ///
     /// Parameter `range`: The range of bytes that have been modified.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `range.start` exceeds `range.end`.
+    #[cfg(any(target_os = "macos", target_abi = "macabi"))]
+    #[deprecated(note = "managed storage has no effect on Apple silicon; use shared storage")]
     fn did_modify_range(
         &self,
         range: Range<usize>,
@@ -119,6 +126,10 @@ pub trait BufferExt: MTLBuffer + Message {
     /// Parameter `marker`: A label used for the marker.
     ///
     /// Parameter `range`: The range of bytes the marker is using.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `range.start` exceeds `range.end`.
     fn add_debug_marker(
         &self,
         marker: &str,
@@ -127,6 +138,16 @@ pub trait BufferExt: MTLBuffer + Message {
 }
 
 impl BufferExt for ProtocolObject<dyn MTLBuffer> {
+    fn new_tensor_with_descriptor_offset(
+        &self,
+        descriptor: &MTLTensorDescriptor,
+        offset: usize,
+    ) -> Result<Retained<ProtocolObject<dyn MTLTensor>>, MetalError> {
+        let mut error: *mut NSError = std::ptr::null_mut();
+        let tensor = unsafe { msg_send![self, newTensorWithDescriptor: descriptor, offset: offset, error: &mut error] };
+        unsafe { MetalError::result_from_nullable(tensor, error, "newTensorWithDescriptor:offset:error:") }
+    }
+
     /// Inform the device of the range of a buffer that the CPU has modified, allowing the implementation to invalidate
     /// its caches of the buffer's content.
     ///
@@ -139,14 +160,16 @@ impl BufferExt for ProtocolObject<dyn MTLBuffer> {
     /// It is not valid to invoke this method on buffers of other storage modes.
     ///
     /// Availability: macOS 10.11+, Mac Catalyst 13.0+ (unavailable on iOS)
+    #[cfg(any(target_os = "macos", target_abi = "macabi"))]
     fn did_modify_range(
         &self,
         range: Range<usize>,
     ) {
+        let range = NSRange::from(range);
         let _: () = unsafe {
             msg_send![
                 self,
-                didModifyRange: Into::<NSRange>::into(range),
+                didModifyRange: range,
             ]
         };
     }
@@ -162,11 +185,12 @@ impl BufferExt for ProtocolObject<dyn MTLBuffer> {
         marker: &str,
         range: Range<usize>,
     ) {
+        let range = NSRange::from(range);
         let _: () = unsafe {
             msg_send![
                 self,
                 addDebugMarker: &*NSString::from_str(marker),
-                range: Into::<NSRange>::into(range),
+                range: range,
             ]
         };
     }

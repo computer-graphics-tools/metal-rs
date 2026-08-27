@@ -94,18 +94,15 @@ impl MTLFunctionStitchingGraph {
             ]
         }
     }
-}
 
-#[allow(unused)]
-impl MTLFunctionStitchingGraph {
     /// The name of the function to call.
-    fn function_name(&self) -> String {
+    pub fn function_name(&self) -> String {
         let s: Retained<NSString> = unsafe { msg_send![self, functionName] };
         s.to_string()
     }
 
     /// Setter for [`function_name`][Self::function_name].
-    fn set_function_name(
+    pub fn set_function_name(
         &self,
         name: &str,
     ) {

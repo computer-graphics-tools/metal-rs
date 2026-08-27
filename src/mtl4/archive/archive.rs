@@ -1,5 +1,5 @@
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::{NSError, NSObjectProtocol, NSString};
+use objc2_foundation::{NSObjectProtocol, NSString};
 
 use crate::{
     MTL4BinaryFunction, MTL4BinaryFunctionDescriptor, MTL4ComputePipelineDescriptor, MTL4PipelineDescriptor,
@@ -11,52 +11,86 @@ extern_protocol!(
     /// A read-only container that stores pipeline states from a shader compiler.
     ///
     /// See also [Apple's documentation](https://developer.apple.com/documentation/metal/mtl4archive?language=objc)
-    pub unsafe trait MTL4Archive: NSObjectProtocol + Send + Sync {
-        /// Creates a compute pipeline state from the archive with a descriptor.
-        #[unsafe(method(newComputePipelineStateWithDescriptor:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_compute_pipeline_state_with_descriptor(
-            &self,
-            descriptor: &MTL4ComputePipelineDescriptor,
-        ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, Retained<NSError>>;
-
-        /// Creates a compute pipeline state from the archive with a compute descriptor and a dynamic linking descriptor.
-        #[unsafe(method(newComputePipelineStateWithDescriptor:dynamicLinkingDescriptor:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_compute_pipeline_state_with_descriptor_dynamic_linking_descriptor(
-            &self,
-            descriptor: &MTL4ComputePipelineDescriptor,
-            dynamic_linking_descriptor: &MTL4PipelineStageDynamicLinkingDescriptor,
-        ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, Retained<NSError>>;
-
-        /// Creates a render pipeline state from the archive with a descriptor.
-        #[unsafe(method(newRenderPipelineStateWithDescriptor:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_render_pipeline_state_with_descriptor(
-            &self,
-            descriptor: &MTL4PipelineDescriptor,
-        ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Retained<NSError>>;
-
-        /// Creates a render pipeline state from the archive with a render descriptor and a dynamic linking descriptor.
-        #[unsafe(method(newRenderPipelineStateWithDescriptor:dynamicLinkingDescriptor:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_render_pipeline_state_with_descriptor_dynamic_linking_descriptor(
-            &self,
-            descriptor: &MTL4PipelineDescriptor,
-            dynamic_linking_descriptor: &MTL4RenderPipelineDynamicLinkingDescriptor,
-        ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Retained<NSError>>;
-
-        /// Method used to create a binary function, with a given descriptor, from the contents of the archive.
-        #[unsafe(method(newBinaryFunctionWithDescriptor:error:_))]
-        #[unsafe(method_family = new)]
-        fn new_binary_function_with_descriptor(
-            &self,
-            descriptor: &MTL4BinaryFunctionDescriptor,
-        ) -> Result<Retained<ProtocolObject<dyn MTL4BinaryFunction>>, Retained<NSError>>;
-    }
+    pub unsafe trait MTL4Archive: NSObjectProtocol + Send + Sync {}
 );
 
 pub trait MTL4ArchiveExt: MTL4Archive + Message {
+    /// Creates a compute pipeline state from the archive with a descriptor.
+    fn new_compute_pipeline_state_with_descriptor(
+        &self,
+        descriptor: &MTL4ComputePipelineDescriptor,
+    ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, crate::MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe { msg_send![self, newComputePipelineStateWithDescriptor: descriptor, error: _] }
+            .map_err(crate::MetalError::from_nserror)
+    }
+
+    /// Creates a compute pipeline state with dynamic-linking configuration from the archive.
+    fn new_compute_pipeline_state_with_descriptor_dynamic_linking_descriptor(
+        &self,
+        descriptor: &MTL4ComputePipelineDescriptor,
+        dynamic_linking_descriptor: &MTL4PipelineStageDynamicLinkingDescriptor,
+    ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, crate::MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe {
+            msg_send![
+                self,
+                newComputePipelineStateWithDescriptor: descriptor,
+                dynamicLinkingDescriptor: dynamic_linking_descriptor,
+                error: _
+            ]
+        }
+        .map_err(crate::MetalError::from_nserror)
+    }
+
+    /// Creates a render pipeline state from the archive with a descriptor.
+    fn new_render_pipeline_state_with_descriptor(
+        &self,
+        descriptor: &MTL4PipelineDescriptor,
+    ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, crate::MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe { msg_send![self, newRenderPipelineStateWithDescriptor: descriptor, error: _] }
+            .map_err(crate::MetalError::from_nserror)
+    }
+
+    /// Creates a render pipeline state with dynamic-linking configuration from the archive.
+    fn new_render_pipeline_state_with_descriptor_dynamic_linking_descriptor(
+        &self,
+        descriptor: &MTL4PipelineDescriptor,
+        dynamic_linking_descriptor: &MTL4RenderPipelineDynamicLinkingDescriptor,
+    ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, crate::MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe {
+            msg_send![
+                self,
+                newRenderPipelineStateWithDescriptor: descriptor,
+                dynamicLinkingDescriptor: dynamic_linking_descriptor,
+                error: _
+            ]
+        }
+        .map_err(crate::MetalError::from_nserror)
+    }
+
+    /// Creates a binary function from the contents of the archive.
+    fn new_binary_function_with_descriptor(
+        &self,
+        descriptor: &MTL4BinaryFunctionDescriptor,
+    ) -> Result<Retained<ProtocolObject<dyn MTL4BinaryFunction>>, crate::MetalError>
+    where
+        Self: Sized,
+    {
+        unsafe { msg_send![self, newBinaryFunctionWithDescriptor: descriptor, error: _] }
+            .map_err(crate::MetalError::from_nserror)
+    }
+
     /// A label that you can associate with this archive.
     fn label(&self) -> Option<String> {
         let s: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
@@ -75,3 +109,20 @@ pub trait MTL4ArchiveExt: MTL4Archive + Message {
 }
 
 impl<T: MTL4Archive + Message> MTL4ArchiveExt for T {}
+
+#[cfg(test)]
+mod tests {
+    use objc2::{rc::Retained, runtime::ProtocolObject};
+
+    use super::{MTL4Archive, MTL4ArchiveExt};
+    use crate::{MTL4ComputePipelineDescriptor, MTLComputePipelineState, MetalError};
+
+    #[test]
+    fn fallible_methods_have_rust_native_signatures() {
+        let _: fn(
+            &ProtocolObject<dyn MTL4Archive>,
+            &MTL4ComputePipelineDescriptor,
+        ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, MetalError> =
+            <ProtocolObject<dyn MTL4Archive> as MTL4ArchiveExt>::new_compute_pipeline_state_with_descriptor;
+    }
+}

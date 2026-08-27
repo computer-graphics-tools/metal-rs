@@ -1,4 +1,4 @@
-use objc2::{extern_protocol, rc::Retained, runtime::ProtocolObject};
+use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSString};
 
 use crate::MTLDevice;
@@ -9,18 +9,32 @@ extern_protocol!(
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
         fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
-
-        /// A string to help identify this object.
-        #[unsafe(method(label))]
-        #[unsafe(method_family = none)]
-        fn label(&self) -> Option<Retained<NSString>>;
-
-        /// Setter for [`label`][Self::label]. This is copied when set.
-        #[unsafe(method(setLabel:))]
-        #[unsafe(method_family = none)]
-        fn set_label(
-            &self,
-            label: Option<&NSString>,
-        );
     }
 );
+
+/// Rust-native label access for a Metal fence.
+pub trait MTLFenceExt: MTLFence + Message {
+    /// A string to help identify this object.
+    fn label(&self) -> Option<String>
+    where
+        Self: Sized,
+    {
+        let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
+        label.map(|label| label.to_string())
+    }
+
+    /// Sets the optional label, copying it into the fence.
+    fn set_label(
+        &self,
+        label: Option<&str>,
+    ) where
+        Self: Sized,
+    {
+        let label = label.map(NSString::from_str);
+        unsafe {
+            let _: () = msg_send![self, setLabel: label.as_deref()];
+        }
+    }
+}
+
+impl<T: MTLFence + Message> MTLFenceExt for T {}

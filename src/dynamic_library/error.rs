@@ -27,8 +27,8 @@ unsafe extern "C" {
     static MTLDynamicLibraryDomain: &'static NSErrorDomain;
 }
 
-/// Returns the NSError domain for dynamic library errors emitted by Metal.
+/// Returns the error domain for dynamic-library errors emitted by Metal.
 #[inline]
-pub fn dynamic_library_error_domain() -> &'static NSErrorDomain {
-    unsafe { MTLDynamicLibraryDomain }
+pub fn dynamic_library_error_domain() -> String {
+    unsafe { MTLDynamicLibraryDomain }.to_string()
 }

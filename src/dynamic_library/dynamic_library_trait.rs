@@ -1,9 +1,9 @@
 use std::path::Path;
 
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::{NSError, NSObjectProtocol, NSString, NSURL};
+use objc2_foundation::{NSObjectProtocol, NSString};
 
-use crate::device::MTLDevice;
+use crate::{MetalError, device::MTLDevice, util::file_url};
 
 extern_protocol!(
     /// A container for the binary representation of code compiled for a Device.
@@ -34,7 +34,7 @@ pub trait MTLDynamicLibraryExt: MTLDynamicLibrary + Message {
     fn serialize_to_path(
         &self,
         path: &Path,
-    ) -> Result<(), Retained<NSError>>;
+    ) -> Result<(), MetalError>;
 }
 
 impl MTLDynamicLibraryExt for ProtocolObject<dyn MTLDynamicLibrary> {
@@ -60,8 +60,8 @@ impl MTLDynamicLibraryExt for ProtocolObject<dyn MTLDynamicLibrary> {
     fn serialize_to_path(
         &self,
         path: &Path,
-    ) -> Result<(), Retained<NSError>> {
-        let url = NSURL::from_file_path(path).expect("path must be a valid file URL path");
-        unsafe { msg_send![self, serializeToURL: &*url, error: _] }
+    ) -> Result<(), MetalError> {
+        let url = file_url(path, "serializeToURL:error:")?;
+        unsafe { msg_send![self, serializeToURL: &*url, error: _] }.map_err(MetalError::from_nserror)
     }
 }

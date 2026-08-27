@@ -4,11 +4,10 @@ unsafe extern "C" {
     /// Error domain constant for `MTLBinaryArchive` operations.
     ///
     /// Apple's documentation: `https://developer.apple.com/documentation/metal/mtlbinaryarchivedomain`.
-    pub static MTLBinaryArchiveDomain: &'static NSErrorDomain;
+    static MTLBinaryArchiveDomain: &'static NSErrorDomain;
 }
 
-#[allow(unused)]
-/// Bridged error domain symbol for `MTLBinaryArchive`.
-pub fn binary_archive_domain() -> &'static NSErrorDomain {
-    unsafe { MTLBinaryArchiveDomain }
+/// Returns the error domain for `MTLBinaryArchive` operations.
+pub fn binary_archive_domain() -> String {
+    unsafe { MTLBinaryArchiveDomain }.to_string()
 }

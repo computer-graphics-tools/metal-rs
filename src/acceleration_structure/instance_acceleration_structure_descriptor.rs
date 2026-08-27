@@ -1,5 +1,5 @@
 use objc2::{
-    extern_class, extern_conformance, extern_methods,
+    extern_class, extern_conformance, extern_methods, msg_send,
     rc::{Allocated, Retained},
     runtime::{NSObject, ProtocolObject},
 };
@@ -86,21 +86,6 @@ impl MTLInstanceAccelerationStructureDescriptor {
         pub fn set_instance_count(
             &self,
             instance_count: usize,
-        );
-
-        /// Acceleration structures to be instanced
-        #[unsafe(method(instancedAccelerationStructures))]
-        #[unsafe(method_family = none)]
-        pub fn instanced_acceleration_structures(
-            &self
-        ) -> Option<Retained<NSArray<ProtocolObject<dyn MTLAccelerationStructure>>>>;
-
-        /// Setter for [`instancedAccelerationStructures`][Self::instancedAccelerationStructures].
-        #[unsafe(method(setInstancedAccelerationStructures:))]
-        #[unsafe(method_family = none)]
-        pub fn set_instanced_acceleration_structures(
-            &self,
-            instanced_acceleration_structures: Option<&NSArray<ProtocolObject<dyn MTLAccelerationStructure>>>,
         );
 
         /// Type of instance descriptor in the instance descriptor buffer. Defaults to
@@ -203,6 +188,26 @@ impl MTLInstanceAccelerationStructureDescriptor {
         #[unsafe(method_family = none)]
         pub fn descriptor() -> Retained<Self>;
     );
+
+    /// Acceleration structures to be instanced.
+    pub fn instanced_acceleration_structures(
+        &self
+    ) -> Option<Box<[Retained<ProtocolObject<dyn MTLAccelerationStructure>>]>> {
+        let structures: Option<Retained<NSArray<ProtocolObject<dyn MTLAccelerationStructure>>>> =
+            unsafe { msg_send![self, instancedAccelerationStructures] };
+        structures.map(|structures| structures.to_vec().into_boxed_slice())
+    }
+
+    /// Sets the acceleration structures to be instanced.
+    pub fn set_instanced_acceleration_structures(
+        &self,
+        instanced_acceleration_structures: Option<&[&ProtocolObject<dyn MTLAccelerationStructure>]>,
+    ) {
+        let structures = instanced_acceleration_structures.map(NSArray::from_slice);
+        unsafe {
+            let _: () = msg_send![self, setInstancedAccelerationStructures: structures.as_deref()];
+        }
+    }
 }
 
 /// Methods declared on superclass `NSObject`.

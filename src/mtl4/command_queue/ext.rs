@@ -1,14 +1,25 @@
-use objc2::{Message, msg_send, runtime::ProtocolObject};
+use objc2::{Message, msg_send, rc::Retained, runtime::ProtocolObject};
+use objc2_foundation::NSString;
 
-use crate::util::ref_slice_as_ptr;
-use crate::*;
+use crate::{util::ref_slice_as_ptr, *};
 
 pub trait MTL4CommandQueueExt: MTL4CommandQueue + Message {
+    /// Obtains this queue's optional label for debugging purposes.
+    fn label(&self) -> Option<String>
+    where
+        Self: Sized,
+    {
+        let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
+        label.map(|label| label.to_string())
+    }
+
     /// Enqueues an array of command buffers for execution.
     /// The order of command buffers in the slice is meaningful, especially for
     /// suspending/resuming render passes.
-    fn commit(&self, command_buffers: &[&ProtocolObject<dyn MTL4CommandBuffer>])
-    where
+    fn commit(
+        &self,
+        command_buffers: &[&ProtocolObject<dyn MTL4CommandBuffer>],
+    ) where
         Self: Sized,
     {
         let ptr = ref_slice_as_ptr(command_buffers);
@@ -31,8 +42,10 @@ pub trait MTL4CommandQueueExt: MTL4CommandQueue + Message {
     /// Marks an array of residency sets as part of this command queue.
     /// Ensures that Metal makes them resident during execution of all command buffers committed
     /// to this queue. Each command queue supports up to 32 unique residency set instances.
-    fn add_residency_sets(&self, residency_sets: &[&ProtocolObject<dyn MTLResidencySet>])
-    where
+    fn add_residency_sets(
+        &self,
+        residency_sets: &[&ProtocolObject<dyn MTLResidencySet>],
+    ) where
         Self: Sized,
     {
         let ptr = ref_slice_as_ptr(residency_sets);
@@ -41,8 +54,10 @@ pub trait MTL4CommandQueueExt: MTL4CommandQueue + Message {
 
     /// Removes multiple residency sets from the command queue. After calling this method only
     /// the remaining residency sets remain resident during execution of committed command buffers.
-    fn remove_residency_sets(&self, residency_sets: &[&ProtocolObject<dyn MTLResidencySet>])
-    where
+    fn remove_residency_sets(
+        &self,
+        residency_sets: &[&ProtocolObject<dyn MTLResidencySet>],
+    ) where
         Self: Sized,
     {
         let ptr = ref_slice_as_ptr(residency_sets);

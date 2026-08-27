@@ -1,14 +1,23 @@
 use objc2::{Encode, Encoding, RefEncode};
-use objc2_foundation::NSErrorDomain;
+use objc2_foundation::{NSErrorDomain, NSErrorUserInfoKey};
 
 unsafe extern "C" {
     /// Error domain for NSError objects produced by MTLCommandBuffer.
-    pub static MTLCommandBufferErrorDomain: &'static NSErrorDomain;
+    static MTLCommandBufferErrorDomain: &'static NSErrorDomain;
+
+    /// Key whose value contains encoder execution details in a command-buffer error.
+    static MTLCommandBufferEncoderInfoErrorKey: &'static NSErrorUserInfoKey;
 }
 
 #[inline]
-pub fn command_buffer_error_domain() -> &'static NSErrorDomain {
-    unsafe { MTLCommandBufferErrorDomain }
+pub fn command_buffer_error_domain() -> String {
+    unsafe { MTLCommandBufferErrorDomain }.to_string()
+}
+
+/// Returns the user-info key for command-buffer encoder execution details.
+#[inline]
+pub fn command_buffer_encoder_info_error_key() -> String {
+    unsafe { MTLCommandBufferEncoderInfoErrorKey }.to_string()
 }
 
 /// Error codes that can be found in MTLCommandBuffer.error.
@@ -27,8 +36,16 @@ pub enum MTLCommandBufferError {
     OutOfMemory = 8,
     InvalidResource = 9,
     Memoryless = 10,
+    #[deprecated(note = "this error cannot occur on Apple Silicon")]
     DeviceRemoved = 11,
     StackOverflow = 12,
+}
+
+impl MTLCommandBufferError {
+    /// Deprecated name for [`Self::AccessRevoked`].
+    #[allow(non_upper_case_globals)]
+    #[deprecated(note = "use AccessRevoked")]
+    pub const Blacklisted: Self = Self::AccessRevoked;
 }
 
 unsafe impl Encode for MTLCommandBufferError {
@@ -47,4 +64,21 @@ unsafe impl Encode for MTLCommandBufferErrorOption {
 }
 unsafe impl RefEncode for MTLCommandBufferErrorOption {
     const ENCODING_REF: Encoding = Encoding::Pointer(&Self::ENCODING);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{MTLCommandBufferError, MTLCommandBufferErrorOption};
+
+    #[test]
+    #[allow(deprecated)]
+    fn deprecated_blacklisted_error_matches_access_revoked() {
+        assert_eq!(MTLCommandBufferError::Blacklisted, MTLCommandBufferError::AccessRevoked);
+    }
+
+    #[test]
+    fn error_option_bits_match_metal_header_values() {
+        assert_eq!(MTLCommandBufferErrorOption::None.bits(), 0);
+        assert_eq!(MTLCommandBufferErrorOption::EncoderExecutionStatus.bits(), 1);
+    }
 }

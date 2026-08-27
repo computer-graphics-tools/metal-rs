@@ -1,32 +1,28 @@
-use std::ops::Deref;
-
 use block2::{Block, RcBlock};
 use objc2::{rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::NSError;
 
 use super::MTLFunction;
+use crate::MetalError;
 
 /// A completion handler invoked when a function creation finishes.
 ///
-/// Signature mirrors Metal's `void (^MTLNewLibraryCompletionHandler)(id<MTLFunction> function, NSError *error)`.
+/// Signature mirrors the function-creation completion blocks on `MTLLibrary`.
 pub struct LibraryFunctionCompletionHandler(RcBlock<dyn Fn(*mut ProtocolObject<dyn MTLFunction>, *mut NSError)>);
 
 impl LibraryFunctionCompletionHandler {
     pub fn new<F>(handler: F) -> Self
     where
-        F: Fn(Option<Retained<ProtocolObject<dyn MTLFunction>>>, *mut NSError) + 'static,
+        F: Fn(Option<Retained<ProtocolObject<dyn MTLFunction>>>, Option<MetalError>) + 'static,
     {
         Self(RcBlock::new(move |function_ptr: *mut ProtocolObject<dyn MTLFunction>, error: *mut NSError| {
-            let function = unsafe { Retained::from_raw(function_ptr) };
+            let function = unsafe { Retained::retain(function_ptr) };
+            let error = unsafe { MetalError::from_unretained(error) };
             handler(function, error);
         }))
     }
-}
 
-impl Deref for LibraryFunctionCompletionHandler {
-    type Target = Block<dyn Fn(*mut ProtocolObject<dyn MTLFunction>, *mut NSError)>;
-
-    fn deref(&self) -> &Self::Target {
+    pub(super) fn as_block(&self) -> &Block<dyn Fn(*mut ProtocolObject<dyn MTLFunction>, *mut NSError)> {
         &self.0
     }
 }

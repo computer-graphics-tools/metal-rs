@@ -3,8 +3,7 @@ use core::ops::Range;
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSRange, NSString};
 
-use crate::util::ref_slice_as_ptr;
-use crate::*;
+use crate::{util::ref_slice_as_ptr, *};
 
 extern_protocol!(
     /// Records a sequence of GPU commands.
@@ -81,6 +80,8 @@ extern_protocol!(
         fn pop_debug_group(&self);
 
         /// Writes a GPU timestamp into the given counter heap.
+        ///
+        /// `index` needs to identify a valid entry in a timestamp counter heap.
         #[unsafe(method(writeTimestampIntoHeap:atIndex:))]
         #[unsafe(method_family = none)]
         fn write_timestamp_into_heap_at_index(
@@ -105,13 +106,10 @@ pub trait MTL4CommandBufferExt: MTL4CommandBuffer + Message {
         &self,
         label: &str,
     );
-    /// Convenience: index as usize.
-    fn write_timestamp_into_heap_at_index_usize(
-        &self,
-        counter_heap: &ProtocolObject<dyn MTL4CounterHeap>,
-        index: usize,
-    );
-    /// Resolve counter heap using a Rust Range<usize>.
+    /// Resolves a counter-heap range into a buffer range.
+    ///
+    /// `range` needs to be within `counter_heap`, and `buffer_range` needs to provide
+    /// enough valid writable GPU storage for every resolved entry.
     fn resolve_counter_heap_into_buffer_with_range(
         &self,
         counter_heap: &ProtocolObject<dyn MTL4CounterHeap>,
@@ -121,7 +119,10 @@ pub trait MTL4CommandBufferExt: MTL4CommandBuffer + Message {
         fence_to_update: Option<&ProtocolObject<dyn MTLFence>>,
     );
     /// Marks an array of residency sets as part of the command buffer's execution.
-    fn use_residency_sets(&self, residency_sets: &[&ProtocolObject<dyn MTLResidencySet>]);
+    fn use_residency_sets(
+        &self,
+        residency_sets: &[&ProtocolObject<dyn MTLResidencySet>],
+    );
 }
 
 impl MTL4CommandBufferExt for ProtocolObject<dyn MTL4CommandBuffer> {
@@ -148,16 +149,6 @@ impl MTL4CommandBufferExt for ProtocolObject<dyn MTL4CommandBuffer> {
         }
     }
 
-    fn write_timestamp_into_heap_at_index_usize(
-        &self,
-        counter_heap: &ProtocolObject<dyn MTL4CounterHeap>,
-        index: usize,
-    ) {
-        unsafe {
-            let _: () = msg_send![self, writeTimestampIntoHeap: counter_heap, atIndex: index];
-        }
-    }
-
     fn resolve_counter_heap_into_buffer_with_range(
         &self,
         counter_heap: &ProtocolObject<dyn MTL4CounterHeap>,
@@ -179,7 +170,10 @@ impl MTL4CommandBufferExt for ProtocolObject<dyn MTL4CommandBuffer> {
         }
     }
 
-    fn use_residency_sets(&self, residency_sets: &[&ProtocolObject<dyn MTLResidencySet>]) {
+    fn use_residency_sets(
+        &self,
+        residency_sets: &[&ProtocolObject<dyn MTLResidencySet>],
+    ) {
         let ptr = ref_slice_as_ptr(residency_sets);
         unsafe {
             let _: () = msg_send![self, useResidencySets: ptr, count: residency_sets.len()];

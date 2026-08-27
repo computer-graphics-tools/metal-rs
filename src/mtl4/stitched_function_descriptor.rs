@@ -1,5 +1,5 @@
 use objc2::{
-    extern_class, extern_conformance, extern_methods,
+    extern_class, extern_conformance, extern_methods, msg_send,
     rc::{Allocated, Retained},
 };
 use objc2_foundation::{CopyingHelper, NSArray, NSCopying, NSObject, NSObjectProtocol};
@@ -43,22 +43,25 @@ impl MTL4StitchedFunctionDescriptor {
             &self,
             function_graph: Option<&MTLFunctionStitchingGraph>,
         );
-
-        /// Configures an array of function descriptors with references to functions that contribute to the stitching process.
-        #[unsafe(method(functionDescriptors))]
-        #[unsafe(method_family = none)]
-        pub fn function_descriptors(&self) -> Option<Retained<NSArray<MTL4FunctionDescriptor>>>;
-
-        /// Setter for [`functionDescriptors`][Self::functionDescriptors].
-        ///
-        /// This is [copied][objc2_foundation::NSCopying::copy] when set.
-        #[unsafe(method(setFunctionDescriptors:))]
-        #[unsafe(method_family = none)]
-        pub fn set_function_descriptors(
-            &self,
-            function_descriptors: Option<&NSArray<MTL4FunctionDescriptor>>,
-        );
     );
+
+    /// Function descriptors that contribute to the stitching process.
+    pub fn function_descriptors(&self) -> Option<Box<[Retained<MTL4FunctionDescriptor>]>> {
+        let descriptors: Option<Retained<NSArray<MTL4FunctionDescriptor>>> =
+            unsafe { msg_send![self, functionDescriptors] };
+        descriptors.map(|descriptors| descriptors.to_vec().into_boxed_slice())
+    }
+
+    /// Sets the function descriptors with copy semantics.
+    pub fn set_function_descriptors(
+        &self,
+        function_descriptors: Option<&[&MTL4FunctionDescriptor]>,
+    ) {
+        let function_descriptors = function_descriptors.map(NSArray::from_slice);
+        unsafe {
+            let _: () = msg_send![self, setFunctionDescriptors: function_descriptors.as_deref()];
+        }
+    }
 }
 
 /// Methods declared on superclass `NSObject`.
@@ -72,4 +75,19 @@ impl MTL4StitchedFunctionDescriptor {
         #[unsafe(method_family = new)]
         pub fn new() -> Retained<Self>;
     );
+}
+
+#[cfg(test)]
+mod tests {
+    use objc2::rc::Retained;
+
+    use super::{MTL4FunctionDescriptor, MTL4StitchedFunctionDescriptor};
+
+    #[test]
+    fn collection_method_has_rust_native_signature() {
+        let _: fn(&MTL4StitchedFunctionDescriptor) -> Option<Box<[Retained<MTL4FunctionDescriptor>]>> =
+            MTL4StitchedFunctionDescriptor::function_descriptors;
+        let _: fn(&MTL4StitchedFunctionDescriptor, Option<&[&MTL4FunctionDescriptor]>) =
+            MTL4StitchedFunctionDescriptor::set_function_descriptors;
+    }
 }

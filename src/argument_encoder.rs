@@ -3,11 +3,10 @@ use core::{ffi::c_void, ops::Range, ptr::NonNull};
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
 use objc2_foundation::{NSObjectProtocol, NSRange, NSString};
 
-use crate::util::opt_ref_slice_as_ptr;
 use crate::{
     MTLAccelerationStructure, MTLBuffer, MTLComputePipelineState, MTLDepthStencilState, MTLDevice,
     MTLIndirectCommandBuffer, MTLIntersectionFunctionTable, MTLRenderPipelineState, MTLSamplerState, MTLTexture,
-    MTLVisibleFunctionTable,
+    MTLVisibleFunctionTable, util::opt_ref_slice_as_ptr,
 };
 
 /// When calling functions with an `attributeStrides:` parameter on a render
@@ -15,31 +14,32 @@ use crate::{
 /// points that are either not part of the set of MTLBufferLayoutDescriptor,
 /// or whose stride values in the descriptor is not set to
 /// `MTLBufferLayoutStrideDynamic`
+///
+/// Availability: macOS 14.0+, iOS 17.0+
 pub const MTL_ATTRIBUTE_STRIDE_STATIC: usize = usize::MAX;
+
+fn assert_slice_matches_range<T>(
+    values: &[T],
+    range: &Range<usize>,
+) {
+    assert_eq!(values.len(), range.len(), "slice length must match binding range length");
+}
 
 extern_protocol!(
     /// Encodes buffer, texture, sampler, pipeline, indirect command buffer,
     /// acceleration structure, and constant data into a buffer.
     ///
     /// Availability: macOS 10.13+, iOS 11.0+
+    ///
+    /// # Safety
+    ///
+    /// Implementors must be Objective-C objects that conform to the
+    /// `MTLArgumentEncoder` protocol.
     pub unsafe trait MTLArgumentEncoder: NSObjectProtocol {
         /// The device this argument encoder was created against.
         #[unsafe(method(device))]
         #[unsafe(method_family = none)]
         fn device(&self) -> Retained<ProtocolObject<dyn MTLDevice>>;
-
-        /// A string to help identify this object.
-        #[unsafe(method(label))]
-        #[unsafe(method_family = none)]
-        fn label(&self) -> Option<Retained<NSString>>;
-
-        /// Setter for `label`.
-        #[unsafe(method(setLabel:))]
-        #[unsafe(method_family = none)]
-        fn set_label(
-            &self,
-            label: Option<&NSString>,
-        );
 
         /// The number of bytes required to store the encoded resource bindings.
         #[unsafe(method(encodedLength))]
@@ -198,7 +198,33 @@ extern_protocol!(
     }
 );
 
+/// Safe slice-based wrappers for the bulk argument-encoder selectors.
+///
+/// Each method panics unless its slice length equals the binding range length,
+/// preventing Metal from reading beyond the slice passed across FFI.
 pub trait MTLArgumentEncoderExt: MTLArgumentEncoder + Message {
+    /// A string to help identify this object.
+    fn label(&self) -> Option<String>
+    where
+        Self: Sized,
+    {
+        let label: Option<Retained<NSString>> = unsafe { msg_send![self, label] };
+        label.map(|label| label.to_string())
+    }
+
+    /// Sets the optional label, copying it into the encoder.
+    fn set_label(
+        &self,
+        label: Option<&str>,
+    ) where
+        Self: Sized,
+    {
+        let label = label.map(NSString::from_str);
+        unsafe {
+            let _: () = msg_send![self, setLabel: label.as_deref()];
+        }
+    }
+
     /// Set an array of buffers at the given bind point index range.
     fn set_buffers(
         &self,
@@ -208,7 +234,8 @@ pub trait MTLArgumentEncoderExt: MTLArgumentEncoder + Message {
     ) where
         Self: Sized,
     {
-        assert_eq!(buffers.len(), offsets.len());
+        assert_eq!(buffers.len(), offsets.len(), "buffers and offsets must have equal lengths");
+        assert_slice_matches_range(buffers, &range);
         let ptr = opt_ref_slice_as_ptr(buffers);
         unsafe { msg_send![self, setBuffers: ptr, offsets: offsets.as_ptr(), withRange: NSRange::from(range)] }
     }
@@ -221,6 +248,7 @@ pub trait MTLArgumentEncoderExt: MTLArgumentEncoder + Message {
     ) where
         Self: Sized,
     {
+        assert_slice_matches_range(textures, &range);
         let ptr = opt_ref_slice_as_ptr(textures);
         unsafe { msg_send![self, setTextures: ptr, withRange: NSRange::from(range)] }
     }
@@ -233,6 +261,7 @@ pub trait MTLArgumentEncoderExt: MTLArgumentEncoder + Message {
     ) where
         Self: Sized,
     {
+        assert_slice_matches_range(samplers, &range);
         let ptr = opt_ref_slice_as_ptr(samplers);
         unsafe { msg_send![self, setSamplerStates: ptr, withRange: NSRange::from(range)] }
     }
@@ -247,6 +276,7 @@ pub trait MTLArgumentEncoderExt: MTLArgumentEncoder + Message {
     ) where
         Self: Sized,
     {
+        assert_slice_matches_range(pipelines, &range);
         let ptr = opt_ref_slice_as_ptr(pipelines);
         unsafe { msg_send![self, setRenderPipelineStates: ptr, withRange: NSRange::from(range)] }
     }
@@ -261,6 +291,7 @@ pub trait MTLArgumentEncoderExt: MTLArgumentEncoder + Message {
     ) where
         Self: Sized,
     {
+        assert_slice_matches_range(pipelines, &range);
         let ptr = opt_ref_slice_as_ptr(pipelines);
         unsafe { msg_send![self, setComputePipelineStates: ptr, withRange: NSRange::from(range)] }
     }
@@ -275,6 +306,7 @@ pub trait MTLArgumentEncoderExt: MTLArgumentEncoder + Message {
     ) where
         Self: Sized,
     {
+        assert_slice_matches_range(buffers, &range);
         let ptr = opt_ref_slice_as_ptr(buffers);
         unsafe { msg_send![self, setIndirectCommandBuffers: ptr, withRange: NSRange::from(range)] }
     }
@@ -289,6 +321,7 @@ pub trait MTLArgumentEncoderExt: MTLArgumentEncoder + Message {
     ) where
         Self: Sized,
     {
+        assert_slice_matches_range(tables, &range);
         let ptr = opt_ref_slice_as_ptr(tables);
         unsafe { msg_send![self, setVisibleFunctionTables: ptr, withRange: NSRange::from(range)] }
     }
@@ -303,6 +336,7 @@ pub trait MTLArgumentEncoderExt: MTLArgumentEncoder + Message {
     ) where
         Self: Sized,
     {
+        assert_slice_matches_range(tables, &range);
         let ptr = opt_ref_slice_as_ptr(tables);
         unsafe { msg_send![self, setIntersectionFunctionTables: ptr, withRange: NSRange::from(range)] }
     }
@@ -317,9 +351,26 @@ pub trait MTLArgumentEncoderExt: MTLArgumentEncoder + Message {
     ) where
         Self: Sized,
     {
+        assert_slice_matches_range(states, &range);
         let ptr = opt_ref_slice_as_ptr(states);
         unsafe { msg_send![self, setDepthStencilStates: ptr, withRange: NSRange::from(range)] }
     }
 }
 
 impl<T: MTLArgumentEncoder + Message> MTLArgumentEncoderExt for T {}
+
+#[cfg(test)]
+mod tests {
+    use super::assert_slice_matches_range;
+
+    #[test]
+    fn accepts_a_slice_matching_the_binding_range() {
+        assert_slice_matches_range(&[1, 2, 3], &(4..7));
+    }
+
+    #[test]
+    #[should_panic(expected = "slice length must match binding range length")]
+    fn rejects_a_slice_shorter_than_the_binding_range() {
+        assert_slice_matches_range(&[1, 2], &(4..7));
+    }
+}

@@ -79,7 +79,7 @@ impl<T: MTL4ArgumentTable + Message> MTL4ArgumentTableExt for T {
         s.map(|v| v.to_string())
     }
 
-    /// Setter for [`label`][Self::label].
+    /// Sets the optional debugging label.
     fn set_label(
         &self,
         label: Option<&str>,

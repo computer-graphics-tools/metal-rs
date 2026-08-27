@@ -4,7 +4,7 @@ use objc2::{
     rc::Retained,
     runtime::ProtocolObject,
 };
-use objc2_foundation::{NSObjectProtocol};
+use objc2_foundation::NSObjectProtocol;
 
 use crate::*;
 

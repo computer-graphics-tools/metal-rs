@@ -1,5 +1,5 @@
 use objc2::{
-    extern_class, extern_conformance, extern_methods,
+    extern_class, extern_conformance, extern_methods, msg_send,
     rc::{Allocated, Retained},
     runtime::NSObject,
 };
@@ -17,24 +17,28 @@ extern_conformance!(
 );
 
 impl MTLRasterizationRateSampleArray {
-    extern_methods!(
-        /// Retrieves the sample value at the specified index.
-        #[unsafe(method(objectAtIndexedSubscript:))]
-        #[unsafe(method_family = none)]
-        pub fn object_at_indexed_subscript(
-            &self,
-            index: usize,
-        ) -> Retained<NSNumber>;
+    /// Retrieves the single-precision sample value at `index`.
+    ///
+    /// Metal returns `0.0` when `index` is out of range.
+    pub fn object_at_indexed_subscript(
+        &self,
+        index: usize,
+    ) -> f32 {
+        let value: Retained<NSNumber> = unsafe { msg_send![self, objectAtIndexedSubscript: index] };
+        value.as_f32()
+    }
 
-        /// Stores a sample value at the specified index.
-        #[unsafe(method(setObject:atIndexedSubscript:))]
-        #[unsafe(method_family = none)]
-        pub fn set_object_at_indexed_subscript(
-            &self,
-            value: &NSNumber,
-            index: usize,
-        );
-    );
+    /// Stores a sample value at `index`.
+    pub fn set_object_at_indexed_subscript(
+        &self,
+        value: f32,
+        index: usize,
+    ) {
+        let value = NSNumber::new_f32(value);
+        unsafe {
+            let _: () = msg_send![self, setObject: &*value, atIndexedSubscript: index];
+        }
+    }
 }
 
 /// Methods declared on superclass `NSObject`.

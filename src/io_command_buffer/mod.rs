@@ -10,10 +10,10 @@ mod queue_type;
 mod scratch_buffer;
 mod scratch_buffer_allocator;
 
-pub use command_buffer::MTLIOCommandBuffer;
+pub use command_buffer::{MTLIOCommandBuffer, MTLIOCommandBufferExt};
 pub use command_queue::{MTLIOCommandQueue, MTLIOCommandQueueExt};
 pub use command_queue_descriptor::MTLIOCommandQueueDescriptor;
-pub use completed_handler::MTLIOCommandBufferCompletedHandler;
+pub use completed_handler::{MTLIOCommandBufferCompletedHandler, MTLIOCommandBufferHandler};
 pub use error::{MTLIOError, io_error_domain};
 pub use file_handle::{MTLIOFileHandle, MTLIOFileHandleExt};
 pub use io_status::MTLIOStatus;

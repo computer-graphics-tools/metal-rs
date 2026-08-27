@@ -1,27 +1,36 @@
 use std::{ffi::c_void, path::Path, ptr::NonNull};
 
+use block2::{Block, RcBlock};
 use dispatch2::DispatchData;
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::{NSArray, NSError, NSObjectProtocol, NSString, NSURL};
+use objc2_foundation::{NSArray, NSBundle, NSError, NSObjectProtocol, NSString};
+use objc2_io_surface::IOSurfaceRef;
 
 use super::{MTLArchitecture, MTLSizeAndAlign};
+#[cfg(target_os = "macos")]
+#[allow(deprecated)]
+use crate::MTLDeviceLocation;
+#[allow(deprecated)]
+use crate::MTLFeatureSet;
 use crate::{
-    MTL4Archive, MTL4ArgumentTable, MTL4ArgumentTableDescriptor, MTL4BinaryFunction, MTL4CommandAllocatorDescriptor,
-    MTL4CommandQueueDescriptor, MTL4CompilerDescriptor, MTL4CounterHeap, MTL4CounterHeapDescriptor,
-    MTL4CounterHeapType, MTL4PipelineDataSetSerializer, MTL4PipelineDataSetSerializerDescriptor,
-    MTLAccelerationStructure, MTLArgumentBuffersTier, MTLArgumentEncoder, MTLBinaryArchive, MTLBinaryArchiveDescriptor,
-    MTLBuffer, MTLBufferBinding, MTLCommandQueue, MTLCommandQueueDescriptor, MTLCompileOptions,
-    MTLComputePipelineDescriptor, MTLComputePipelineState, MTLCounterSampleBuffer, MTLCounterSampleBufferDescriptor,
-    MTLCounterSamplingPoint, MTLCounterSet, MTLDepthStencilDescriptor, MTLDepthStencilState, MTLDeviceLocation,
-    MTLDynamicLibrary, MTLEvent, MTLFeatureSet, MTLFence, MTLFunction, MTLFunctionHandle, MTLGPUFamily, MTLHeap,
-    MTLHeapDescriptor, MTLIOCommandQueue, MTLIOCommandQueueDescriptor, MTLIOCompressionMethod, MTLIOFileHandle,
-    MTLIndirectCommandBuffer, MTLIndirectCommandBufferDescriptor, MTLLibrary, MTLLogState, MTLLogStateDescriptor,
-    MTLPipelineOption, MTLPixelFormat, MTLRasterizationRateMap, MTLRasterizationRateMapDescriptor,
-    MTLReadWriteTextureTier, MTLRenderPipelineDescriptor, MTLRenderPipelineReflection, MTLRenderPipelineState,
-    MTLResidencySet, MTLResidencySetDescriptor, MTLResourceOptions, MTLResourceViewPoolDescriptor, MTLSamplePosition,
+    CallbackBlock, MTL4Archive, MTL4ArgumentTable, MTL4ArgumentTableDescriptor, MTL4BinaryFunction,
+    MTL4CommandAllocatorDescriptor, MTL4CommandQueueDescriptor, MTL4CompilerDescriptor, MTL4CounterHeap,
+    MTL4CounterHeapDescriptor, MTL4CounterHeapType, MTL4PipelineDataSetSerializer,
+    MTL4PipelineDataSetSerializerDescriptor, MTLAccelerationStructure, MTLArgumentBuffersTier, MTLArgumentEncoder,
+    MTLBinaryArchive, MTLBinaryArchiveDescriptor, MTLBuffer, MTLBufferBinding, MTLCommandQueue,
+    MTLCommandQueueDescriptor, MTLCompileOptions, MTLComputePipelineDescriptor, MTLComputePipelineState,
+    MTLCounterSampleBuffer, MTLCounterSampleBufferDescriptor, MTLCounterSamplingPoint, MTLCounterSet,
+    MTLDepthStencilDescriptor, MTLDepthStencilState, MTLDynamicLibrary, MTLEvent, MTLFence, MTLFunction,
+    MTLFunctionHandle, MTLGPUFamily, MTLHeap, MTLHeapDescriptor, MTLIOCommandQueue, MTLIOCommandQueueDescriptor,
+    MTLIOCompressionMethod, MTLIOFileHandle, MTLIndirectCommandBuffer, MTLIndirectCommandBufferDescriptor, MTLLibrary,
+    MTLLogState, MTLLogStateDescriptor, MTLMeshRenderPipelineDescriptor, MTLNewRenderPipelineStateCompletionHandler,
+    MTLNewRenderPipelineStateWithReflectionCompletionHandler, MTLPipelineOption, MTLPixelFormat,
+    MTLRasterizationRateMap, MTLRasterizationRateMapDescriptor, MTLReadWriteTextureTier, MTLRegion,
+    MTLRenderPipelineDescriptor, MTLRenderPipelineReflection, MTLRenderPipelineState, MTLResidencySet,
+    MTLResidencySetDescriptor, MTLResourceOptions, MTLResourceViewPoolDescriptor, MTLSamplePosition,
     MTLSamplerDescriptor, MTLSamplerState, MTLSharedEvent, MTLSharedEventHandle, MTLSharedTextureHandle, MTLSize,
-    MTLSparsePageSize, MTLTensor, MTLTensorDescriptor, MTLTexture, MTLTextureDescriptor, MTLTextureType,
-    MTLTextureViewPool,
+    MTLSparsePageSize, MTLSparseTextureRegionAlignmentMode, MTLTensor, MTLTensorBufferAttachments, MTLTensorDescriptor,
+    MTLTexture, MTLTextureDescriptor, MTLTextureType, MTLTextureViewPool, MetalError,
     acceleration_structure::{MTLAccelerationStructureDescriptor, MTLAccelerationStructureSizes},
     argument::MTLArgumentDescriptor,
     compute_pipeline::{
@@ -31,12 +40,22 @@ use crate::{
     function_stitching::MTLStitchedLibraryDescriptor,
     library::NewLibraryCompletionHandler,
     render_pipeline::MTLTileRenderPipelineDescriptor,
+    util::file_url,
 };
+
+/// Timestamp value returned by Metal's device sampling APIs.
+pub type MTLTimestamp = u64;
 
 extern_protocol!(
     /// A Metal device that represents a GPU.
     ///
-    /// See Apple's documentation for  for details.
+    /// Metal declares device objects sendable and permits their use from
+    /// multiple threads.
+    ///
+    /// # Safety
+    ///
+    /// Implementors must be genuine Objective-C objects conforming to
+    /// `MTLDevice`, including Metal's thread-safety contract.
     pub unsafe trait MTLDevice: NSObjectProtocol + Send + Sync {
         /// Returns the IORegistry ID for the Metal device.
         #[unsafe(method(registryID))]
@@ -54,11 +73,15 @@ extern_protocol!(
         fn max_threads_per_threadgroup(&self) -> MTLSize;
 
         /// Whether this GPU is a low-power device.
+        #[cfg(any(target_os = "macos", target_abi = "macabi"))]
+        #[deprecated(note = "not applicable on Apple Silicon")]
         #[unsafe(method(isLowPower))]
         #[unsafe(method_family = none)]
         fn is_low_power(&self) -> bool;
 
         /// Whether this GPU has no displays attached.
+        #[cfg(any(target_os = "macos", target_abi = "macabi"))]
+        #[deprecated(note = "not applicable on Apple Silicon")]
         #[unsafe(method(isHeadless))]
         #[unsafe(method_family = none)]
         fn is_headless(&self) -> bool;
@@ -74,16 +97,23 @@ extern_protocol!(
         fn recommended_max_working_set_size(&self) -> u64;
 
         /// Preferred location of the GPU relative to the host.
+        #[cfg(target_os = "macos")]
+        #[allow(deprecated)]
+        #[deprecated(note = "not applicable on Apple Silicon")]
         #[unsafe(method(location))]
         #[unsafe(method_family = none)]
         fn location(&self) -> MTLDeviceLocation;
 
         /// Further specifies the GPU's location (slot or port number).
+        #[cfg(target_os = "macos")]
+        #[deprecated(note = "not applicable on Apple Silicon")]
         #[unsafe(method(locationNumber))]
         #[unsafe(method_family = none)]
         fn location_number(&self) -> usize;
 
         /// Upper bound of System RAM <=> VRAM transfer rate in bytes/sec.
+        #[cfg(target_os = "macos")]
+        #[deprecated(note = "not applicable on Apple Silicon")]
         #[unsafe(method(maxTransferRate))]
         #[unsafe(method_family = none)]
         fn max_transfer_rate(&self) -> u64;
@@ -99,6 +129,8 @@ extern_protocol!(
         fn argument_buffers_support(&self) -> MTLArgumentBuffersTier;
 
         /// Whether the device supports MTLPixelFormatDepth24Unorm_Stencil8.
+        #[cfg(any(target_os = "macos", target_abi = "macabi"))]
+        #[deprecated(note = "never supported on Apple Silicon")]
         #[unsafe(method(isDepth24Stencil8PixelFormatSupported))]
         #[unsafe(method_family = none)]
         fn is_depth24_stencil8_pixel_format_supported(&self) -> bool;
@@ -143,21 +175,13 @@ extern_protocol!(
             descriptor: &MTLDepthStencilDescriptor,
         ) -> Option<Retained<ProtocolObject<dyn MTLDepthStencilState>>>;
 
-        /// Allocate a new counter sample buffer.
-        #[unsafe(method(newCounterSampleBufferWithDescriptor:error:_))]
-        #[unsafe(method_family = none)]
-        fn new_counter_sample_buffer_with_descriptor_error(
-            &self,
-            descriptor: &MTLCounterSampleBufferDescriptor,
-        ) -> Result<Retained<ProtocolObject<dyn MTLCounterSampleBuffer>>, Retained<NSError>>;
-
         /// Sample the CPU and GPU timestamps as closely as possible.
         #[unsafe(method(sampleTimestamps:gpuTimestamp:))]
         #[unsafe(method_family = none)]
         fn sample_timestamps_gpu_timestamp(
             &self,
-            cpu_timestamp: *mut u64,
-            gpu_timestamp: *mut u64,
+            cpu_timestamp: &mut MTLTimestamp,
+            gpu_timestamp: &mut MTLTimestamp,
         );
 
         /// Query device for counter sampling points support.
@@ -184,6 +208,7 @@ extern_protocol!(
         fn supports_pull_model_interpolation(&self) -> bool;
 
         /// Deprecated in favor of .
+        #[deprecated(note = "use supports_shader_barycentric_coordinates")]
         #[unsafe(method(areBarycentricCoordsSupported))]
         #[unsafe(method_family = none)]
         fn barycentric_coords_supported(&self) -> bool;
@@ -199,6 +224,8 @@ extern_protocol!(
         fn current_allocated_size(&self) -> usize;
 
         /// Whether this GPU is removable.
+        #[cfg(any(target_os = "macos", target_abi = "macabi"))]
+        #[deprecated(note = "not applicable on Apple Silicon")]
         #[unsafe(method(isRemovable))]
         #[unsafe(method_family = none)]
         fn is_removable(&self) -> bool;
@@ -224,16 +251,22 @@ extern_protocol!(
         fn are_programmable_sample_positions_supported(&self) -> bool;
 
         /// Unique identifier for the peer group this device belongs to.
+        #[cfg(target_os = "macos")]
+        #[deprecated(note = "not applicable on Apple Silicon")]
         #[unsafe(method(peerGroupID))]
         #[unsafe(method_family = none)]
         fn peer_group_id(&self) -> u64;
 
         /// Unique index of this device within its peer group.
+        #[cfg(target_os = "macos")]
+        #[deprecated(note = "not applicable on Apple Silicon")]
         #[unsafe(method(peerIndex))]
         #[unsafe(method_family = none)]
         fn peer_index(&self) -> u32;
 
         /// Total number of devices in the peer group this device belongs to.
+        #[cfg(target_os = "macos")]
+        #[deprecated(note = "not applicable on Apple Silicon")]
         #[unsafe(method(peerCount))]
         #[unsafe(method_family = none)]
         fn peer_count(&self) -> u32;
@@ -284,11 +317,13 @@ extern_protocol!(
         fn supports_primitive_motion_blur(&self) -> bool;
 
         /// Whether this device should use additional CPU threads for compilation tasks.
+        #[cfg(target_os = "macos")]
         #[unsafe(method(shouldMaximizeConcurrentCompilation))]
         #[unsafe(method_family = none)]
         fn should_maximize_concurrent_compilation(&self) -> bool;
 
         /// Setter for `shouldMaximizeConcurrentCompilation`.
+        #[cfg(target_os = "macos")]
         #[unsafe(method(setShouldMaximizeConcurrentCompilation:))]
         #[unsafe(method_family = none)]
         fn set_should_maximize_concurrent_compilation(
@@ -429,14 +464,6 @@ extern_protocol!(
             options: MTLResourceOptions,
         ) -> Option<Retained<ProtocolObject<dyn MTLIndirectCommandBuffer>>>;
 
-        /// Creates a `MTLBinaryArchive` using the given descriptor.
-        #[unsafe(method(newBinaryArchiveWithDescriptor:error:_))]
-        #[unsafe(method_family = none)]
-        fn new_binary_archive_with_descriptor(
-            &self,
-            descriptor: &MTLBinaryArchiveDescriptor,
-        ) -> Result<Retained<ProtocolObject<dyn MTLBinaryArchive>>, Retained<NSError>>;
-
         /// Creates an argument encoder for a buffer binding from shader reflection.
         #[unsafe(method(newArgumentEncoderWithBufferBinding:))]
         #[unsafe(method_family = new)]
@@ -447,7 +474,6 @@ extern_protocol!(
     }
 );
 
-#[allow(unused)]
 pub trait MTLDeviceExt: MTLDevice + Message {
     // -- Properties (header order) --
 
@@ -459,10 +485,16 @@ pub trait MTLDeviceExt: MTLDevice + Message {
 
     // -- Methods (header order) --
 
+    /// Allocates a counter sample buffer.
+    fn new_counter_sample_buffer_with_descriptor(
+        &self,
+        descriptor: &MTLCounterSampleBufferDescriptor,
+    ) -> Result<Retained<ProtocolObject<dyn MTLCounterSampleBuffer>>, MetalError>;
+
     fn new_log_state_with_descriptor(
         &self,
         descriptor: &MTLLogStateDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLLogState>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLLogState>>, MetalError>;
     fn new_command_queue(&self) -> Option<Retained<ProtocolObject<dyn MTLCommandQueue>>>;
     fn new_command_queue_with_max_command_buffer_count(
         &self,
@@ -482,55 +514,101 @@ pub trait MTLDeviceExt: MTLDevice + Message {
         data: &[u8],
         options: MTLResourceOptions,
     ) -> Option<Retained<ProtocolObject<dyn MTLBuffer>>>;
+    /// Creates a buffer over caller-managed memory without copying it.
+    ///
+    /// `ptr` must address at least `length` initialized bytes that satisfy
+    /// Metal's alignment and resource-option requirements. The allocation
+    /// must remain valid and at a stable address until the returned buffer is
+    /// destroyed. While Metal may access the buffer, all access to the same
+    /// memory must obey Rust's aliasing and synchronization rules.
     fn new_buffer_with_bytes_no_copy(
         &self,
         ptr: NonNull<c_void>,
         length: usize,
         options: MTLResourceOptions,
     ) -> Option<Retained<ProtocolObject<dyn MTLBuffer>>>;
+    /// Creates a no-copy buffer and runs `deallocator` when Metal releases the
+    /// backing allocation.
+    ///
+    /// Metal declares the deallocator sendable, so its captured state must be
+    /// safe to transfer to and share with Metal's callback thread.
+    ///
+    /// `ptr` must address at least `length` initialized bytes that satisfy
+    /// Metal's alignment and resource-option requirements. The allocation
+    /// must remain valid at a stable address until `deallocator` runs, and all
+    /// access while Metal may use it must obey Rust's aliasing and
+    /// synchronization rules. `deallocator` must correctly release that exact
+    /// allocation and must not unwind.
+    fn new_buffer_with_bytes_no_copy_with_deallocator<F>(
+        &self,
+        ptr: NonNull<c_void>,
+        length: usize,
+        options: MTLResourceOptions,
+        deallocator: F,
+    ) -> Option<Retained<ProtocolObject<dyn MTLBuffer>>>
+    where
+        Self: Sized,
+        F: Fn(*mut c_void, usize) + Send + Sync + 'static;
     fn new_texture_with_descriptor(
         &self,
         descriptor: &MTLTextureDescriptor,
+    ) -> Option<Retained<ProtocolObject<dyn MTLTexture>>>;
+    fn new_texture_with_descriptor_iosurface(
+        &self,
+        descriptor: &MTLTextureDescriptor,
+        iosurface: &IOSurfaceRef,
+        plane: usize,
     ) -> Option<Retained<ProtocolObject<dyn MTLTexture>>>;
     fn new_sampler_state_with_descriptor(
         &self,
         descriptor: &MTLSamplerDescriptor,
     ) -> Option<Retained<ProtocolObject<dyn MTLSamplerState>>>;
     fn new_default_library(&self) -> Option<Retained<ProtocolObject<dyn MTLLibrary>>>;
+    fn new_default_library_with_bundle_path(
+        &self,
+        path: &Path,
+    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError>;
+    #[deprecated(note = "use new_library_with_path")]
+    fn new_library_with_file(
+        &self,
+        path: &str,
+    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError>;
     fn new_library_with_path(
         &self,
         path: &Path,
-    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError>;
     fn new_library_with_data(
         &self,
         data: &[u8],
-    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError>;
     fn new_library_with_source(
         &self,
         source: &str,
         options: Option<&MTLCompileOptions>,
-    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError>;
     fn new_library_with_stitched_descriptor(
         &self,
         descriptor: &MTLStitchedLibraryDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError>;
     fn new_render_pipeline_state_with_descriptor(
         &self,
         descriptor: &MTLRenderPipelineDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, MetalError>;
     fn new_compute_pipeline_state_with_function(
         &self,
         function: &ProtocolObject<dyn MTLFunction>,
-    ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, MetalError>;
     fn new_compute_pipeline_state_with_descriptor(
         &self,
         descriptor: &MTLComputePipelineDescriptor,
         options: MTLPipelineOption,
     ) -> Result<
         (Retained<ProtocolObject<dyn MTLComputePipelineState>>, Option<Retained<MTLComputePipelineReflection>>),
-        Retained<NSError>,
+        MetalError,
     >;
     fn new_fence(&self) -> Option<Retained<ProtocolObject<dyn MTLFence>>>;
+    #[allow(deprecated)]
+    #[deprecated(note = "use supports_family")]
     fn supports_feature_set(
         &self,
         feature_set: MTLFeatureSet,
@@ -545,18 +623,22 @@ pub trait MTLDeviceExt: MTLDevice + Message {
         &self,
         handle: &MTLSharedEventHandle,
     ) -> Option<Retained<ProtocolObject<dyn MTLSharedEvent>>>;
+    fn new_binary_archive_with_descriptor(
+        &self,
+        descriptor: &MTLBinaryArchiveDescriptor,
+    ) -> Result<Retained<ProtocolObject<dyn MTLBinaryArchive>>, MetalError>;
     fn new_io_command_queue_with_descriptor(
         &self,
         descriptor: &MTLIOCommandQueueDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLIOCommandQueue>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLIOCommandQueue>>, MetalError>;
     fn new_dynamic_library(
         &self,
         library: &ProtocolObject<dyn MTLLibrary>,
-    ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, MetalError>;
     fn new_dynamic_library_with_path(
         &self,
         path: &Path,
-    ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, MetalError>;
     fn new_acceleration_structure_with_size(
         &self,
         size: usize,
@@ -568,7 +650,7 @@ pub trait MTLDeviceExt: MTLDevice + Message {
     fn new_residency_set_with_descriptor(
         &self,
         descriptor: &MTLResidencySetDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLResidencySet>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLResidencySet>>, MetalError>;
     fn tensor_size_and_align_with_descriptor(
         &self,
         descriptor: &MTLTensorDescriptor,
@@ -576,7 +658,12 @@ pub trait MTLDeviceExt: MTLDevice + Message {
     fn new_tensor_with_descriptor(
         &self,
         descriptor: &MTLTensorDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLTensor>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLTensor>>, MetalError>;
+    fn new_tensor_with_descriptor_attachments(
+        &self,
+        descriptor: &MTLTensorDescriptor,
+        attachments: &MTLTensorBufferAttachments,
+    ) -> Result<Retained<ProtocolObject<dyn MTLTensor>>, MetalError>;
     fn function_handle_with_function(
         &self,
         function: &ProtocolObject<dyn MTLFunction>,
@@ -585,29 +672,29 @@ pub trait MTLDeviceExt: MTLDevice + Message {
     fn new_command_allocator_with_descriptor(
         &self,
         descriptor: &MTL4CommandAllocatorDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn crate::MTL4CommandAllocator>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn crate::MTL4CommandAllocator>>, MetalError>;
     fn new_mtl4_command_queue(&self) -> Option<Retained<ProtocolObject<dyn crate::MTL4CommandQueue>>>;
     fn new_mtl4_command_queue_with_descriptor(
         &self,
         descriptor: &MTL4CommandQueueDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn crate::MTL4CommandQueue>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn crate::MTL4CommandQueue>>, MetalError>;
     fn new_mtl4_command_buffer(&self) -> Option<Retained<ProtocolObject<dyn crate::MTL4CommandBuffer>>>;
     fn new_argument_table_with_descriptor(
         &self,
         descriptor: &MTL4ArgumentTableDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTL4ArgumentTable>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTL4ArgumentTable>>, MetalError>;
     fn new_texture_view_pool_with_descriptor(
         &self,
         descriptor: &MTLResourceViewPoolDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLTextureViewPool>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLTextureViewPool>>, MetalError>;
     fn new_compiler_with_descriptor(
         &self,
         descriptor: &MTL4CompilerDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn crate::MTL4Compiler>>, Retained<NSError>>;
-    fn new_archive_with_url(
+    ) -> Result<Retained<ProtocolObject<dyn crate::MTL4Compiler>>, MetalError>;
+    fn new_archive_with_path(
         &self,
-        url: &NSURL,
-    ) -> Result<Retained<ProtocolObject<dyn MTL4Archive>>, Retained<NSError>>;
+        path: &Path,
+    ) -> Result<Retained<ProtocolObject<dyn MTL4Archive>>, MetalError>;
     fn new_pipeline_data_set_serializer_with_descriptor(
         &self,
         descriptor: &MTL4PipelineDataSetSerializerDescriptor,
@@ -621,7 +708,7 @@ pub trait MTLDeviceExt: MTLDevice + Message {
     fn new_counter_heap_with_descriptor(
         &self,
         descriptor: &MTL4CounterHeapDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTL4CounterHeap>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTL4CounterHeap>>, MetalError>;
     fn size_of_counter_heap_entry(
         &self,
         counter_heap_type: MTL4CounterHeapType,
@@ -639,22 +726,43 @@ pub trait MTLDeviceExt: MTLDevice + Message {
         &self,
         positions: &mut [MTLSamplePosition],
     );
+    fn convert_sparse_pixel_regions_to_tile_regions(
+        &self,
+        pixel_regions: &[MTLRegion],
+        tile_regions: &mut [MTLRegion],
+        tile_size: MTLSize,
+        alignment_mode: MTLSparseTextureRegionAlignmentMode,
+    );
+    fn convert_sparse_tile_regions_to_pixel_regions(
+        &self,
+        tile_regions: &[MTLRegion],
+        pixel_regions: &mut [MTLRegion],
+        tile_size: MTLSize,
+    );
     fn new_io_file_handle_with_url(
         &self,
         path: &Path,
-    ) -> Result<Retained<ProtocolObject<dyn MTLIOFileHandle>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLIOFileHandle>>, MetalError>;
     fn new_io_file_handle_with_url_compression_method(
         &self,
         path: &Path,
         compression_method: MTLIOCompressionMethod,
-    ) -> Result<Retained<ProtocolObject<dyn MTLIOFileHandle>>, Retained<NSError>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLIOFileHandle>>, MetalError>;
     fn new_render_pipeline_state_with_descriptor_options(
         &self,
         descriptor: &MTLRenderPipelineDescriptor,
         options: MTLPipelineOption,
     ) -> Result<
         (Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Option<Retained<MTLRenderPipelineReflection>>),
-        Retained<NSError>,
+        MetalError,
+    >;
+    fn new_render_pipeline_state_with_mesh_descriptor_options(
+        &self,
+        descriptor: &MTLMeshRenderPipelineDescriptor,
+        options: MTLPipelineOption,
+    ) -> Result<
+        (Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Option<Retained<MTLRenderPipelineReflection>>),
+        MetalError,
     >;
     fn new_compute_pipeline_state_with_function_options(
         &self,
@@ -662,7 +770,7 @@ pub trait MTLDeviceExt: MTLDevice + Message {
         options: MTLPipelineOption,
     ) -> Result<
         (Retained<ProtocolObject<dyn MTLComputePipelineState>>, Option<Retained<MTLComputePipelineReflection>>),
-        Retained<NSError>,
+        MetalError,
     >;
     fn new_render_pipeline_state_with_tile_descriptor(
         &self,
@@ -670,8 +778,31 @@ pub trait MTLDeviceExt: MTLDevice + Message {
         options: MTLPipelineOption,
     ) -> Result<
         (Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Option<Retained<MTLRenderPipelineReflection>>),
-        Retained<NSError>,
+        MetalError,
     >;
+    fn new_render_pipeline_state_with_descriptor_completion_handler(
+        &self,
+        descriptor: &MTLRenderPipelineDescriptor,
+        completion_handler: MTLNewRenderPipelineStateCompletionHandler,
+    );
+    fn new_render_pipeline_state_with_descriptor_options_completion_handler(
+        &self,
+        descriptor: &MTLRenderPipelineDescriptor,
+        options: MTLPipelineOption,
+        completion_handler: MTLNewRenderPipelineStateWithReflectionCompletionHandler,
+    );
+    fn new_render_pipeline_state_with_tile_descriptor_options_completion_handler(
+        &self,
+        descriptor: &MTLTileRenderPipelineDescriptor,
+        options: MTLPipelineOption,
+        completion_handler: MTLNewRenderPipelineStateWithReflectionCompletionHandler,
+    );
+    fn new_render_pipeline_state_with_mesh_descriptor_options_completion_handler(
+        &self,
+        descriptor: &MTLMeshRenderPipelineDescriptor,
+        options: MTLPipelineOption,
+        completion_handler: MTLNewRenderPipelineStateWithReflectionCompletionHandler,
+    );
     fn new_library_with_source_completion_handler(
         &self,
         source: &str,
@@ -728,13 +859,21 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
         array.map(|a| a.to_vec().into_boxed_slice())
     }
 
+    fn new_counter_sample_buffer_with_descriptor(
+        &self,
+        descriptor: &MTLCounterSampleBufferDescriptor,
+    ) -> Result<Retained<ProtocolObject<dyn MTLCounterSampleBuffer>>, MetalError> {
+        unsafe { msg_send![self, newCounterSampleBufferWithDescriptor: descriptor, error: _] }
+            .map_err(MetalError::from_nserror)
+    }
+
     // -- Methods --
 
     fn new_log_state_with_descriptor(
         &self,
         descriptor: &MTLLogStateDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLLogState>>, Retained<NSError>> {
-        unsafe { msg_send![self, newLogStateWithDescriptor: descriptor, error: _] }
+    ) -> Result<Retained<ProtocolObject<dyn MTLLogState>>, MetalError> {
+        unsafe { msg_send![self, newLogStateWithDescriptor: descriptor, error: _] }.map_err(MetalError::from_nserror)
     }
 
     fn new_command_queue(&self) -> Option<Retained<ProtocolObject<dyn MTLCommandQueue>>> {
@@ -784,7 +923,32 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
         length: usize,
         options: MTLResourceOptions,
     ) -> Option<Retained<ProtocolObject<dyn MTLBuffer>>> {
-        let deallocator: Option<&crate::block2::Block<dyn Fn(*mut c_void, usize)>> = None;
+        let deallocator: Option<&Block<dyn Fn(*mut c_void, usize)>> = None;
+        unsafe {
+            msg_send![
+                self,
+                newBufferWithBytesNoCopy: ptr.as_ptr(),
+                length: length,
+                options: options,
+                deallocator: deallocator
+            ]
+        }
+    }
+
+    fn new_buffer_with_bytes_no_copy_with_deallocator<F>(
+        &self,
+        ptr: NonNull<c_void>,
+        length: usize,
+        options: MTLResourceOptions,
+        deallocator: F,
+    ) -> Option<Retained<ProtocolObject<dyn MTLBuffer>>>
+    where
+        F: Fn(*mut c_void, usize) + Send + Sync + 'static,
+    {
+        let deallocator = RcBlock::new(move |pointer: *mut c_void, length: usize| {
+            deallocator(pointer, length);
+        });
+        let deallocator: &Block<dyn Fn(*mut c_void, usize)> = &deallocator;
         unsafe {
             msg_send![
                 self,
@@ -803,6 +967,15 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
         unsafe { msg_send![self, newTextureWithDescriptor: descriptor] }
     }
 
+    fn new_texture_with_descriptor_iosurface(
+        &self,
+        descriptor: &MTLTextureDescriptor,
+        iosurface: &IOSurfaceRef,
+        plane: usize,
+    ) -> Option<Retained<ProtocolObject<dyn MTLTexture>>> {
+        unsafe { msg_send![self, newTextureWithDescriptor: descriptor, iosurface: iosurface, plane: plane] }
+    }
+
     fn new_sampler_state_with_descriptor(
         &self,
         descriptor: &MTLSamplerDescriptor,
@@ -814,50 +987,73 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
         unsafe { msg_send![self, newDefaultLibrary] }
     }
 
+    fn new_default_library_with_bundle_path(
+        &self,
+        path: &Path,
+    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError> {
+        let url = file_url(path, "newDefaultLibraryWithBundle:error:")?;
+        let bundle = NSBundle::bundleWithURL(&url).ok_or_else(|| {
+            MetalError::invalid_input("newDefaultLibraryWithBundle:error:", "path does not identify a bundle")
+        })?;
+        unsafe { msg_send![self, newDefaultLibraryWithBundle: &*bundle, error: _] }.map_err(MetalError::from_nserror)
+    }
+
+    fn new_library_with_file(
+        &self,
+        path: &str,
+    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError> {
+        let path = NSString::from_str(path);
+        unsafe { msg_send![self, newLibraryWithFile: &*path, error: _] }.map_err(MetalError::from_nserror)
+    }
+
     fn new_library_with_path(
         &self,
         path: &Path,
-    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, Retained<NSError>> {
-        let url = NSURL::from_file_path(path).expect("path must be a valid file URL path");
-        unsafe { msg_send![self, newLibraryWithURL: &*url, error: _] }
+    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError> {
+        let url = file_url(path, "newLibraryWithURL:error:")?;
+        unsafe { msg_send![self, newLibraryWithURL: &*url, error: _] }.map_err(MetalError::from_nserror)
     }
 
     fn new_library_with_data(
         &self,
         data: &[u8],
-    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, Retained<NSError>> {
+    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError> {
         let dispatch_data = DispatchData::from_bytes(data);
-        unsafe { msg_send![self, newLibraryWithData: &*dispatch_data, error: _] }
+        unsafe { msg_send![self, newLibraryWithData: &*dispatch_data, error: _] }.map_err(MetalError::from_nserror)
     }
 
     fn new_library_with_source(
         &self,
         source: &str,
         options: Option<&MTLCompileOptions>,
-    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, Retained<NSError>> {
+    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError> {
         let source = NSString::from_str(source);
         unsafe { msg_send![self, newLibraryWithSource: &*source, options: options, error: _] }
+            .map_err(MetalError::from_nserror)
     }
 
     fn new_library_with_stitched_descriptor(
         &self,
         descriptor: &MTLStitchedLibraryDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, Retained<NSError>> {
+    ) -> Result<Retained<ProtocolObject<dyn MTLLibrary>>, MetalError> {
         unsafe { msg_send![self, newLibraryWithStitchedDescriptor: descriptor, error: _] }
+            .map_err(MetalError::from_nserror)
     }
 
     fn new_render_pipeline_state_with_descriptor(
         &self,
         descriptor: &MTLRenderPipelineDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Retained<NSError>> {
+    ) -> Result<Retained<ProtocolObject<dyn MTLRenderPipelineState>>, MetalError> {
         unsafe { msg_send![self, newRenderPipelineStateWithDescriptor: descriptor, error: _] }
+            .map_err(MetalError::from_nserror)
     }
 
     fn new_compute_pipeline_state_with_function(
         &self,
         function: &ProtocolObject<dyn MTLFunction>,
-    ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, Retained<NSError>> {
+    ) -> Result<Retained<ProtocolObject<dyn MTLComputePipelineState>>, MetalError> {
         unsafe { msg_send![self, newComputePipelineStateWithFunction: function, error: _] }
+            .map_err(MetalError::from_nserror)
     }
 
     fn new_compute_pipeline_state_with_descriptor(
@@ -866,7 +1062,7 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
         options: MTLPipelineOption,
     ) -> Result<
         (Retained<ProtocolObject<dyn MTLComputePipelineState>>, Option<Retained<MTLComputePipelineReflection>>),
-        Retained<NSError>,
+        MetalError,
     > {
         let mut reflection: *mut MTLComputePipelineReflection = std::ptr::null_mut();
         let mut error: *mut NSError = std::ptr::null_mut();
@@ -879,23 +1075,50 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
                 error: &mut error
             ]
         };
-        match result {
-            Some(pso) => {
-                let reflection_obj = if reflection.is_null() {
-                    None
-                } else {
-                    unsafe { Retained::retain(reflection) }
-                };
-                Ok((pso, reflection_obj))
-            },
-            None => Err(unsafe { Retained::retain(error).unwrap() }),
-        }
+        let pipeline = unsafe {
+            MetalError::result_from_nullable(
+                result,
+                error,
+                "newComputePipelineStateWithDescriptor:options:reflection:error:",
+            )?
+        };
+        Ok((pipeline, unsafe { Retained::retain(reflection) }))
+    }
+
+    fn new_render_pipeline_state_with_mesh_descriptor_options(
+        &self,
+        descriptor: &MTLMeshRenderPipelineDescriptor,
+        options: MTLPipelineOption,
+    ) -> Result<
+        (Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Option<Retained<MTLRenderPipelineReflection>>),
+        MetalError,
+    > {
+        let mut reflection: *mut MTLRenderPipelineReflection = std::ptr::null_mut();
+        let mut error: *mut NSError = std::ptr::null_mut();
+        let result: Option<Retained<ProtocolObject<dyn MTLRenderPipelineState>>> = unsafe {
+            msg_send![
+                self,
+                newRenderPipelineStateWithMeshDescriptor: descriptor,
+                options: options,
+                reflection: &mut reflection,
+                error: &mut error
+            ]
+        };
+        let pipeline = unsafe {
+            MetalError::result_from_nullable(
+                result,
+                error,
+                "newRenderPipelineStateWithMeshDescriptor:options:reflection:error:",
+            )?
+        };
+        Ok((pipeline, unsafe { Retained::retain(reflection) }))
     }
 
     fn new_fence(&self) -> Option<Retained<ProtocolObject<dyn MTLFence>>> {
         unsafe { msg_send![self, newFence] }
     }
 
+    #[allow(deprecated)]
     fn supports_feature_set(
         &self,
         feature_set: MTLFeatureSet,
@@ -926,26 +1149,35 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
         unsafe { msg_send![self, newSharedEventWithHandle: handle] }
     }
 
+    fn new_binary_archive_with_descriptor(
+        &self,
+        descriptor: &MTLBinaryArchiveDescriptor,
+    ) -> Result<Retained<ProtocolObject<dyn MTLBinaryArchive>>, MetalError> {
+        unsafe { msg_send![self, newBinaryArchiveWithDescriptor: descriptor, error: _] }
+            .map_err(MetalError::from_nserror)
+    }
+
     fn new_io_command_queue_with_descriptor(
         &self,
         descriptor: &MTLIOCommandQueueDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLIOCommandQueue>>, Retained<NSError>> {
+    ) -> Result<Retained<ProtocolObject<dyn MTLIOCommandQueue>>, MetalError> {
         unsafe { msg_send![self, newIOCommandQueueWithDescriptor: descriptor, error: _] }
+            .map_err(MetalError::from_nserror)
     }
 
     fn new_dynamic_library(
         &self,
         library: &ProtocolObject<dyn MTLLibrary>,
-    ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, Retained<NSError>> {
-        unsafe { msg_send![self, newDynamicLibrary: library, error: _] }
+    ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, MetalError> {
+        unsafe { msg_send![self, newDynamicLibrary: library, error: _] }.map_err(MetalError::from_nserror)
     }
 
     fn new_dynamic_library_with_path(
         &self,
         path: &Path,
-    ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, Retained<NSError>> {
-        let url = NSURL::from_file_path(path).expect("path must be a valid file URL path");
-        unsafe { msg_send![self, newDynamicLibraryWithURL: &*url, error: _] }
+    ) -> Result<Retained<ProtocolObject<dyn MTLDynamicLibrary>>, MetalError> {
+        let url = file_url(path, "newDynamicLibraryWithURL:error:")?;
+        unsafe { msg_send![self, newDynamicLibraryWithURL: &*url, error: _] }.map_err(MetalError::from_nserror)
     }
 
     fn new_acceleration_structure_with_size(
@@ -965,8 +1197,9 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
     fn new_residency_set_with_descriptor(
         &self,
         descriptor: &MTLResidencySetDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLResidencySet>>, Retained<NSError>> {
+    ) -> Result<Retained<ProtocolObject<dyn MTLResidencySet>>, MetalError> {
         unsafe { msg_send![self, newResidencySetWithDescriptor: descriptor, error: _] }
+            .map_err(MetalError::from_nserror)
     }
 
     fn tensor_size_and_align_with_descriptor(
@@ -979,8 +1212,17 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
     fn new_tensor_with_descriptor(
         &self,
         descriptor: &MTLTensorDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLTensor>>, Retained<NSError>> {
-        unsafe { msg_send![self, newTensorWithDescriptor: descriptor, error: _] }
+    ) -> Result<Retained<ProtocolObject<dyn MTLTensor>>, MetalError> {
+        unsafe { msg_send![self, newTensorWithDescriptor: descriptor, error: _] }.map_err(MetalError::from_nserror)
+    }
+
+    fn new_tensor_with_descriptor_attachments(
+        &self,
+        descriptor: &MTLTensorDescriptor,
+        attachments: &MTLTensorBufferAttachments,
+    ) -> Result<Retained<ProtocolObject<dyn MTLTensor>>, MetalError> {
+        unsafe { msg_send![self, newTensorWithDescriptor: descriptor, attachments: attachments, error: _] }
+            .map_err(MetalError::from_nserror)
     }
 
     fn function_handle_with_function(
@@ -997,8 +1239,9 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
     fn new_command_allocator_with_descriptor(
         &self,
         descriptor: &MTL4CommandAllocatorDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn crate::MTL4CommandAllocator>>, Retained<NSError>> {
+    ) -> Result<Retained<ProtocolObject<dyn crate::MTL4CommandAllocator>>, MetalError> {
         unsafe { msg_send![self, newCommandAllocatorWithDescriptor: descriptor, error: _] }
+            .map_err(MetalError::from_nserror)
     }
 
     fn new_mtl4_command_queue(&self) -> Option<Retained<ProtocolObject<dyn crate::MTL4CommandQueue>>> {
@@ -1008,8 +1251,9 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
     fn new_mtl4_command_queue_with_descriptor(
         &self,
         descriptor: &MTL4CommandQueueDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn crate::MTL4CommandQueue>>, Retained<NSError>> {
+    ) -> Result<Retained<ProtocolObject<dyn crate::MTL4CommandQueue>>, MetalError> {
         unsafe { msg_send![self, newMTL4CommandQueueWithDescriptor: descriptor, error: _] }
+            .map_err(MetalError::from_nserror)
     }
 
     fn new_mtl4_command_buffer(&self) -> Option<Retained<ProtocolObject<dyn crate::MTL4CommandBuffer>>> {
@@ -1019,29 +1263,32 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
     fn new_argument_table_with_descriptor(
         &self,
         descriptor: &MTL4ArgumentTableDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTL4ArgumentTable>>, Retained<NSError>> {
+    ) -> Result<Retained<ProtocolObject<dyn MTL4ArgumentTable>>, MetalError> {
         unsafe { msg_send![self, newArgumentTableWithDescriptor: descriptor, error: _] }
+            .map_err(MetalError::from_nserror)
     }
 
     fn new_texture_view_pool_with_descriptor(
         &self,
         descriptor: &MTLResourceViewPoolDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTLTextureViewPool>>, Retained<NSError>> {
+    ) -> Result<Retained<ProtocolObject<dyn MTLTextureViewPool>>, MetalError> {
         unsafe { msg_send![self, newTextureViewPoolWithDescriptor: descriptor, error: _] }
+            .map_err(MetalError::from_nserror)
     }
 
     fn new_compiler_with_descriptor(
         &self,
         descriptor: &MTL4CompilerDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn crate::MTL4Compiler>>, Retained<NSError>> {
-        unsafe { msg_send![self, newCompilerWithDescriptor: descriptor, error: _] }
+    ) -> Result<Retained<ProtocolObject<dyn crate::MTL4Compiler>>, MetalError> {
+        unsafe { msg_send![self, newCompilerWithDescriptor: descriptor, error: _] }.map_err(MetalError::from_nserror)
     }
 
-    fn new_archive_with_url(
+    fn new_archive_with_path(
         &self,
-        url: &NSURL,
-    ) -> Result<Retained<ProtocolObject<dyn MTL4Archive>>, Retained<NSError>> {
-        unsafe { msg_send![self, newArchiveWithURL: url, error: _] }
+        path: &Path,
+    ) -> Result<Retained<ProtocolObject<dyn MTL4Archive>>, MetalError> {
+        let url = file_url(path, "newArchiveWithURL:error:")?;
+        unsafe { msg_send![self, newArchiveWithURL: &*url, error: _] }.map_err(MetalError::from_nserror)
     }
 
     fn new_pipeline_data_set_serializer_with_descriptor(
@@ -1070,8 +1317,8 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
     fn new_counter_heap_with_descriptor(
         &self,
         descriptor: &MTL4CounterHeapDescriptor,
-    ) -> Result<Retained<ProtocolObject<dyn MTL4CounterHeap>>, Retained<NSError>> {
-        unsafe { msg_send![self, newCounterHeapWithDescriptor: descriptor, error: _] }
+    ) -> Result<Retained<ProtocolObject<dyn MTL4CounterHeap>>, MetalError> {
+        unsafe { msg_send![self, newCounterHeapWithDescriptor: descriptor, error: _] }.map_err(MetalError::from_nserror)
     }
 
     fn size_of_counter_heap_entry(
@@ -1128,20 +1375,58 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
         }
     }
 
+    fn convert_sparse_pixel_regions_to_tile_regions(
+        &self,
+        pixel_regions: &[MTLRegion],
+        tile_regions: &mut [MTLRegion],
+        tile_size: MTLSize,
+        alignment_mode: MTLSparseTextureRegionAlignmentMode,
+    ) {
+        assert_eq!(pixel_regions.len(), tile_regions.len());
+        unsafe {
+            let _: () = msg_send![
+                self,
+                convertSparsePixelRegions: pixel_regions.as_ptr(),
+                toTileRegions: tile_regions.as_mut_ptr(),
+                withTileSize: tile_size,
+                alignmentMode: alignment_mode,
+                numRegions: pixel_regions.len()
+            ];
+        }
+    }
+
+    fn convert_sparse_tile_regions_to_pixel_regions(
+        &self,
+        tile_regions: &[MTLRegion],
+        pixel_regions: &mut [MTLRegion],
+        tile_size: MTLSize,
+    ) {
+        assert_eq!(tile_regions.len(), pixel_regions.len());
+        unsafe {
+            let _: () = msg_send![
+                self,
+                convertSparseTileRegions: tile_regions.as_ptr(),
+                toPixelRegions: pixel_regions.as_mut_ptr(),
+                withTileSize: tile_size,
+                numRegions: tile_regions.len()
+            ];
+        }
+    }
+
     fn new_io_file_handle_with_url(
         &self,
         path: &Path,
-    ) -> Result<Retained<ProtocolObject<dyn MTLIOFileHandle>>, Retained<NSError>> {
-        let url = NSURL::from_file_path(path).expect("path must be a valid file URL path");
-        unsafe { msg_send![self, newIOFileHandleWithURL: &*url, error: _] }
+    ) -> Result<Retained<ProtocolObject<dyn MTLIOFileHandle>>, MetalError> {
+        let url = file_url(path, "newIOFileHandleWithURL:error:")?;
+        unsafe { msg_send![self, newIOFileHandleWithURL: &*url, error: _] }.map_err(MetalError::from_nserror)
     }
 
     fn new_io_file_handle_with_url_compression_method(
         &self,
         path: &Path,
         compression_method: MTLIOCompressionMethod,
-    ) -> Result<Retained<ProtocolObject<dyn MTLIOFileHandle>>, Retained<NSError>> {
-        let url = NSURL::from_file_path(path).expect("path must be a valid file URL path");
+    ) -> Result<Retained<ProtocolObject<dyn MTLIOFileHandle>>, MetalError> {
+        let url = file_url(path, "newIOFileHandleWithURL:compressionMethod:error:")?;
         unsafe {
             msg_send![
                 self,
@@ -1150,6 +1435,7 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
                 error: _
             ]
         }
+        .map_err(MetalError::from_nserror)
     }
 
     fn new_render_pipeline_state_with_descriptor_options(
@@ -1158,7 +1444,7 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
         options: MTLPipelineOption,
     ) -> Result<
         (Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Option<Retained<MTLRenderPipelineReflection>>),
-        Retained<NSError>,
+        MetalError,
     > {
         let mut reflection: *mut MTLRenderPipelineReflection = std::ptr::null_mut();
         let mut error: *mut NSError = std::ptr::null_mut();
@@ -1171,17 +1457,14 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
                 error: &mut error
             ]
         };
-        match result {
-            Some(pso) => {
-                let reflection_obj = if reflection.is_null() {
-                    None
-                } else {
-                    unsafe { Retained::retain(reflection) }
-                };
-                Ok((pso, reflection_obj))
-            },
-            None => Err(unsafe { Retained::retain(error).unwrap() }),
-        }
+        let pipeline = unsafe {
+            MetalError::result_from_nullable(
+                result,
+                error,
+                "newRenderPipelineStateWithDescriptor:options:reflection:error:",
+            )?
+        };
+        Ok((pipeline, unsafe { Retained::retain(reflection) }))
     }
 
     fn new_compute_pipeline_state_with_function_options(
@@ -1190,7 +1473,7 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
         options: MTLPipelineOption,
     ) -> Result<
         (Retained<ProtocolObject<dyn MTLComputePipelineState>>, Option<Retained<MTLComputePipelineReflection>>),
-        Retained<NSError>,
+        MetalError,
     > {
         let mut reflection: *mut MTLComputePipelineReflection = std::ptr::null_mut();
         let mut error: *mut NSError = std::ptr::null_mut();
@@ -1203,17 +1486,14 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
                 error: &mut error
             ]
         };
-        match result {
-            Some(pso) => {
-                let reflection_obj = if reflection.is_null() {
-                    None
-                } else {
-                    unsafe { Retained::retain(reflection) }
-                };
-                Ok((pso, reflection_obj))
-            },
-            None => Err(unsafe { Retained::retain(error).unwrap() }),
-        }
+        let pipeline = unsafe {
+            MetalError::result_from_nullable(
+                result,
+                error,
+                "newComputePipelineStateWithFunction:options:reflection:error:",
+            )?
+        };
+        Ok((pipeline, unsafe { Retained::retain(reflection) }))
     }
 
     fn new_render_pipeline_state_with_tile_descriptor(
@@ -1222,7 +1502,7 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
         options: MTLPipelineOption,
     ) -> Result<
         (Retained<ProtocolObject<dyn MTLRenderPipelineState>>, Option<Retained<MTLRenderPipelineReflection>>),
-        Retained<NSError>,
+        MetalError,
     > {
         let mut reflection: *mut MTLRenderPipelineReflection = std::ptr::null_mut();
         let mut error: *mut NSError = std::ptr::null_mut();
@@ -1235,16 +1515,75 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
                 error: &mut error
             ]
         };
-        match result {
-            Some(pso) => {
-                let reflection_obj = if reflection.is_null() {
-                    None
-                } else {
-                    unsafe { Retained::retain(reflection) }
-                };
-                Ok((pso, reflection_obj))
-            },
-            None => Err(unsafe { Retained::retain(error).unwrap() }),
+        let pipeline = unsafe {
+            MetalError::result_from_nullable(
+                result,
+                error,
+                "newRenderPipelineStateWithTileDescriptor:options:reflection:error:",
+            )?
+        };
+        Ok((pipeline, unsafe { Retained::retain(reflection) }))
+    }
+
+    fn new_render_pipeline_state_with_descriptor_completion_handler(
+        &self,
+        descriptor: &MTLRenderPipelineDescriptor,
+        completion_handler: MTLNewRenderPipelineStateCompletionHandler,
+    ) {
+        unsafe {
+            let _: () = msg_send![
+                self,
+                newRenderPipelineStateWithDescriptor: descriptor,
+                completionHandler: completion_handler.as_block()
+            ];
+        }
+    }
+
+    fn new_render_pipeline_state_with_descriptor_options_completion_handler(
+        &self,
+        descriptor: &MTLRenderPipelineDescriptor,
+        options: MTLPipelineOption,
+        completion_handler: MTLNewRenderPipelineStateWithReflectionCompletionHandler,
+    ) {
+        unsafe {
+            let _: () = msg_send![
+                self,
+                newRenderPipelineStateWithDescriptor: descriptor,
+                options: options,
+                completionHandler: completion_handler.as_block()
+            ];
+        }
+    }
+
+    fn new_render_pipeline_state_with_tile_descriptor_options_completion_handler(
+        &self,
+        descriptor: &MTLTileRenderPipelineDescriptor,
+        options: MTLPipelineOption,
+        completion_handler: MTLNewRenderPipelineStateWithReflectionCompletionHandler,
+    ) {
+        unsafe {
+            let _: () = msg_send![
+                self,
+                newRenderPipelineStateWithTileDescriptor: descriptor,
+                options: options,
+                completionHandler: completion_handler.as_block()
+            ];
+        }
+    }
+
+    fn new_render_pipeline_state_with_mesh_descriptor_options_completion_handler(
+        &self,
+        descriptor: &MTLMeshRenderPipelineDescriptor,
+        options: MTLPipelineOption,
+        completion_handler: MTLNewRenderPipelineStateWithReflectionCompletionHandler,
+    ) {
+        unsafe {
+            let _: () = msg_send![
+                self,
+                newRenderPipelineStateWithMeshDescriptor: descriptor,
+                options: options,
+                completionHandler: completion_handler.as_block()
+            ];
         }
     }
 
@@ -1260,7 +1599,7 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
                 self,
                 newLibraryWithSource: &*source,
                 options: options,
-                completionHandler: &*completion_handler
+                completionHandler: completion_handler.as_block()
             ];
         }
     }
@@ -1274,7 +1613,7 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
             let _: () = msg_send![
                 self,
                 newLibraryWithStitchedDescriptor: descriptor,
-                completionHandler: &*completion_handler
+                completionHandler: completion_handler.as_block()
             ];
         }
     }
@@ -1288,7 +1627,7 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
             let _: () = msg_send![
                 self,
                 newComputePipelineStateWithFunction: function,
-                completionHandler: &*completion_handler
+                completionHandler: completion_handler.as_block()
             ];
         }
     }
@@ -1304,7 +1643,7 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
                 self,
                 newComputePipelineStateWithFunction: function,
                 options: options,
-                completionHandler: &*completion_handler
+                completionHandler: completion_handler.as_block()
             ];
         }
     }
@@ -1320,13 +1659,27 @@ impl MTLDeviceExt for ProtocolObject<dyn MTLDevice> {
                 self,
                 newComputePipelineStateWithDescriptor: descriptor,
                 options: options,
-                completionHandler: &*completion_handler
+                completionHandler: completion_handler.as_block()
             ];
         }
     }
 }
 
 impl dyn MTLDevice {
+    /// Returns all Metal devices available to the process.
+    ///
+    /// # Panics
+    ///
+    /// Panics if Metal violates its documented non-null return contract.
+    pub fn all() -> Box<[Retained<ProtocolObject<dyn MTLDevice>>]> {
+        unsafe extern "C" {
+            fn MTLCopyAllDevices() -> *mut NSArray<ProtocolObject<dyn MTLDevice>>;
+        }
+        let devices =
+            unsafe { Retained::from_raw(MTLCopyAllDevices()).expect("MTLCopyAllDevices returned a null array") };
+        devices.to_vec().into_boxed_slice()
+    }
+
     /// Returns a reference to the preferred system default Metal device.
     #[inline]
     pub fn system_default() -> Option<Retained<ProtocolObject<dyn MTLDevice>>> {
@@ -1335,5 +1688,27 @@ impl dyn MTLDevice {
         }
         let ret = unsafe { MTLCreateSystemDefaultDevice() };
         unsafe { Retained::from_raw(ret) }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use objc2::runtime::ProtocolObject;
+
+    use super::{MTLDevice, MTLTimestamp};
+    use crate::MTLGPUFamily;
+
+    fn assert_send_sync<T: ?Sized + Send + Sync>() {}
+
+    #[test]
+    fn public_device_contract_matches_the_header() {
+        assert_send_sync::<ProtocolObject<dyn MTLDevice>>();
+
+        let _: fn(&ProtocolObject<dyn MTLDevice>, MTLGPUFamily) -> bool =
+            <ProtocolObject<dyn MTLDevice> as MTLDevice>::supports_family;
+        let _: fn(&ProtocolObject<dyn MTLDevice>, &mut MTLTimestamp, &mut MTLTimestamp) =
+            <ProtocolObject<dyn MTLDevice> as MTLDevice>::sample_timestamps_gpu_timestamp;
+
+        assert_eq!(size_of::<MTLTimestamp>(), size_of::<u64>());
     }
 }

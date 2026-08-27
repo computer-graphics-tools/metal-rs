@@ -21,8 +21,8 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         fn barrier_after_queue_stages_before_stages_visibility_options(
             &self,
-            after_queue_stages: MTLRenderStages,
-            before_stages: MTLRenderStages,
+            after_queue_stages: MTLStages,
+            before_stages: MTLStages,
             visibility_options: MTL4VisibilityOptions,
         );
 
@@ -31,8 +31,8 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         fn barrier_after_stages_before_queue_stages_visibility_options(
             &self,
-            after_stages: MTLRenderStages,
-            before_queue_stages: MTLRenderStages,
+            after_stages: MTLStages,
+            before_queue_stages: MTLStages,
             visibility_options: MTL4VisibilityOptions,
         );
 
@@ -41,8 +41,8 @@ extern_protocol!(
         #[unsafe(method_family = none)]
         fn barrier_after_encoder_stages_before_encoder_stages_visibility_options(
             &self,
-            after_encoder_stages: MTLRenderStages,
-            before_encoder_stages: MTLRenderStages,
+            after_encoder_stages: MTLStages,
+            before_encoder_stages: MTLStages,
             visibility_options: MTL4VisibilityOptions,
         );
 
@@ -52,7 +52,7 @@ extern_protocol!(
         fn update_fence_after_encoder_stages(
             &self,
             fence: &ProtocolObject<dyn MTLFence>,
-            after_encoder_stages: MTLRenderStages,
+            after_encoder_stages: MTLStages,
         );
 
         /// Encodes a command to wait on a GPU fence.
@@ -61,7 +61,7 @@ extern_protocol!(
         fn wait_for_fence_before_encoder_stages(
             &self,
             fence: &ProtocolObject<dyn MTLFence>,
-            before_encoder_stages: MTLRenderStages,
+            before_encoder_stages: MTLStages,
         );
 
         /// Pops the latest debug group string from this encoder's stack of debug groups.

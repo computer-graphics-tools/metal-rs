@@ -3,18 +3,32 @@ use core::{ffi::c_void, ops::Range, ptr::NonNull};
 use objc2::{Message, extern_protocol, msg_send, runtime::ProtocolObject};
 use objc2_foundation::NSRange;
 
-use crate::util::{opt_ref_slice_as_ptr, ref_slice_as_ptr};
 use crate::{
     MTLAccelerationStructure, MTLBarrierScope, MTLBuffer, MTLCommandEncoder, MTLCounterSampleBuffer, MTLFence, MTLHeap,
     MTLIndirectCommandBuffer, MTLResource, MTLResourceUsage, MTLSamplerState, MTLTexture,
     compute_pipeline::MTLComputePipelineState,
     intersection_function_table::MTLIntersectionFunctionTable,
     types::{MTLRegion, MTLSize},
+    util::{opt_ref_slice_as_ptr, ref_slice_as_ptr},
     visible_function_table::MTLVisibleFunctionTable,
 };
 
+fn assert_slice_matches_range<T>(
+    values: &[T],
+    range: &Range<usize>,
+) {
+    assert_eq!(values.len(), range.len(), "slice length must match binding range length");
+}
+
 extern_protocol!(
     /// A command encoder that writes data parallel compute commands.
+    ///
+    /// Availability: macOS 10.11+, iOS 8.0+
+    ///
+    /// # Safety
+    ///
+    /// Implementors must be Objective-C objects that conform to the
+    /// `MTLComputeCommandEncoder` protocol.
     pub unsafe trait MTLComputeCommandEncoder: MTLCommandEncoder {
         #[unsafe(method(dispatchType))]
         #[unsafe(method_family = none)]
@@ -27,8 +41,10 @@ extern_protocol!(
             state: &ProtocolObject<dyn MTLComputePipelineState>,
         );
 
-        /// Set data for a buffer binding point, by copy.
-        /// Safety: `bytes` must be valid.
+        /// Sets copied data for a buffer binding point.
+        ///
+        /// `bytes` must point to at least `length` readable bytes for the
+        /// duration of this call.
         #[unsafe(method(setBytes:length:atIndex:))]
         #[unsafe(method_family = none)]
         fn set_bytes(
@@ -74,7 +90,10 @@ extern_protocol!(
             index: usize,
         );
 
-        /// Safety: `bytes` must be valid.
+        /// Sets copied data and a dynamic attribute stride for a buffer binding point.
+        ///
+        /// `bytes` must point to at least `length` readable bytes for the
+        /// duration of this call.
         #[unsafe(method(setBytes:length:attributeStride:atIndex:))]
         #[unsafe(method_family = none)]
         fn set_bytes_with_attribute_stride(
@@ -247,6 +266,12 @@ extern_protocol!(
     }
 );
 
+/// Safe slice-based wrappers for compute-encoder selectors with array inputs.
+///
+/// Bulk binding methods panic unless each input slice length equals the
+/// binding range length, preventing Metal from reading beyond the slices
+/// passed across FFI. Methods with an explicit `count` derive it from the
+/// corresponding slice.
 pub trait MTLComputeCommandEncoderExt: MTLComputeCommandEncoder + Message {
     fn set_buffers(
         &self,
@@ -256,11 +281,10 @@ pub trait MTLComputeCommandEncoderExt: MTLComputeCommandEncoder + Message {
     ) where
         Self: Sized,
     {
-        assert_eq!(buffers.len(), offsets.len());
+        assert_eq!(buffers.len(), offsets.len(), "buffers and offsets must have equal lengths");
+        assert_slice_matches_range(buffers, &range);
         let ptr = opt_ref_slice_as_ptr(buffers);
-        unsafe {
-            msg_send![self, setBuffers: ptr, offsets: offsets.as_ptr(), withRange: NSRange::from(range)]
-        }
+        unsafe { msg_send![self, setBuffers: ptr, offsets: offsets.as_ptr(), withRange: NSRange::from(range)] }
     }
 
     fn set_buffers_with_attribute_strides(
@@ -272,8 +296,9 @@ pub trait MTLComputeCommandEncoderExt: MTLComputeCommandEncoder + Message {
     ) where
         Self: Sized,
     {
-        assert_eq!(buffers.len(), offsets.len());
-        assert_eq!(buffers.len(), strides.len());
+        assert_eq!(buffers.len(), offsets.len(), "buffers and offsets must have equal lengths");
+        assert_eq!(buffers.len(), strides.len(), "buffers and strides must have equal lengths");
+        assert_slice_matches_range(buffers, &range);
         let ptr = opt_ref_slice_as_ptr(buffers);
         unsafe {
             msg_send![
@@ -293,6 +318,7 @@ pub trait MTLComputeCommandEncoderExt: MTLComputeCommandEncoder + Message {
     ) where
         Self: Sized,
     {
+        assert_slice_matches_range(tables, &range);
         let ptr = opt_ref_slice_as_ptr(tables);
         unsafe { msg_send![self, setVisibleFunctionTables: ptr, withBufferRange: NSRange::from(range)] }
     }
@@ -304,6 +330,7 @@ pub trait MTLComputeCommandEncoderExt: MTLComputeCommandEncoder + Message {
     ) where
         Self: Sized,
     {
+        assert_slice_matches_range(tables, &range);
         let ptr = opt_ref_slice_as_ptr(tables);
         unsafe { msg_send![self, setIntersectionFunctionTables: ptr, withBufferRange: NSRange::from(range)] }
     }
@@ -315,6 +342,7 @@ pub trait MTLComputeCommandEncoderExt: MTLComputeCommandEncoder + Message {
     ) where
         Self: Sized,
     {
+        assert_slice_matches_range(textures, &range);
         let ptr = opt_ref_slice_as_ptr(textures);
         unsafe { msg_send![self, setTextures: ptr, withRange: NSRange::from(range)] }
     }
@@ -326,6 +354,7 @@ pub trait MTLComputeCommandEncoderExt: MTLComputeCommandEncoder + Message {
     ) where
         Self: Sized,
     {
+        assert_slice_matches_range(samplers, &range);
         let ptr = opt_ref_slice_as_ptr(samplers);
         unsafe { msg_send![self, setSamplerStates: ptr, withRange: NSRange::from(range)] }
     }
@@ -339,8 +368,9 @@ pub trait MTLComputeCommandEncoderExt: MTLComputeCommandEncoder + Message {
     ) where
         Self: Sized,
     {
-        assert_eq!(samplers.len(), lod_min_clamps.len());
-        assert_eq!(samplers.len(), lod_max_clamps.len());
+        assert_eq!(samplers.len(), lod_min_clamps.len(), "samplers and minimum LODs must have equal lengths");
+        assert_eq!(samplers.len(), lod_max_clamps.len(), "samplers and maximum LODs must have equal lengths");
+        assert_slice_matches_range(samplers, &range);
         let ptr = opt_ref_slice_as_ptr(samplers);
         unsafe {
             msg_send![
@@ -380,16 +410,20 @@ pub trait MTLComputeCommandEncoderExt: MTLComputeCommandEncoder + Message {
         unsafe { msg_send![self, useResources: ptr, count: resources.len(), usage: usage] }
     }
 
-    fn use_heaps(&self, heaps: &[&ProtocolObject<dyn MTLHeap>])
-    where
+    fn use_heaps(
+        &self,
+        heaps: &[&ProtocolObject<dyn MTLHeap>],
+    ) where
         Self: Sized,
     {
         let ptr = ref_slice_as_ptr(heaps);
         unsafe { msg_send![self, useHeaps: ptr, count: heaps.len()] }
     }
 
-    fn memory_barrier_with_resources(&self, resources: &[&ProtocolObject<dyn MTLResource>])
-    where
+    fn memory_barrier_with_resources(
+        &self,
+        resources: &[&ProtocolObject<dyn MTLResource>],
+    ) where
         Self: Sized,
     {
         let ptr = ref_slice_as_ptr(resources);
@@ -398,3 +432,35 @@ pub trait MTLComputeCommandEncoderExt: MTLComputeCommandEncoder + Message {
 }
 
 impl<T: MTLComputeCommandEncoder + Message> MTLComputeCommandEncoderExt for T {}
+
+#[cfg(test)]
+mod tests {
+    use core::mem::{align_of, size_of};
+
+    use super::assert_slice_matches_range;
+    use crate::{
+        MTLDispatchThreadgroupsIndirectArguments, MTLDispatchThreadsIndirectArguments,
+        MTLStageInRegionIndirectArguments,
+    };
+
+    #[test]
+    fn indirect_argument_structs_match_metal_abi() {
+        assert_eq!(size_of::<MTLDispatchThreadgroupsIndirectArguments>(), 12);
+        assert_eq!(size_of::<MTLDispatchThreadsIndirectArguments>(), 24);
+        assert_eq!(size_of::<MTLStageInRegionIndirectArguments>(), 24);
+        assert_eq!(align_of::<MTLDispatchThreadgroupsIndirectArguments>(), 4);
+        assert_eq!(align_of::<MTLDispatchThreadsIndirectArguments>(), 4);
+        assert_eq!(align_of::<MTLStageInRegionIndirectArguments>(), 4);
+    }
+
+    #[test]
+    fn accepts_a_slice_matching_the_binding_range() {
+        assert_slice_matches_range(&[1, 2, 3], &(5..8));
+    }
+
+    #[test]
+    #[should_panic(expected = "slice length must match binding range length")]
+    fn rejects_a_slice_shorter_than_the_binding_range() {
+        assert_slice_matches_range(&[1, 2], &(5..8));
+    }
+}

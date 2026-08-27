@@ -1,9 +1,9 @@
 use objc2::{Message, extern_protocol, msg_send, rc::Retained, runtime::ProtocolObject};
-use objc2_foundation::{NSArray, NSError, NSObjectProtocol, NSString};
+use objc2_foundation::{NSArray, NSObjectProtocol, NSString};
 
 use crate::{
     LibraryFunctionCompletionHandler, MTLDevice, MTLFunction, MTLFunctionConstantValues, MTLFunctionDescriptor,
-    MTLFunctionReflection, MTLIntersectionFunctionDescriptor, MTLLibraryType,
+    MTLFunctionReflection, MTLIntersectionFunctionDescriptor, MTLLibraryType, MetalError,
 };
 
 extern_protocol!(
@@ -17,15 +17,6 @@ extern_protocol!(
         #[unsafe(method(type))]
         #[unsafe(method_family = none)]
         fn r#type(&self) -> MTLLibraryType;
-
-        /// Synchronously creates a new function object from a descriptor.
-        #[unsafe(method(newFunctionWithDescriptor:error:))]
-        #[unsafe(method_family = new)]
-        fn new_function_with_descriptor_error(
-            &self,
-            descriptor: &MTLFunctionDescriptor,
-            error: *mut *mut NSError,
-        ) -> Option<Retained<ProtocolObject<dyn MTLFunction>>>;
     }
 );
 
@@ -47,13 +38,18 @@ pub trait MTLLibraryExt: MTLLibrary + Message {
         function_name: &str,
     ) -> Option<Retained<ProtocolObject<dyn MTLFunction>>>;
 
+    /// Synchronously creates a new function object from a descriptor.
+    fn new_function_with_descriptor(
+        &self,
+        descriptor: &MTLFunctionDescriptor,
+    ) -> Result<Retained<ProtocolObject<dyn MTLFunction>>, MetalError>;
+
     /// Returns a function obtained by applying constant values to the named function (synchronous).
-    fn new_function_with_name_constant_values_error(
+    fn new_function_with_name_constant_values(
         &self,
         name: &str,
         constant_values: &MTLFunctionConstantValues,
-        error: *mut *mut NSError,
-    ) -> Option<Retained<ProtocolObject<dyn MTLFunction>>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLFunction>>, MetalError>;
 
     /// Asynchronously creates a function by applying constant values to the named function.
     fn new_function_with_name_constant_values_completion_handler(
@@ -90,11 +86,10 @@ pub trait MTLLibraryExt: MTLLibrary + Message {
     );
 
     /// Synchronously creates a new intersection function object.
-    fn new_intersection_function_with_descriptor_error(
+    fn new_intersection_function_with_descriptor(
         &self,
         descriptor: &MTLIntersectionFunctionDescriptor,
-        error: *mut *mut NSError,
-    ) -> Option<Retained<ProtocolObject<dyn MTLFunction>>>;
+    ) -> Result<Retained<ProtocolObject<dyn MTLFunction>>, MetalError>;
 }
 
 impl MTLLibraryExt for ProtocolObject<dyn MTLLibrary> {
@@ -120,22 +115,32 @@ impl MTLLibraryExt for ProtocolObject<dyn MTLLibrary> {
         unsafe { msg_send![self, newFunctionWithName: &*ns_name] }
     }
 
+    fn new_function_with_descriptor(
+        &self,
+        descriptor: &MTLFunctionDescriptor,
+    ) -> Result<Retained<ProtocolObject<dyn MTLFunction>>, MetalError> {
+        let mut error = std::ptr::null_mut();
+        let function = unsafe { msg_send![self, newFunctionWithDescriptor: descriptor, error: &mut error] };
+        unsafe { MetalError::result_from_nullable(function, error, "newFunctionWithDescriptor:error:") }
+    }
+
     /// Returns a function obtained by applying constant values to the named function (synchronous).
-    fn new_function_with_name_constant_values_error(
+    fn new_function_with_name_constant_values(
         &self,
         name: &str,
         constant_values: &MTLFunctionConstantValues,
-        error: *mut *mut NSError,
-    ) -> Option<Retained<ProtocolObject<dyn MTLFunction>>> {
+    ) -> Result<Retained<ProtocolObject<dyn MTLFunction>>, MetalError> {
         let ns_name = NSString::from_str(name);
-        unsafe {
+        let mut error = std::ptr::null_mut();
+        let function = unsafe {
             msg_send![
                 self,
                 newFunctionWithName: &*ns_name,
                 constantValues: constant_values,
-                error: error
+                error: &mut error
             ]
-        }
+        };
+        unsafe { MetalError::result_from_nullable(function, error, "newFunctionWithName:constantValues:error:") }
     }
 
     /// Asynchronously creates a function by applying constant values to the named function.
@@ -151,7 +156,7 @@ impl MTLLibraryExt for ProtocolObject<dyn MTLLibrary> {
                 self,
                 newFunctionWithName: &*ns_name,
                 constantValues: constant_values,
-                completionHandler: &*completion_handler
+                completionHandler: completion_handler.as_block()
             ];
         }
     }
@@ -187,7 +192,7 @@ impl MTLLibraryExt for ProtocolObject<dyn MTLLibrary> {
             let _: () = msg_send![
                 self,
                 newFunctionWithDescriptor: descriptor,
-                completionHandler: &*completion_handler
+                completionHandler: completion_handler.as_block()
             ];
         }
     }
@@ -201,16 +206,17 @@ impl MTLLibraryExt for ProtocolObject<dyn MTLLibrary> {
             let _: () = msg_send![
                 self,
                 newIntersectionFunctionWithDescriptor: descriptor,
-                completionHandler: &*completion_handler
+                completionHandler: completion_handler.as_block()
             ];
         }
     }
 
-    fn new_intersection_function_with_descriptor_error(
+    fn new_intersection_function_with_descriptor(
         &self,
         descriptor: &MTLIntersectionFunctionDescriptor,
-        error: *mut *mut NSError,
-    ) -> Option<Retained<ProtocolObject<dyn MTLFunction>>> {
-        unsafe { msg_send![self, newIntersectionFunctionWithDescriptor: descriptor, error: error] }
+    ) -> Result<Retained<ProtocolObject<dyn MTLFunction>>, MetalError> {
+        let mut error = std::ptr::null_mut();
+        let function = unsafe { msg_send![self, newIntersectionFunctionWithDescriptor: descriptor, error: &mut error] };
+        unsafe { MetalError::result_from_nullable(function, error, "newIntersectionFunctionWithDescriptor:error:") }
     }
 }
