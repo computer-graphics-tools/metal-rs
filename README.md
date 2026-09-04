@@ -15,7 +15,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-mtl-rs = "0.2.1"
+mtl-rs = "0.2.2"
 ```
 
 ## Usage
